@@ -1,0 +1,30 @@
+/* =========================
+   GLOBAL CSS VARIABLES
+========================= */
+:root {
+  /* Backgrounds */
+  /* --bg-app: #f3f4f6; */
+  --bg-app: #ffffff;
+  --bg-card: #ffffff;
+  --bg-tabl: #e7f5dc;
+
+  /* Primary colors */
+  --color-primary: #4f46e5;
+  --color-primary-hover: #4338ca;
+
+  /* Secondary */
+  --color-secondary: #10b981;
+  --color-danger: #ef4444;
+
+  /* Text */
+  --text-main: #111827;
+  --text-muted: #6b7280;
+}
+
+/* =========================
+   GLOBAL BODY STYLES
+========================= */
+body {
+  background-color: var(--bg-app);
+  color: var(--text-main);
+}

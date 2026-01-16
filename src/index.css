@@ -1,1 +1,37 @@
 @import "tailwindcss";
+
+
+@import "./styles/global.css";
+
+
+@layer components {
+  .card {
+    background-color: var(--bg-card);
+    @apply rounded-xl shadow-sm p-6;
+  }
+
+  .tabl {
+    background-color:var(--bg-tabl);
+    @apply rounded-xl shadow-sm p-6;
+    
+  }
+
+  .btn-primary {
+    background-color: var(--color-primary);
+    @apply text-white px-5 py-2 rounded-lg font-medium transition;
+  }
+
+  .btn-primary:hover {
+    background-color: var(--color-primary-hover);
+  }
+
+  .btn-secondary {
+    background-color: var(--color-secondary);
+    @apply text-white px-5 py-2 rounded-lg;
+  }
+
+  .btn-danger {
+    background-color: var(--color-danger);
+    @apply text-white px-5 py-2 rounded-lg;
+  }
+}
