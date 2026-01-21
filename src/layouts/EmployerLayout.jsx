@@ -1,8 +1,21 @@
-import React from 'react'
+import React, { useState } from 'react'
+import Sidebar from '../components/layout/Sidebar'
+import Navbar from '../components/layout/Navbar'
 
-const EmployerLayout = () => {
+const EmployerLayout = ({children}) => {
+  const [toggleSidebar, setToggleSidebar] = useState(false);
   return (
-    <div>EmployerLayout</div>
+    <div className="flex min-h-screen bg-gray-100">
+      <Sidebar toggleSidebar={toggleSidebar} setToggleSidebar={setToggleSidebar} />
+
+      <div className="flex-1 flex flex-col">
+       <Navbar role="employer" setToggleSidebar={setToggleSidebar} toggleSidebar={toggleSidebar} />
+
+        <main className="flex-1 p-6 mt-16 lg:mt-20  lg:ml-64">
+          {children}
+        </main>
+      </div>
+    </div>
   )
 }
 

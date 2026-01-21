@@ -7,6 +7,7 @@
 @layer components {
   .card {
     background-color: var(--bg-card);
+    
     @apply rounded-xl shadow-sm p-6;
   }
 
@@ -15,6 +16,8 @@
     @apply rounded-xl shadow-sm p-6;
     
   }
+   
+  
 
   .btn-primary {
     background-color: var(--color-primary);
@@ -23,6 +26,7 @@
 
   .btn-primary:hover {
     background-color: var(--color-primary-hover);
+    @apply text-white px-5 py-2 rounded-lg font-medium transition cursor-pointer scale-102;
   }
 
   .btn-secondary {

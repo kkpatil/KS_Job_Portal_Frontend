@@ -36,7 +36,7 @@ const candidateMenu = [
 
 ]
 
-const Sidebar = ({toggleSidebar,setToggleSidebar}) => {
+const MobileSidebar = () => {
   const navigate = useNavigate();
   const role = localStorage.getItem("role");
 
@@ -50,34 +50,24 @@ const Sidebar = ({toggleSidebar,setToggleSidebar}) => {
   }
 
   return (
-    <div
-  className={`fixed top-0 left-0 h-full w-64  text-white z-40
-  transform transition-transform duration-300
-  ${toggleSidebar ? "translate-x-0" : "-translate-x-full"}
-  ${toggleSidebar ? "bg-[rgb(18,92,82)]": "bg-[#42a396c8]"}
-  md:translate-x-0 md:flex md:flex-col`}
->
-
+    <div className="hidden md:flex flex-col fixed top-0 left-0 h-full w-64 bg-[#3f9287c8] text-white">
+      
       {/* Logo */}
       <div className="h-20 flex items-center px-6 text-2xl font-bold border-b font-mono">
         Jobie
       </div>
 
       {/* Menu */}
-      
-        <nav className="flex-1 px-4">
-  {menu.map((item, index) => (
-    <SidebarItem
-      key={index}
-      icon={item.icon}
-      label={item.label}
-      to={item.to}
-      onClick={() => setToggleSidebar(false)}
-    />
-  ))}
-</nav>
-
-      
+      <nav className="flex-1 px-4">
+        {menu.map((item, index) => (
+          <SidebarItem
+            key={index}
+            icon={item.icon}
+            label={item.label}
+            to={item.to}
+          />
+        ))}
+      </nav>
 
       {/* Footer */}
       <div className="flex items-center justify-center gap-6 px-6 py-4 text-xs ">
@@ -89,16 +79,13 @@ const Sidebar = ({toggleSidebar,setToggleSidebar}) => {
 };
 
 
-const SidebarItem = ({ icon, label, to, onClick }) => (
+const SidebarItem = ({ icon, label, to }) => (
   <NavLink
     to={to}
-    onClick={onClick}
     end
     className={({ isActive }) =>
-      `flex items-center gap-4 px-4 py-3 mt-4 rounded-lg transition
-      ${isActive
-        ? "bg-black font-semibold"
-        : "hover:bg-black/60 hover:scale-105"}`
+      `flex items-center gap-4 px-4 py-3 mt-4 rounded-lg cursor-pointer transition
+      ${isActive ? "bg-[#000000] font-semibold " : "scale-100 transition-all duration-600 hover:bg-[#000000]/60 hover:scale-105 hover:text-white"}`
     }
   >
     <div className="w-5 h-5">{icon}</div>
@@ -106,5 +93,4 @@ const SidebarItem = ({ icon, label, to, onClick }) => (
   </NavLink>
 );
 
-
-export default Sidebar;
+export default MobileSidebar;

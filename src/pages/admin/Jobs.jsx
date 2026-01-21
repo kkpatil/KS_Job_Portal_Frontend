@@ -6,6 +6,9 @@ import {
   CheckCircleIcon,
   NoSymbolIcon,
 } from "@heroicons/react/24/outline";
+import { Link } from "react-router-dom";
+import Modal from "../../components/common/Modal";
+
 
 const dummyJobs = [
   {
@@ -30,17 +33,6 @@ const dummyJobs = [
     status: "Active",
     postedOn: "08 Feb 2025",
   },
-  {
-    id: 3,
-    title: "UI/UX Designer",
-    company: "Bright Solutions",
-    employer: "Amit Singh",
-    type: "Contract",
-    location: "Delhi",
-    applications: 9,
-    status: "Blocked",
-    postedOn: "01 Feb 2025",
-  },
 ];
 
 const statusColor = {
@@ -54,6 +46,11 @@ const Jobs = () => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
 
+  const [showEdit, setShowEdit] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
+  const [selectedJob, setSelectedJob] = useState(null);
+
+  // filter jobs based on search and status
   const filteredJobs = jobs.filter((job) => {
     const matchSearch =
       job.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -65,6 +62,7 @@ const Jobs = () => {
     return matchSearch && matchStatus;
   });
 
+  // update job status
   const updateStatus = (id, status) => {
     setJobs((prev) =>
       prev.map((job) =>
@@ -72,14 +70,27 @@ const Jobs = () => {
       )
     );
   };
+  // edit job
+  const updateJob = (data) => {
+    setJobs((prev) =>
+      prev.map((job) => (job.id === data.id ? data : job))
+    );
+    setShowEdit(false);
+  };
+
+  //  delete job
+  const deleteJob = () => {
+    setJobs((prev) => prev.filter((job) => job.id !== selectedJob.id));
+    setShowDelete(false);
+  };
 
   return (
-    <div className="card">
-      {/* HEADER */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+    <div className="card ">
+      {/* header */}
+      <div className="flex md:flex-row flex-col gap-3 md:gap-0 justify-between mb-6 ">
         <h2 className="text-xl font-semibold">Jobs</h2>
 
-        <div className="flex flex-col sm:flex-row gap-3">
+        <div className="flex gap-3">
           <input
             type="text"
             placeholder="Search job or company"
@@ -101,54 +112,65 @@ const Jobs = () => {
         </div>
       </div>
 
-  
+      {/* job cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {filteredJobs.map((job) => (
           <div
             key={job.id}
-            className=" rounded-xl p-5 bg-[#e7f5dc] shadow-sm hover:shadow-md shadow-gray-300 cursor-pointer transition"
+            className="rounded-xl p-5 tabl shadow-sm hover:shadow-md transition"
           >
-            {/* HEADER */}
-            <div className="flex justify-between items-start mb-3">
+            <div className="flex justify-between mb-3">
               <div>
-                <h3 className="font-semibold text-lg">{job.title}</h3>
+                <h3 className="font-semibold">{job.title}</h3>
                 <p className="text-sm text-gray-500">{job.company}</p>
               </div>
 
               <span
-                className={`px-3 py-1 rounded-full text-xs font-medium ${statusColor[job.status]}`}
+                className={`px-3 py-3 rounded-md text-xs  ${statusColor[job.status]}`}
               >
                 {job.status}
               </span>
             </div>
 
-            {/* DETAILS */}
             <div className="text-sm text-gray-600 space-y-1 mb-4">
               <p><b>Employer:</b> {job.employer}</p>
               <p><b>Type:</b> {job.type}</p>
               <p><b>Location:</b> {job.location}</p>
               <p><b>Applications:</b> {job.applications}</p>
-              <p><b>Posted On:</b> {job.postedOn}</p>
+              <p><b>Posted:</b> {job.postedOn}</p>
             </div>
 
-            {/* ACTIONS */}
-            <div className="flex justify-between items-center pt-3 border-t">
+            <div className="flex justify-between items-center border-t pt-3">
               <div className="flex gap-3">
-                <button title="View">
+                <Link to={`/admin/jobs/${job.id}`} className="cursor-pointer">
                   <EyeIcon className="w-5 h-5 text-blue-600" />
-                </button>
-                <button title="Edit">
+                </Link>
+
+                <button
+                  className="cursor-pointer"
+                  onClick={() => {
+                    setSelectedJob(job);
+                    setShowEdit(true);
+                  }}
+                >
                   <PencilSquareIcon className="w-5 h-5 text-green-600" />
                 </button>
-                <button title="Delete">
-                  <TrashIcon className="w-5 h-5 text-red-600" />
+
+                <button
+                  className="cursor-pointer"
+                  onClick={() => {
+                    setSelectedJob(job);
+                    setShowDelete(true);
+                  }}
+                >
+                  <TrashIcon className="w-5 h-5 text-red-600 " />
                 </button>
               </div>
 
               {job.status !== "Active" ? (
                 <button
                   onClick={() => updateStatus(job.id, "Active")}
-                  className="flex items-center gap-1 text-green-600 text-sm font-medium"
+                  className="flex items-center gap-1 text-green-600 text-sm cursor-pointer"
                 >
                   <CheckCircleIcon className="w-4 h-4" />
                   Approve
@@ -156,7 +178,7 @@ const Jobs = () => {
               ) : (
                 <button
                   onClick={() => updateStatus(job.id, "Blocked")}
-                  className="flex items-center gap-1 text-yellow-600 text-sm font-medium"
+                  className="flex items-center gap-1 text-yellow-600 text-sm cursor-pointer" 
                 >
                   <NoSymbolIcon className="w-4 h-4" />
                   Block
@@ -165,15 +187,88 @@ const Jobs = () => {
             </div>
           </div>
         ))}
-
-        {filteredJobs.length === 0 && (
-          <p className="text-gray-500 text-center col-span-full">
-            No jobs found
-          </p>
-        )}
       </div>
+
+      {/* edit modal */}
+      {showEdit && (
+        <JobForm
+          job={selectedJob}
+          onClose={() => setShowEdit(false)}
+          onSave={updateJob}
+        />
+      )}
+
+      {/* delete modal */}
+      {showDelete && (
+        <DeleteModal
+          title={selectedJob.title}
+          onClose={() => setShowDelete(false)}
+          onConfirm={deleteJob}
+        />
+      )}
     </div>
   );
 };
+
+// edit modal
+const JobForm = ({ job, onClose, onSave }) => {
+  const [form, setForm] = useState(job);
+
+  return (
+    <Modal onClose={onClose}>
+      <h3 className="text-lg font-semibold mb-4">Edit Job</h3>
+
+      <input
+        className="w-full border px-4 py-2 rounded mb-3"
+        value={form.title}
+        onChange={(e) => setForm({ ...form, title: e.target.value })}
+      />
+
+      <input
+        className="w-full border px-4 py-2 rounded mb-3"
+        value={form.company}
+        onChange={(e) => setForm({ ...form, company: e.target.value })}
+      />
+
+      <select
+        className="w-full border px-4 py-2 rounded mb-4"
+        value={form.type}
+        onChange={(e) => setForm({ ...form, type: e.target.value })}
+      >
+        <option>Full Time</option>
+        <option>Part Time</option>
+        <option>Contract</option>
+      </select>
+
+      <div className="flex justify-end gap-3">
+        <button onClick={onClose} className="px-4 py-2 border rounded">
+          Cancel
+        </button>
+        <button onClick={() => onSave(form)} className="btn-primary">
+          Save
+        </button>
+      </div>
+    </Modal>
+  );
+};
+
+// delete modal
+const DeleteModal = ({ title, onClose, onConfirm }) => (
+  <Modal onClose={onClose}>
+    <h3 className="text-lg font-semibold mb-3">Delete Job</h3>
+    <p className="mb-6 text-sm">
+      Are you sure you want to delete <b>{title}</b>?
+    </p>
+
+    <div className="flex justify-end gap-3">
+      <button onClick={onClose} className="px-4 py-2 border rounded">
+        Cancel
+      </button>
+      <button onClick={onConfirm} className="btn-danger">
+        Delete
+      </button>
+    </div>
+  </Modal>
+);
 
 export default Jobs;

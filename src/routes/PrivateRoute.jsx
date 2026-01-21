@@ -1,15 +1,23 @@
-import React from 'react'
-import { useSelector } from 'react-redux';
-import { Navigate } from 'react-router-dom';
+import { Navigate } from "react-router-dom";
 
-const PrivateRoute = ({ children }) => {
-  const { user } = useSelector((state) => state.auth);
+const PrivateRoute = ({ children, allowedRoles = [] }) => {
+  const role = localStorage.getItem("role"); // plain string
 
-  if (!user) {
-    return <Navigate to="/login" />;
+  // Not logged in
+  if (!role) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Role not allowed
+  if (allowedRoles.length && !allowedRoles.includes(role)) {
+    if (role === "admin") return <Navigate to="/admin" replace />;
+    if (role === "employer") return <Navigate to="/employer" replace />;
+    if (role === "candidate") return <Navigate to="/candidate" replace />;
+
+    return <Navigate to="/login" replace />;
   }
 
   return children;
 };
 
-export default PrivateRoute
+export default PrivateRoute;

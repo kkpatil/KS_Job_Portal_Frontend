@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import singupIllustration from "../../assets/images/singupIllustration.webp";
 const Register = () => {
   return (
-    <> {/* left section */}
+    <div className="flex min-h-screen w-full"> {/* left section */}
         <div className="w-full md:w-1/2 px-10 py-12">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Create account
@@ -90,7 +90,7 @@ const Register = () => {
             <p className="text-gray-500 mt-2">with our productivity app</p>
           </div>
         </div>
-    </>
+    </div>
   );
 };
 
