@@ -6,6 +6,8 @@ import { MdOutlineAdminPanelSettings } from "react-icons/md";
 import { HiOutlineLightBulb } from "react-icons/hi2";
 import { MdOutlineDashboardCustomize } from "react-icons/md";
 import {  NavLink, useNavigate } from "react-router-dom";
+import { getRoleFromToken } from "../../utils/jwt";
+
 
 const adminMenu = [
   { label: "Dashboard", to: "/admin", icon: <HomeIcon className="w-5 h-5" /> },
@@ -36,53 +38,62 @@ const candidateMenu = [
 
 ]
 
-const Sidebar = ({toggleSidebar,setToggleSidebar}) => {
+const Sidebar = ({ toggleSidebar, setToggleSidebar }) => {
   const navigate = useNavigate();
-  const role = localStorage.getItem("role");
 
-  const menu = role === "admin" ? adminMenu : role === "employer" ? employerMenu : role === "candidate" && candidateMenu;
+  // ✅ JWT se role
+  const role = getRoleFromToken(); // ADMIN | EMPLOYER | CANDIDATE
+
+  // ✅ SAFE menu selection (always array)
+  const menu =
+    role === "ADMIN"
+      ? adminMenu
+      : role === "EMPLOYER"
+      ? employerMenu
+      : role === "CANDIDATE"
+      ? candidateMenu
+      : []; // 🔥 VERY IMPORTANT fallback
 
   const logoutHandle = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("role");
-    
-    navigate("/login",{ replace: true });
-  }
+    localStorage.removeItem("token");
+    navigate("/login", { replace: true });
+  };
 
   return (
     <div
-  className={`fixed top-0 left-0 h-full w-64  text-white z-40
-  transform transition-transform duration-300
-  ${toggleSidebar ? "translate-x-0" : "-translate-x-full"}
-  ${toggleSidebar ? "bg-[rgb(18,92,82)]": "bg-[#42a396c8]"}
-  md:translate-x-0 md:flex md:flex-col`}
->
-
+      className={`fixed top-0 left-0 h-full w-64 text-white z-40
+      transform transition-transform duration-300
+      ${toggleSidebar ? "translate-x-0" : "-translate-x-full"}
+      ${toggleSidebar ? "bg-[rgb(18,92,82)]" : "bg-[#42a396c8]"}
+      md:translate-x-0 md:flex md:flex-col`}
+    >
       {/* Logo */}
       <div className="h-20 flex items-center px-6 text-2xl font-bold border-b font-mono">
         Jobie
       </div>
 
       {/* Menu */}
-      
-        <nav className="flex-1 px-4">
-  {menu.map((item, index) => (
-    <SidebarItem
-      key={index}
-      icon={item.icon}
-      label={item.label}
-      to={item.to}
-      onClick={() => setToggleSidebar(false)}
-    />
-  ))}
-</nav>
-
-      
+      <nav className="flex-1 px-4">
+        {menu.map((item, index) => (
+          <SidebarItem
+            key={index}
+            icon={item.icon}
+            label={item.label}
+            to={item.to}
+            onClick={() => setToggleSidebar(false)}
+          />
+        ))}
+      </nav>
 
       {/* Footer */}
-      <div className="flex items-center justify-center gap-6 px-6 py-4 text-xs ">
+      <div className="flex items-center justify-center gap-6 px-6 py-4 text-xs">
         © 2025 Jobie
-        <button onClick={()=>logoutHandle()} className=" btn-danger p-3  m-3 text-md text-white flex items-center gap-3 cursor-pointer">Logout <IoLogOut size={22} /> </button>
+        <button
+          onClick={logoutHandle}
+          className="btn-danger p-3 m-3 text-md text-white flex items-center gap-3 cursor-pointer"
+        >
+          Logout <IoLogOut size={22} />
+        </button>
       </div>
     </div>
   );

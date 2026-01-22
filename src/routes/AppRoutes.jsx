@@ -5,6 +5,8 @@ import {
   Navigate,
 } from "react-router-dom";
 import { lazy, Suspense } from "react";
+import { getRoleFromToken } from "../utils/jwt";
+
 
 // ================= LAYOUTS (NO LAZY) =================
 import AuthLayout from "../layouts/AuthLayout";
@@ -79,7 +81,7 @@ const Loader = () => (
 );
 
 const AppRoutes = () => {
-  const user = dummyUser;
+  
 
   return (
     <Router>
@@ -104,7 +106,7 @@ const AppRoutes = () => {
           <Route
             path="/admin"
             element={
-              <PrivateRoute allowedRoles={["admin"]}>
+              <PrivateRoute allowedRoles={["ADMIN"]}>
                 <AdminLayout>
                   <AdminDashboard />
                 </AdminLayout>
@@ -114,7 +116,7 @@ const AppRoutes = () => {
           <Route
             path="/admin/employers"
             element={
-              <PrivateRoute allowedRoles={["admin"]}>
+              <PrivateRoute allowedRoles={["ADMIN"]}>
                 <AdminLayout>
                   <Employers />
                 </AdminLayout>
@@ -124,7 +126,7 @@ const AppRoutes = () => {
           <Route
             path="/admin/employers/:id"
             element={
-              <PrivateRoute  allowedRoles={["admin"]}>
+              <PrivateRoute  allowedRoles={["ADMIN"]}>
                 <AdminLayout>
                   <EmployerDetails />
                 </AdminLayout>
@@ -134,7 +136,7 @@ const AppRoutes = () => {
           <Route
             path="/admin/applications"
             element={
-              <PrivateRoute allowedRoles={["admin"]}>
+              <PrivateRoute allowedRoles={["ADMIN"]}>
                 <AdminLayout>
                   <Applications />
                 </AdminLayout>
@@ -144,7 +146,7 @@ const AppRoutes = () => {
           <Route
             path="/admin/categories"
             element={
-              <PrivateRoute allowedRoles={["admin"]}>
+              <PrivateRoute allowedRoles={["ADMIN"]}>
                 <AdminLayout>
                   <Categories />
                 </AdminLayout>
@@ -154,7 +156,7 @@ const AppRoutes = () => {
           <Route
             path="/admin/skills"
             element={
-              <PrivateRoute allowedRoles={["admin"]}>
+              <PrivateRoute allowedRoles={["ADMIN"]}>
                 <AdminLayout>
                   <Skills />
                 </AdminLayout>
@@ -164,7 +166,7 @@ const AppRoutes = () => {
           <Route
             path="/admin/settings"
             element={
-              <PrivateRoute allowedRoles={["admin"]}>
+              <PrivateRoute allowedRoles={["ADMIN"]}>
                 <AdminLayout>
                   <Settings />
                 </AdminLayout>
@@ -174,7 +176,7 @@ const AppRoutes = () => {
           <Route
             path="/admin/cms"
             element={
-              <PrivateRoute allowedRoles={["admin"]}>
+              <PrivateRoute allowedRoles={["ADMIN"]}>
                 <AdminLayout>
                   <CMS />
                 </AdminLayout>
@@ -184,7 +186,7 @@ const AppRoutes = () => {
           <Route
             path="/admin/jobs"
             element={
-              <PrivateRoute allowedRoles={["admin"]}>
+              <PrivateRoute allowedRoles={["ADMIN"]}>
                 <AdminLayout>
                   <Jobs />
                 </AdminLayout>
@@ -194,7 +196,7 @@ const AppRoutes = () => {
           <Route
             path="/admin/jobs/:id"
             element={
-              <PrivateRoute allowedRoles={["admin"]}>
+              <PrivateRoute allowedRoles={["ADMIN"]}>
                 <AdminLayout>
                   <JobsDetails />
                 </AdminLayout>
@@ -204,7 +206,7 @@ const AppRoutes = () => {
           <Route
             path="/admin/reports"
             element={
-              <PrivateRoute allowedRoles={["admin"]}>
+              <PrivateRoute allowedRoles={["ADMIN"]}>
                 <AdminLayout>
                   <Reports />
                 </AdminLayout>
@@ -216,7 +218,7 @@ const AppRoutes = () => {
           <Route
             path="/employer"
             element={
-              <PrivateRoute allowedRoles={["employer"]}>
+              <PrivateRoute allowedRoles={["EMPLOYER"]}>
                 <EmployerLayout>
                   <EmployerDashboard />
                 </EmployerLayout>
@@ -226,7 +228,7 @@ const AppRoutes = () => {
           <Route
             path="/employer/profile"
             element={
-              <PrivateRoute allowedRoles={["employer"]}>
+              <PrivateRoute allowedRoles={["EMPLOYER"]}>
                 <EmployerLayout>
                   <CompanyProfile />
                 </EmployerLayout>
@@ -236,7 +238,7 @@ const AppRoutes = () => {
           <Route
             path="/employer/jobs"
             element={
-              <PrivateRoute allowedRoles={["employer"]}>
+              <PrivateRoute allowedRoles={["EMPLOYER"]}>
                 <EmployerLayout>
                   <MyJobs />
                 </EmployerLayout>
@@ -246,7 +248,7 @@ const AppRoutes = () => {
           <Route
             path="/employer/jobs/:id"
             element={
-              <PrivateRoute allowedRoles={["employer"]}>
+              <PrivateRoute allowedRoles={["EMPLOYER"]}>
                 <EmployerLayout>
                   <EmployerJobDetails />
                 </EmployerLayout>
@@ -256,7 +258,7 @@ const AppRoutes = () => {
           <Route
             path="/employer/jobs/:id/applications"
             element={
-              <PrivateRoute allowedRoles={["employer"]}>
+              <PrivateRoute allowedRoles={["EMPLOYER"]}>
                 <EmployerLayout>
                   <JobApplicationsEmployer />
                 </EmployerLayout>
@@ -266,7 +268,7 @@ const AppRoutes = () => {
           <Route
             path="/employer/candidates/:id"
             element={
-              <PrivateRoute allowedRoles={["employer"]}>
+              <PrivateRoute allowedRoles={["EMPLOYER"]}>
                 <EmployerLayout>
                   <ApplicationsCandidateDetails />
                 </EmployerLayout>
@@ -276,7 +278,7 @@ const AppRoutes = () => {
           <Route
             path="/employer/applications"
             element={
-              <PrivateRoute allowedRoles={["employer"]}>
+              <PrivateRoute allowedRoles={["EMPLOYER"]}>
                 <EmployerLayout>
                   <ApplicationsEmployer />
                 </EmployerLayout>
@@ -286,7 +288,7 @@ const AppRoutes = () => {
           <Route
             path="/employer/settings"
             element={
-              <PrivateRoute allowedRoles={["employer"]}>
+              <PrivateRoute allowedRoles={["EMPLOYER"]}>
                 <EmployerLayout>
                   <EmployerSettings />
                 </EmployerLayout>
@@ -298,7 +300,7 @@ const AppRoutes = () => {
           <Route
             path="/candidate"
             element={
-              <PrivateRoute allowedRoles={["candidate"]}>
+              <PrivateRoute allowedRoles={["CANDIDATE"]}>
                 <CandidateLayout>
                   <CandidateDashboard />
                 </CandidateLayout>
@@ -308,7 +310,7 @@ const AppRoutes = () => {
           <Route
             path="/candidate/profile"
             element={
-              <PrivateRoute allowedRoles={["candidate"]}>
+              <PrivateRoute allowedRoles={["CANDIDATE"]}>
                 <CandidateLayout>
                   <Profile />
                 </CandidateLayout>
@@ -318,7 +320,7 @@ const AppRoutes = () => {
           <Route
             path="/candidate/jobs"
             element={
-              <PrivateRoute allowedRoles={["candidate"]}>
+              <PrivateRoute allowedRoles={["CANDIDATE"]}>
                 <CandidateLayout>
                   <CandidateJobs />
                 </CandidateLayout>
@@ -326,9 +328,9 @@ const AppRoutes = () => {
             }
           />
           <Route 
-            path="candidate/jobs/:id"
+            path="/candidate/jobs/:id"
             element= {
-              <PrivateRoute allowedRoles={["candidate"]}>
+              <PrivateRoute allowedRoles={["CANDIDATE"]}>
                 <CandidateLayout>
                   <JobDetailsView />
                 </CandidateLayout>
@@ -339,7 +341,7 @@ const AppRoutes = () => {
           <Route
             path="/candidate/applications"
             element={
-              <PrivateRoute allowedRoles={["candidate"]}>
+              <PrivateRoute allowedRoles={["CANDIDATE"]}>
                 <CandidateLayout>
                   <MyApplications />
                 </CandidateLayout>
@@ -349,7 +351,7 @@ const AppRoutes = () => {
           <Route
             path="/candidate/saved-jobs"
             element={
-              <PrivateRoute allowedRoles={["candidate"]}>
+              <PrivateRoute allowedRoles={["CANDIDATE"]}>
                 <CandidateLayout>
                   <SavedJobs />
                 </CandidateLayout>
@@ -359,7 +361,7 @@ const AppRoutes = () => {
           <Route
             path="/candidate/settings"
             element={
-              <PrivateRoute allowedRoles={["candidate"]}>
+              <PrivateRoute allowedRoles={["CANDIDATE"]}>
                 <CandidateLayout>
                   <CandidateSettings />
                 </CandidateLayout>
@@ -367,19 +369,22 @@ const AppRoutes = () => {
             }
           />
 
-          {/* DASHBOARD REDIRECT */}
-          <Route
-            path="/dashboard"
-            element={
-              user.role === "admin" ? (
-                <Navigate to="/admin" />
-              ) : user.role === "employer" ? (
-                <Navigate to="/employer" />
-              ) : (
-                <Navigate to="/candidate" />
-              )
-            }
-          />
+         <Route
+  path="/dashboard"
+  element={
+    (() => {
+      const role = getRoleFromToken();
+
+      if (role === "ADMIN") return <Navigate to="/admin" />;
+      if (role === "EMPLOYER") return <Navigate to="/employer" />;
+      if (role === "CANDIDATE") return <Navigate to="/candidate" />;
+
+      return <Navigate to="/login" />;
+    })()
+  }
+/>
+
+
 
           {/* 404 */}
           <Route path="*" element={<NotFound />} />
