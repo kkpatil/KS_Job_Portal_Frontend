@@ -5,95 +5,109 @@ import {
   TrashIcon,
   CheckCircleIcon,
   NoSymbolIcon,
+  XCircleIcon,
 } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
 import Modal from "../../components/common/Modal";
-
-
-const dummyJobs = [
-  {
-    id: 1,
-    title: "Frontend Developer",
-    company: "TechNova Pvt Ltd",
-    employer: "Rahul Sharma",
-    type: "Full Time",
-    location: "Remote",
-    applications: 34,
-    status: "Pending",
-    postedOn: "10 Feb 2025",
-  },
-  {
-    id: 2,
-    title: "Backend Developer",
-    company: "CloudPeak",
-    employer: "Neha Patel",
-    type: "Part Time",
-    location: "Bangalore",
-    applications: 18,
-    status: "Active",
-    postedOn: "08 Feb 2025",
-  },
-];
+import {
+  useGetAllJobsQuery,
+  useApproveJobMutation,
+  useRejectJobMutation,
+  useBlockJobMutation,
+  useDeleteJobMutation,
+  useUpdateJobMutation,
+} from "../../services/endpoints/jobApi";
 
 const statusColor = {
-  Active: "bg-green-100 text-green-700",
-  Pending: "bg-yellow-100 text-yellow-700",
-  Blocked: "bg-red-100 text-red-700",
+  ACTIVE: "bg-green-100 text-green-700",
+  PENDING: "bg-yellow-100 text-yellow-700",
+  BLOCKED: "bg-red-100 text-red-700",
+  REJECTED: "bg-gray-200 text-gray-600",
 };
 
 const Jobs = () => {
-  const [jobs, setJobs] = useState(dummyJobs);
+  const [actionModal, setActionModal] = useState({
+    open: false,
+    type: null, // "approve" | "reject" | "block"
+    jobId: null,
+  });
+
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedJob, setSelectedJob] = useState(null);
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const { data: jobsData = [], isLoading, isError } = useGetAllJobsQuery();
+  const [deleteJob] = useDeleteJobMutation();
+  const jobs = Array.isArray(jobsData) ? jobsData : [];
+
+  const [approveJob] = useApproveJobMutation();
+  const [rejectJob] = useRejectJobMutation();
+  const [blockJob] = useBlockJobMutation();
+
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
 
-  const [showEdit, setShowEdit] = useState(false);
-  const [showDelete, setShowDelete] = useState(false);
-  const [selectedJob, setSelectedJob] = useState(null);
 
-  // filter jobs based on search and status
   const filteredJobs = jobs.filter((job) => {
     const matchSearch =
-      job.title.toLowerCase().includes(search.toLowerCase()) ||
-      job.company.toLowerCase().includes(search.toLowerCase());
+      job.title?.toLowerCase().includes(search.toLowerCase()) ||
+      job.employer?.name?.toLowerCase().includes(search.toLowerCase());
 
-    const matchStatus =
-      statusFilter === "All" || job.status === statusFilter;
+    const matchStatus = statusFilter === "All" || job.status === statusFilter;
 
     return matchSearch && matchStatus;
   });
 
-  // update job status
-  const updateStatus = (id, status) => {
-    setJobs((prev) =>
-      prev.map((job) =>
-        job.id === id ? { ...job, status } : job
-      )
-    );
-  };
-  // edit job
-  const updateJob = (data) => {
-    setJobs((prev) =>
-      prev.map((job) => (job.id === data.id ? data : job))
-    );
-    setShowEdit(false);
+  const openActionModal = (type, jobId) => {
+    setActionModal({
+      open: true,
+      type,
+      jobId,
+    });
   };
 
-  //  delete job
-  const deleteJob = () => {
-    setJobs((prev) => prev.filter((job) => job.id !== selectedJob.id));
-    setShowDelete(false);
+  const closeActionModal = () => {
+    setActionModal({
+      open: false,
+      type: null,
+      jobId: null,
+    });
+  };
+
+  const handleConfirmAction = async () => {
+    try {
+      const { type, jobId } = actionModal;
+
+      if (type === "approve") {
+        await approveJob(jobId).unwrap();
+      }
+
+      if (type === "reject") {
+        await rejectJob(jobId).unwrap();
+      }
+
+      if (type === "block") {
+        await blockJob(jobId).unwrap();
+      }
+
+      closeActionModal();
+    } catch (error) {
+      console.error("Action failed", error);
+      closeActionModal();
+    }
   };
 
   return (
-    <div className="card ">
-      {/* header */}
-      <div className="flex md:flex-row flex-col gap-3 md:gap-0 justify-between mb-6 ">
+    <div className="card">
+      {/* HEADER */}
+      <div className="flex md:flex-row flex-col gap-3 justify-between mb-6">
         <h2 className="text-xl font-semibold">Jobs</h2>
 
         <div className="flex gap-3">
           <input
             type="text"
-            placeholder="Search job or company"
+            placeholder="Search job or employer"
             className="border px-4 py-2 rounded-lg text-sm"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -105,170 +119,279 @@ const Jobs = () => {
             onChange={(e) => setStatusFilter(e.target.value)}
           >
             <option value="All">All</option>
-            <option value="Active">Active</option>
-            <option value="Pending">Pending</option>
-            <option value="Blocked">Blocked</option>
+            <option value="ACTIVE">Active</option>
+            <option value="PENDING">Pending</option>
+            <option value="BLOCKED">Blocked</option>
+            <option value="REJECTED">Rejected</option>
           </select>
         </div>
       </div>
 
-      {/* job cards */}
+      {isLoading && <p className="text-center py-6">Loading jobs...</p>}
+      {isError && (
+        <p className="text-center py-6 text-red-500">Failed to load jobs</p>
+      )}
+
+      {/* JOB CARDS */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        {filteredJobs.length === 0 && <p className="text-center py-6 ">No jobs found</p>}
         {filteredJobs.map((job) => (
           <div
-            key={job.id}
+            key={job._id}
             className="rounded-xl p-5 tabl shadow-sm hover:shadow-md transition"
           >
             <div className="flex justify-between mb-3">
               <div>
                 <h3 className="font-semibold">{job.title}</h3>
-                <p className="text-sm text-gray-500">{job.company}</p>
+                <p className="text-sm text-gray-500">
+                  {job.employer?.name || "—"}
+                </p>
               </div>
 
               <span
-                className={`px-3 py-3 rounded-md text-xs  ${statusColor[job.status]}`}
+                className={`px-3 py-2 rounded-md text-xs ${
+                  statusColor[job.status]
+                }`}
               >
                 {job.status}
               </span>
             </div>
 
             <div className="text-sm text-gray-600 space-y-1 mb-4">
-              <p><b>Employer:</b> {job.employer}</p>
-              <p><b>Type:</b> {job.type}</p>
-              <p><b>Location:</b> {job.location}</p>
-              <p><b>Applications:</b> {job.applications}</p>
-              <p><b>Posted:</b> {job.postedOn}</p>
+              <p>
+                <b>Type:</b> {job.type}
+              </p>
+              <p>
+                <b>Location:</b> {job.location}
+              </p>
+              <p>
+                <b>Experience:</b> {job.experience}
+              </p>
+              <p>
+                <b>Salary:</b> {job.salary}
+              </p>
             </div>
 
+            {/* ACTION BUTTONS */}
             <div className="flex justify-between items-center border-t pt-3">
               <div className="flex gap-3">
-                <Link to={`/admin/jobs/${job.id}`} className="cursor-pointer">
+                <Link to={`/admin/jobs/${job?._id}`}>
                   <EyeIcon className="w-5 h-5 text-blue-600" />
                 </Link>
 
                 <button
-                  className="cursor-pointer"
                   onClick={() => {
                     setSelectedJob(job);
-                    setShowEdit(true);
+                    setIsEditModalOpen(true);
                   }}
                 >
-                  <PencilSquareIcon className="w-5 h-5 text-green-600" />
+                  <PencilSquareIcon className="w-5 h-5 text-green-600 cursor-pointer" />
                 </button>
 
-                <button
-                  className="cursor-pointer"
-                  onClick={() => {
-                    setSelectedJob(job);
-                    setShowDelete(true);
-                  }}
-                >
-                  <TrashIcon className="w-5 h-5 text-red-600 " />
+                <button onClick={() => setIsDeleteModalOpen(job._id)}>
+                  <TrashIcon className="w-5 h-5 text-red-600 cursor-pointer" />
                 </button>
               </div>
 
-              {job.status !== "Active" ? (
-                <button
-                  onClick={() => updateStatus(job.id, "Active")}
-                  className="flex items-center gap-1 text-green-600 text-sm cursor-pointer"
-                >
-                  <CheckCircleIcon className="w-4 h-4" />
-                  Approve
-                </button>
-              ) : (
-                <button
-                  onClick={() => updateStatus(job.id, "Blocked")}
-                  className="flex items-center gap-1 text-yellow-600 text-sm cursor-pointer" 
-                >
-                  <NoSymbolIcon className="w-4 h-4" />
-                  Block
-                </button>
-              )}
+              {/* STATUS BASED ACTIONS */}
+              <div className="flex gap-2">
+                {job.status === "PENDING" && (
+                  <>
+                    <button
+                      onClick={() => openActionModal("approve", job._id)}
+                      className="flex items-center gap-1 text-green-600 text-sm"
+                    >
+                      <CheckCircleIcon className="w-4 h-4" />
+                      Approve
+                    </button>
+
+                    <button
+                      onClick={() => openActionModal("reject", job._id)}
+                      className="flex items-center gap-1 text-red-600 text-sm"
+                    >
+                      <XCircleIcon className="w-4 h-4" />
+                      Reject
+                    </button>
+                  </>
+                )}
+
+                {job.status === "ACTIVE" && (
+                  <button
+                    onClick={() => openActionModal("block", job._id)}
+                    className="flex items-center gap-1 text-yellow-600 text-sm"
+                  >
+                    <NoSymbolIcon className="w-4 h-4" />
+                    Block
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         ))}
       </div>
-
-      {/* edit modal */}
-      {showEdit && (
-        <JobForm
-          job={selectedJob}
-          onClose={() => setShowEdit(false)}
-          onSave={updateJob}
-        />
+      {isDeleteModalOpen && (
+        <Modal
+          title="Confirm Delete"
+          onClose={() => setIsDeleteModalOpen(null)}
+        >
+          <p>Are you sure you want to delete this job?</p>
+          <div className="flex justify-end gap-3 mt-4">
+            <button
+              onClick={() => setIsDeleteModalOpen(null)}
+              className="border p-2 rounded cursor-pointer scale-100 hover:scale-95 transition"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={async () => {
+                await handleDelete(isDeleteModalOpen);
+                setIsDeleteModalOpen(null);
+              }}
+              className="btn-danger cursor-pointer scale-100 hover:scale-95 transition flex items-center gap-1"
+            >
+              Delete
+            </button>
+          </div>
+        </Modal>
       )}
 
-      {/* delete modal */}
-      {showDelete && (
-        <DeleteModal
-          title={selectedJob.title}
-          onClose={() => setShowDelete(false)}
-          onConfirm={deleteJob}
+      {actionModal.open && (
+        <Modal
+          title={
+            actionModal.type === "approve"
+              ? "Approve Job"
+              : actionModal.type === "reject"
+                ? "Reject Job"
+                : "Block Job"
+          }
+          onClose={closeActionModal}
+        >
+          <p className="text-sm text-gray-600">
+            Are you sure you want to <b>{actionModal.type}</b> this job?
+          </p>
+
+          <div className="flex justify-end gap-3 mt-4">
+            <button
+              onClick={closeActionModal}
+              className="border px-4 py-2 rounded"
+            >
+              Cancel
+            </button>
+
+            <button
+              onClick={handleConfirmAction}
+              className={`px-4 py-2 rounded text-white ${
+                actionModal.type === "approve"
+                  ? "bg-green-600"
+                  : actionModal.type === "reject"
+                    ? "bg-red-600"
+                    : "bg-yellow-600"
+              }`}
+            >
+              Confirm
+            </button>
+          </div>
+        </Modal>
+      )}
+
+      {isEditModalOpen && selectedJob && (
+        <EditJobModal
+          job={selectedJob}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setSelectedJob(null);
+          }}
         />
       )}
     </div>
   );
 };
 
-// edit modal
-const JobForm = ({ job, onClose, onSave }) => {
-  const [form, setForm] = useState(job);
+const EditJobModal = ({ job, onClose }) => {
+  const [updateJob] = useUpdateJobMutation();
+
+  const [form, setForm] = useState({
+    title: job.title || "",
+    type: job.type || "",
+    location: job.location || "",
+    experience: job.experience || "",
+    salary: job.salary || "",
+  });
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSave = async () => {
+    try {
+      await updateJob({
+        id: job._id,
+        data: form,
+      }).unwrap();
+
+      onClose();
+      alert("Job updated successfully");
+    } catch (error) {
+      alert("Failed to update job");
+
+      console.error("Update job failed", error);
+    }
+  };
 
   return (
-    <Modal onClose={onClose}>
-      <h3 className="text-lg font-semibold mb-4">Edit Job</h3>
+    <Modal title="Edit Job" onClose={onClose}>
+      <div className="space-y-3">
+        <input
+          name="title"
+          value={form.title}
+          onChange={handleChange}
+          placeholder="Job Title"
+          className="w-full border px-3 py-2 rounded"
+        />
 
-      <input
-        className="w-full border px-4 py-2 rounded mb-3"
-        value={form.title}
-        onChange={(e) => setForm({ ...form, title: e.target.value })}
-      />
+        <input
+          name="type"
+          value={form.type}
+          onChange={handleChange}
+          placeholder="Job Type"
+          className="w-full border px-3 py-2 rounded"
+        />
 
-      <input
-        className="w-full border px-4 py-2 rounded mb-3"
-        value={form.company}
-        onChange={(e) => setForm({ ...form, company: e.target.value })}
-      />
+        <input
+          name="location"
+          value={form.location}
+          onChange={handleChange}
+          placeholder="Location"
+          className="w-full border px-3 py-2 rounded"
+        />
 
-      <select
-        className="w-full border px-4 py-2 rounded mb-4"
-        value={form.type}
-        onChange={(e) => setForm({ ...form, type: e.target.value })}
-      >
-        <option>Full Time</option>
-        <option>Part Time</option>
-        <option>Contract</option>
-      </select>
+        <input
+          name="experience"
+          value={form.experience}
+          onChange={handleChange}
+          placeholder="Experience"
+          className="w-full border px-3 py-2 rounded"
+        />
 
-      <div className="flex justify-end gap-3">
-        <button onClick={onClose} className="px-4 py-2 border rounded">
-          Cancel
-        </button>
-        <button onClick={() => onSave(form)} className="btn-primary">
-          Save
-        </button>
+        <input
+          name="salary"
+          value={form.salary}
+          onChange={handleChange}
+          placeholder="Salary"
+          className="w-full border px-3 py-2 rounded"
+        />
+
+        <div className="flex justify-end gap-3 mt-4">
+          <button onClick={onClose} className="border px-4 py-2 rounded">
+            Cancel
+          </button>
+          <button onClick={handleSave} className="btn-primary">
+            Save Changes
+          </button>
+        </div>
       </div>
     </Modal>
   );
 };
-
-// delete modal
-const DeleteModal = ({ title, onClose, onConfirm }) => (
-  <Modal onClose={onClose}>
-    <h3 className="text-lg font-semibold mb-3">Delete Job</h3>
-    <p className="mb-6 text-sm">
-      Are you sure you want to delete <b>{title}</b>?
-    </p>
-
-    <div className="flex justify-end gap-3">
-      <button onClick={onClose} className="px-4 py-2 border rounded">
-        Cancel
-      </button>
-      <button onClick={onConfirm} className="btn-danger">
-        Delete
-      </button>
-    </div>
-  </Modal>
-);
 
 export default Jobs;

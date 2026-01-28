@@ -1,121 +1,298 @@
+import { useEffect, useState } from "react";
 import {
   PencilSquareIcon,
   DocumentArrowDownIcon,
-  ArrowDownRightIcon,
   ArrowLeftIcon,
+  XMarkIcon,
+  PlusIcon,
 } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
+import {
+  useGetCandidateProfileQuery,
+  useUploadResumeMutation,
+  useUpdateCandidateProfileMutation,
+} from "../../services/endpoints/candidate/profileApi";
+
+const API_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const Profile = () => {
+  const { data, isLoading, refetch } =
+    useGetCandidateProfileQuery();
+
+  const [uploadResume, { isLoading: uploading }] =
+    useUploadResumeMutation();
+
+  const [updateProfile, { isLoading: saving }] =
+    useUpdateCandidateProfileMutation();
+
+  /* ================= STATE ================= */
+  const [editMode, setEditMode] = useState(false);
+  const [skillInput, setSkillInput] = useState("");
+
+  const [form, setForm] = useState({
+    name: "",
+    location: "",
+    skills: [],
+  });
+
+  const user = data?.data;
+
+  /* ================= PREFILL ================= */
+  useEffect(() => {
+    if (user) {
+      setForm({
+        name: user.name || "",
+        location: user.location || "",
+        skills: user.skills || [],
+      });
+    }
+  }, [user]);
+
+  if (isLoading) return <p>Loading...</p>;
+
+  /* ================= HANDLERS ================= */
+
+  const handleSaveProfile = async () => {
+    try {
+      await updateProfile(form).unwrap();
+      await refetch();
+      setEditMode(false);
+      alert("Profile updated successfully");
+    } catch {
+      alert("Profile update failed");
+    }
+  };
+
+  const handleAddSkill = () => {
+    const skill = skillInput.trim();
+    if (!skill) return;
+    if (form.skills.includes(skill)) return;
+
+    setForm({
+      ...form,
+      skills: [...form.skills, skill],
+    });
+    setSkillInput("");
+  };
+
+  const handleRemoveSkill = (skill) => {
+    setForm({
+      ...form,
+      skills: form.skills.filter((s) => s !== skill),
+    });
+  };
+
+  const handleResumeUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("resume", file);
+
+    await uploadResume(formData).unwrap();
+    refetch();
+  };
+
+  const resumeUrl =
+    user?.resume && API_URL
+      ? `${API_URL.replace(/\/$/, "")}/${user.resume}`
+      : null;
+
   return (
-    <div className="space-y-6 py-2 md:px-0">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+    <div className="space-y-6 py-2">
+      {/* HEADER */}
+      <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold ">My Profile</h1>
-          <p className="text-gray-500 mb-2">
-            View and manage your profile information
+          <h1 className="text-2xl font-bold">My Profile</h1>
+          <p className="text-gray-500">
+            View and manage your profile
           </p>
         </div>
-        <div className="flex flex-col md:flex-row w-full md:w-auto gap-2 md:gap-5 ">
 
-        <Link to={-1} className="btn-primary flex items-center gap-2 text-white ">
-          <ArrowLeftIcon className="w-4 h-4 "/> Back
-        </Link>
-        <button className="btn-secondary flex items-center gap-1">
-          <PencilSquareIcon className="w-4 h-4" />
-          Edit Profile
-        </button>
+        <div className="flex  gap-3">
+          <Link to={-1} className="btn-primary flex items-center gap-1">
+            <ArrowLeftIcon className="w-4 h-4 " /> Back
+          </Link>
+
+          {!editMode ? (
+            <button
+              className="btn-secondary flex gap-1 transition hover:scale-102"
+              onClick={() => setEditMode(true)}
+            >
+              <PencilSquareIcon className="w-4 h-4" /> Edit
+            </button>
+          ) : (
+            <button
+              className="btn-secondary flex gap-1"
+              onClick={() => setEditMode(false)}
+            >
+              <XMarkIcon className="w-4 h-4" /> Cancel
+            </button>
+          )}
         </div>
       </div>
 
-      <div className="card flex flex-col md:flex-row gap-6">
-        {/* Avatar */}
-        <div className="flex-shrink-0">
-          <div className="w-24 h-24 rounded-full bg-indigo-100 flex items-center justify-center text-3xl font-bold text-indigo-600">
-            AV
-          </div>
+      {/* BASIC INFO */}
+      <div className="card flex gap-6">
+        <div className="w-24 h-24 rounded-full bg-indigo-100 flex items-center justify-center text-3xl font-bold text-indigo-600">
+          {user?.name?.charAt(0)}
         </div>
 
-        {/* Info */}
-        <div className="space-y-2">
-          <h2 className="text-xl font-semibold">
-            Amit Verma
-          </h2>
-          <p className="text-gray-600">
-            Frontend Developer
-          </p>
-          <p className="text-sm text-gray-500">
-            amit@gmail.com • +91 98765 43210
-          </p>
-          <p className="text-sm text-gray-500">
-            Bangalore, India
-          </p>
-        </div>
-      </div>
+        <div className="w-full space-y-3">
+          {!editMode ? (
+            <>
+              <h2 className="text-xl font-semibold">
+                {user?.name}
+              </h2>
+              <p className="text-gray-500">{user?.email}</p>
+              <p>{user?.location || "India"}</p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* LEFT */}
-        <div className="card space-y-4">
-          <ProfileItem label="Experience" value="3 Years" />
-          <ProfileItem label="Current Role" value="Frontend Developer" />
-          <ProfileItem label="Expected Salary" value="₹8 – ₹12 LPA" />
-          <ProfileItem label="Preferred Location" value="Remote / Bangalore" />
-        </div>
+              <div className="flex gap-2 flex-wrap mt-2">
+                {user?.skills?.length > 0 ? (
+                  user.skills.map((skill) => (
+                    <span
+                      key={skill}
+                      className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs"
+                    >
+                      {skill}
+                    </span>
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-400">
+                    No skills added
+                  </p>
+                )}
+              </div>
+            </>
+          ) : (
+            <>
+              <Input
+                label="Name"
+                value={form.name}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    name: e.target.value,
+                  })
+                }
+              />
 
-        {/* RIGHT */}
-        <div className="card">
-          <h3 className="font-semibold mb-3">Skills</h3>
-          <div className="flex flex-wrap gap-2">
-            {[
-              "React",
-              "JavaScript",
-              "HTML",
-              "CSS",
-              "Tailwind",
-            ].map((skill, index) => (
-              <span
-                key={index}
-                className="px-3 py-1 rounded-full text-xs bg-indigo-100 text-indigo-700"
+              <Input
+                label="Location"
+                value={form.location}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    location: e.target.value,
+                  })
+                }
+              />
+
+              {/* SKILLS */}
+              <div>
+                <label className="text-sm text-gray-600">
+                  Skills
+                </label>
+
+                <div className="flex gap-2 flex-wrap my-2">
+                  {form.skills.map((skill) => (
+                    <span
+                      key={skill}
+                      className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs flex items-center gap-1"
+                    >
+                      {skill}
+                      <XMarkIcon
+                        className="w-4 h-4 cursor-pointer"
+                        onClick={() =>
+                          handleRemoveSkill(skill)
+                        }
+                      />
+                    </span>
+                  ))}
+                </div>
+
+                <div className="flex gap-2">
+                  <input
+                    value={skillInput}
+                    onChange={(e) =>
+                      setSkillInput(e.target.value)
+                    }
+                    placeholder="Add skill"
+                    className="border px-3 py-2 rounded-lg text-sm"
+                  />
+                  <button
+                    onClick={handleAddSkill}
+                    className="btn-secondary"
+                  >
+                    <PlusIcon className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              <button
+                className="btn-primary mt-3"
+                onClick={handleSaveProfile}
+                disabled={saving}
               >
-                {skill}
-              </span>
-            ))}
-          </div>
+                {saving ? "Saving..." : "Save Changes"}
+              </button>
+            </>
+          )}
         </div>
       </div>
 
-      <div className="card">
-        <h3 className="font-semibold mb-2">About Me</h3>
-        <p className="text-sm text-gray-600">
-          I am a passionate frontend developer with experience
-          building responsive web applications using React and
-          modern UI frameworks. I enjoy learning new technologies
-          and working on challenging projects.
-        </p>
-      </div>
-
+      {/* RESUME */}
       <div className="card flex justify-between items-center">
         <div>
           <p className="font-medium">Resume</p>
           <p className="text-sm text-gray-500">
-            amit-verma-resume.pdf
+            {user?.resume
+              ? user.resume.split("/").pop()
+              : "Not uploaded"}
           </p>
         </div>
 
-        <button className="btn-primary flex items-center gap-1">
-          <DocumentArrowDownIcon className="w-4 h-4" />
-          Download
-        </button>
+        <div className="flex gap-3">
+          {resumeUrl && (
+            <a
+              href={resumeUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="btn-primary flex gap-1"
+            >
+              <DocumentArrowDownIcon className="w-4 h-4" />
+              Download
+            </a>
+          )}
+
+          <label className="btn-secondary cursor-pointer">
+            {uploading ? "Uploading..." : "Upload"}
+            <input
+              type="file"
+              hidden
+              accept=".pdf,.doc,.docx"
+              onChange={handleResumeUpload}
+            />
+          </label>
+        </div>
       </div>
     </div>
   );
 };
 
+/* ================= REUSABLE INPUT ================= */
 
-const ProfileItem = ({ label, value }) => (
-  <div className="flex justify-between text-sm">
-    <span className="text-gray-500">{label}</span>
-    <span className="font-medium">{value}</span>
+const Input = ({ label, value, onChange }) => (
+  <div>
+    <label className="text-sm text-gray-600">
+      {label}
+    </label>
+    <input
+      value={value}
+      onChange={onChange}
+      className="w-full border px-3 py-2 rounded-lg text-sm"
+    />
   </div>
 );
 

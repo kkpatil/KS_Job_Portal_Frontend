@@ -2,56 +2,29 @@ import { useParams, Link } from "react-router-dom";
 import {
   ArrowLeftIcon,
   UsersIcon,
-  PencilSquareIcon,
   NoSymbolIcon,
 } from "@heroicons/react/24/outline";
 import { useState } from "react";
-import EditJobModal from "../../components/employer/EditJobModal";
-
-/* ================= DUMMY DATA ================= */
-const dummyJobs = [
-  {
-    id: 1,
-    title: "Frontend Developer",
-    type: "Full Time",
-    location: "Remote",
-    experience: "2-4 Years",
-    salary: "₹6 – ₹10 LPA",
-    category: "IT & Software",
-    status: "Active",
-    applications: 28,
-    postedOn: "12 Feb 2026",
-    description:
-      "We are looking for a skilled Frontend Developer with strong knowledge of React.js, Tailwind CSS, and modern UI development.",
-    skills: ["React", "JavaScript", "HTML", "CSS", "Tailwind"],
-  },
-  {
-    id: 2,
-    title: "Backend Developer",
-    type: "Part Time",
-    location: "Bangalore",
-    experience: "3-6 Years",
-    salary: "₹8 – ₹12 LPA",
-    category: "IT & Software",
-    status: "Pending",
-    applications: 14,
-    postedOn: "08 Feb 2026",
-    description:
-      "Backend developer needed with strong Node.js, MongoDB and API experience.",
-    skills: ["Node.js", "MongoDB", "Express"],
-  },
-];
+import {
+  useCloseJobMutation,
+  useGetJobByIdQuery,
+} from "../../services/endpoints/jobApi";
 
 const statusColor = {
-  Active: "bg-green-100 text-green-700",
-  Pending: "bg-yellow-100 text-yellow-700",
-  Closed: "bg-red-100 text-red-700",
+  ACTIVE: "bg-green-100 text-green-700",
+  PENDING: "bg-yellow-100 text-yellow-700",
+  CLOSED: "bg-red-100 text-red-700",
+  REJECTED: "bg-red-200 text-red-600",
 };
 
 const EmployerJobDetails = () => {
   const { id } = useParams();
-  const job = dummyJobs.find((j) => j.id === Number(id));
-  const [editModal,setEditModal] = useState(false);
+  const [showCloseModal, setShowCloseModal] = useState(false);
+
+  const { data: job, isLoading } = useGetJobByIdQuery(id);
+  console.log(job)
+
+  if (isLoading) return <p>Loading...</p>;
 
   if (!job) {
     return (
@@ -78,40 +51,45 @@ const EmployerJobDetails = () => {
       {/* HEADER */}
       <div className="card flex justify-between items-start">
         <div>
-          <h1 className="text-2xl font-bold">{job.title}</h1>
+          <h1 className="text-2xl font-bold">{job?.title}</h1>
+          <span className="text-gray-800 font-medium">{job?.employer?.companyName}</span>
           <p className="text-gray-500">
-            {job.location} • {job.type}
+            {job?.location} • {job?.type}
           </p>
         </div>
 
         <span
-          className={`px-4 py-1 rounded-full text-sm ${statusColor[job.status]}`}
+          className={`px-4 py-1 rounded-full text-sm ${statusColor[job?.status]}`}
         >
-          {job.status}
+          {job?.status}
         </span>
       </div>
 
-      {/* DETAILS GRID */}
+      {/* DETAILS */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* LEFT */}
         <div className="card space-y-3">
-          <Detail label="Category" value={job.category} />
-          <Detail label="Experience" value={job.experience} />
-          <Detail label="Salary" value={job.salary} />
-          <Detail label="Applications" value={job.applications} />
-          <Detail label="Posted On" value={job.postedOn} />
+          <Detail label="Category" value={job?.category} />
+          <Detail label="Experience" value={job?.experience} />
+          <Detail label="Salary" value={job?.salary} />
+          <Detail
+            label="Applications"
+            value={job?.applicationsCount ?? 0}
+          />
+          <Detail
+            label="Posted On"
+            value={new Date(job?.createdAt).toLocaleDateString()}
+          />
         </div>
 
-        {/* RIGHT */}
         <div className="card">
           <h3 className="font-semibold mb-2">Job Description</h3>
           <p className="text-sm text-gray-600 mb-4">
-            {job.description}
+            {job?.description}
           </p>
 
           <h3 className="font-semibold mb-2">Required Skills</h3>
           <div className="flex flex-wrap gap-2">
-            {job.skills.map((skill, index) => (
+            {job?.skills?.map((skill, index) => (
               <span
                 key={index}
                 className="px-3 py-1 rounded-full text-xs bg-indigo-100 text-indigo-700"
@@ -125,35 +103,74 @@ const EmployerJobDetails = () => {
 
       {/* ACTIONS */}
       <div className="flex justify-end gap-3">
-        <button
-          onClick={()=> setEditModal(true)}
-          className="btn-secondary flex items-center gap-1"
-        >
-          <PencilSquareIcon className="w-4 h-4" />
-          Edit Job
-        </button>
+        {job.status === "ACTIVE" && (
+          <button
+            onClick={() => setShowCloseModal(true)}
+            className="btn-danger flex items-center gap-1"
+          >
+            <NoSymbolIcon className="w-4 h-4" />
+            Close Job
+          </button>
+        )}
 
         <Link
-          to={`/employer/jobs/${job.id}/applications`}
+          to={`/employer/jobs/${job?._id}/applications`}
           className="btn-primary flex items-center gap-1"
         >
           <UsersIcon className="w-4 h-4" />
           View Applications
         </Link>
-
-        {job.status === "Active" && (
-          <button className="btn-danger flex items-center gap-1">
-            <NoSymbolIcon className="w-4 h-4" />
-            Close Job
-          </button>
-        )}
       </div>
-      {editModal && (
-      <EditJobModal
-        job={job}
-        onClose={() => setEditModal(false)}
-      />
-    )}
+
+      {showCloseModal && (
+        <CloseJobModal
+          id={job?._id}
+          onClose={() => setShowCloseModal(false)}
+        />
+      )}
+    </div>
+  );
+};
+
+const CloseJobModal = ({ id, onClose }) => {
+  const [closeJob, { isLoading }] = useCloseJobMutation();
+
+  const handleClose = async () => {
+    try {
+      await closeJob(id).unwrap();
+      onClose();
+      alert("Job closed successfully");
+    } catch (error) {
+      alert("Failed to close job");
+      console.error(error);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 max-w-sm w-full">
+        <h2 className="text-lg font-bold mb-4">Close Job</h2>
+        <p className="text-gray-600 mb-6">
+          Are you sure you want to close this job posting?
+        </p>
+
+        <div className="flex justify-end gap-3">
+          <button
+            onClick={onClose}
+            disabled={isLoading}
+            className="btn-secondary"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleClose}
+            disabled={isLoading}
+            className="btn-danger"
+          >
+            {isLoading ? "Closing..." : "Close Job"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

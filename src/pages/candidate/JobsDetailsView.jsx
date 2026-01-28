@@ -7,62 +7,63 @@ import {
   PaperAirplaneIcon,
   ArrowLeftIcon,
 } from "@heroicons/react/24/outline";
-import { useState } from "react";
-import ApplyJobModal from "../../components/candidate/ApplyJobModal";
+import { useState, useEffect } from "react";
 
-/* ================= DUMMY JOB DATA ================= */
-const dummyJobs = [
-  {
-    id: 1,
-    title: "Frontend Developer",
-    company: "TechNova Pvt Ltd",
-    location: "Remote",
-    type: "Full Time",
-    experience: "2-4 Years",
-    salary: "₹6 – ₹10 LPA",
-    description:
-      "We are looking for a Frontend Developer skilled in React, Tailwind CSS, and modern UI practices.",
-    skills: ["React", "JavaScript", "HTML", "CSS", "Tailwind"],
-    postedOn: "12 Feb 2026",
-  },
-  {
-    id: 2,
-    title: "Backend Developer",
-    company: "CloudPeak",
-    location: "Bangalore",
-    type: "Part Time",
-    experience: "3-6 Years",
-    salary: "₹8 – ₹12 LPA",
-    description:
-      "Backend developer needed with strong Node.js, MongoDB, and API experience.",
-    skills: ["Node.js", "MongoDB", "Express"],
-    postedOn: "10 Feb 2026",
-  },
-  {
-    id: 3,
-    title: "UI/UX Designer",
-    company: "Bright Solutions",
-    location: "Delhi",
-    type: "Contract",
-    experience: "1-2 Years",
-    salary: "₹4 – ₹6 LPA",
-    description:
-      "We are hiring a UI/UX Designer skilled in Figma and Adobe XD.",
-    skills: ["Figma", "Adobe XD"],
-    postedOn: "08 Feb 2026",
-  }
-];
+import ApplyJobModal from "../../components/candidate/ApplyJobModal";
+import { useGetJobByIdQuery } from "../../services/endpoints/jobApi";
+import { useApplyJobMutation } from "../../services/endpoints/applicationsApi";
+import { useToggleSaveJobMutation } from "../../services/endpoints/candidate/savedJobApi";
 
 const JobDetailsView = () => {
   const { id } = useParams();
-  const job = dummyJobs.find((j) => j.id === Number(id));
+
+  const { data, isLoading, error } = useGetJobByIdQuery(id);
+  const [applyJob] = useApplyJobMutation();
+  const [toggleSaveJob] = useToggleSaveJobMutation();
+
+  const job = data;
 
   const [saved, setSaved] = useState(false);
   const [showApply, setShowApply] = useState(false);
-const [applied, setApplied] = useState(false);
 
+  // ✅ sync saved state
+  useEffect(() => {
+    if (job?.isSaved) {
+      setSaved(true);
+    }
+  }, [job]);
 
-  if (!job) {
+  // ✅ APPLY JOB
+  const handleApply = async () => {
+    try {
+      await applyJob({
+        jobId: id,
+        companyId: job?.employer?._id,
+      }).unwrap();
+
+      setShowApply(false);
+    } catch (err) {
+      alert(err?.data?.message || "Failed to apply");
+    }
+  };
+
+  // ✅ SAVE / UNSAVE JOB
+  const handleSave = async () => {
+    try {
+      const res = await toggleSaveJob(id).unwrap();
+      setSaved(res?.saved ?? !saved);
+    } catch (err) {
+      alert(err?.data?.message || "Failed to save job");
+    }
+  };
+
+  /* ================= STATES ================= */
+
+  if (isLoading) {
+    return <div className="card text-center">Loading job...</div>;
+  }
+
+  if (error || !job) {
     return (
       <div className="card text-center">
         <p className="text-gray-500">Job not found</p>
@@ -73,24 +74,23 @@ const [applied, setApplied] = useState(false);
     );
   }
 
+  const applied = job.isApplied; // ⭐ single source of truth
+
   return (
     <div className="space-y-6">
       {/* BACK */}
-      <Link
-        to="/candidate/jobs"
-        className="flex items-center gap-1 text-sm text-gray-600 hover:text-black"
-      >
+      <Link to="/candidate/jobs" className="flex items-center gap-1 text-sm">
         <ArrowLeftIcon className="w-4 h-4" />
         Back to Jobs
       </Link>
 
       {/* HEADER */}
-      <div className="card flex flex-col md:flex-row md:justify-between gap-4">
+      <div className="card flex flex-col md:flex-row justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">{job.title}</h1>
-          <p className="text-gray-500">{job.company}</p>
+          <p className="text-gray-500">{job?.employer.companyName}</p>
 
-          <div className="flex flex-wrap gap-4 text-sm text-gray-600 mt-3">
+          <div className="flex gap-4 text-sm text-gray-600 mt-3">
             <span className="flex items-center gap-1">
               <MapPinIcon className="w-4 h-4" />
               {job.location}
@@ -103,13 +103,17 @@ const [applied, setApplied] = useState(false);
               <CurrencyRupeeIcon className="w-4 h-4" />
               {job.salary}
             </span>
+            <a href={`mailto:${job.employer.contactEmail}`}  className="flex items-center gap-1 hover:underline text-blue-600">
+              <PaperAirplaneIcon className="w-4 h-4" />
+              {job.employer.contactEmail}
+            </a>
           </div>
         </div>
 
         {/* ACTIONS */}
-        <div className="flex gap-3 h-12 mt-6 ">
+        <div className="flex gap-3 h-12 mt-6">
           <button
-            onClick={() => setSaved(!saved)}
+            onClick={handleSave}
             className={`px-4 py-2 rounded-lg border flex items-center gap-1 ${
               saved ? "text-indigo-600 border-indigo-600" : ""
             }`}
@@ -121,7 +125,7 @@ const [applied, setApplied] = useState(false);
           <button
             onClick={() => setShowApply(true)}
             disabled={applied}
-            className={`btn-primary flex items-center  gap-1 ${
+            className={`btn-primary flex items-center gap-1 ${
               applied ? "opacity-60 cursor-not-allowed" : ""
             }`}
           >
@@ -131,23 +135,20 @@ const [applied, setApplied] = useState(false);
         </div>
       </div>
 
-      {/* DETAILS GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* LEFT */}
+      {/* DETAILS */}
+      <div className="grid md:grid-cols-3 gap-6">
         <div className="md:col-span-2 space-y-6">
           <div className="card">
             <h2 className="font-semibold mb-2">Job Description</h2>
-            <p className="text-sm text-gray-600">
-              {job.description}
-            </p>
+            <p className="text-sm text-gray-600">{job.description}</p>
           </div>
 
           <div className="card">
             <h2 className="font-semibold mb-2">Required Skills</h2>
             <div className="flex flex-wrap gap-2">
-              {job.skills.map((skill, index) => (
+              {job.skills?.map((skill) => (
                 <span
-                  key={index}
+                  key={skill}
                   className="px-3 py-1 rounded-full text-xs bg-indigo-100 text-indigo-700"
                 >
                   {skill}
@@ -157,27 +158,25 @@ const [applied, setApplied] = useState(false);
           </div>
         </div>
 
-        {/* RIGHT */}
         <div className="card space-y-3 text-sm">
           <Detail label="Experience" value={job.experience} />
           <Detail label="Salary" value={job.salary} />
           <Detail label="Job Type" value={job.type} />
-          <Detail label="Posted On" value={job.postedOn} />
+          <Detail label="Posted On" value={job.createdAt?.slice(0, 10)} />
         </div>
       </div>
-      {showApply && (
-  <ApplyJobModal
-    jobTitle={job.title}
-    onClose={() => setShowApply(false)}
-    onApply={() => setApplied(true)}
-  />
-)}
 
+      {showApply && !applied && (
+        <ApplyJobModal
+          jobTitle={job.title}
+          onClose={() => setShowApply(false)}
+          onApply={handleApply}
+        />
+      )}
     </div>
   );
 };
 
-/* ================= SMALL COMPONENT ================= */
 const Detail = ({ label, value }) => (
   <div className="flex justify-between">
     <span className="text-gray-500">{label}</span>

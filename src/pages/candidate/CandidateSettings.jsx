@@ -1,11 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  useGetCandidateProfileQuery,
+  useUpdateCandidateProfileMutation,
+  useUploadResumeMutation,
+} from "../../services/endpoints/candidate/profileApi";
+import { useChangeEmployerPasswordMutation } from "../../services/endpoints/authApi";
 
 const CandidateSettings = () => {
+  const { data, isLoading } = useGetCandidateProfileQuery();
+  const [updateProfile] = useUpdateCandidateProfileMutation();
+  const [uploadResume] = useUploadResumeMutation();
+  const [changePassword] = useChangeEmployerPasswordMutation();
+
   const [profile, setProfile] = useState({
-    name: "Amit Verma",
-    email: "amit@gmail.com",
-    phone: "+91 98765 43210",
+    name: "",
+    email: "",
+    phone: "",
   });
+
+  const [resume, setResume] = useState(null);
 
   const [password, setPassword] = useState({
     current: "",
@@ -13,17 +26,71 @@ const CandidateSettings = () => {
     confirm: "",
   });
 
-  const [resume, setResume] = useState(null);
-
   const [notifications, setNotifications] = useState({
     jobAlerts: true,
     applicationUpdates: true,
     recruiterMessages: false,
   });
 
+  useEffect(() => {
+    if (data?.data) {
+      const user = data.data;
+
+      setProfile({
+        name: user.name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+      });
+
+      setNotifications({
+        jobAlerts: user.notifications?.jobAlerts ?? true,
+        applicationUpdates: user.notifications?.applicationUpdates ?? true,
+        recruiterMessages: user.notifications?.recruiterMessages ?? false,
+      });
+    }
+  }, [data]);
+
+  if (isLoading) return <p>Loading...</p>;
+
+  const handleProfileSave = async () => {
+    await updateProfile({
+      name: profile.name,
+      phone: profile.phone,
+    });
+    alert("Profile updated successfully");
+  };
+
+  const handleResumeUpload = async () => {
+    if (!resume) return alert("Please select a file");
+
+    const formData = new FormData();
+    formData.append("resume", resume);
+
+    await uploadResume(formData);
+    alert("Resume uploaded successfully");
+  };
+
+  const handlePasswordChange = async () => {
+    if (password.new !== password.confirm) {
+      return alert("Passwords do not match");
+    }
+
+    await changePassword({
+      currentPassword: password.current,
+      newPassword: password.new,
+    });
+
+    alert("Password updated");
+    setPassword({ current: "", new: "", confirm: "" });
+  };
+
+  // const handleNotificationSave = async () => {
+  //   await updateNotifications(notifications);
+  //   alert("Notification preferences saved");
+  // };
+
   return (
     <div className="space-y-8">
-      {/* HEADER */}
       <div>
         <h1 className="text-2xl font-bold">Settings</h1>
         <p className="text-gray-500">
@@ -31,38 +98,28 @@ const CandidateSettings = () => {
         </p>
       </div>
 
-      {/* ================= PROFILE SETTINGS ================= */}
       <div className="card space-y-4">
         <h2 className="text-lg font-semibold">Profile Information</h2>
 
         <Input
           label="Full Name"
           value={profile.name}
-          onChange={(e) =>
-            setProfile({ ...profile, name: e.target.value })
-          }
+          onChange={(e) => setProfile({ ...profile, name: e.target.value })}
         />
 
-        <Input
-          label="Email"
-          value={profile.email}
-          disabled
-        />
+        <Input label="Email" value={profile.email} disabled />
 
         <Input
           label="Phone Number"
           value={profile.phone}
-          onChange={(e) =>
-            setProfile({ ...profile, phone: e.target.value })
-          }
+          onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
         />
 
-        <button className="btn-primary">
+        <button className="btn-primary" onClick={handleProfileSave}>
           Save Profile
         </button>
       </div>
 
-      {/* ================= RESUME ================= */}
       <div className="card space-y-4">
         <h2 className="text-lg font-semibold">Resume</h2>
 
@@ -74,17 +131,14 @@ const CandidateSettings = () => {
         />
 
         {resume && (
-          <p className="text-sm text-green-600">
-            Selected: {resume.name}
-          </p>
+          <p className="text-sm text-green-600">Selected: {resume.name}</p>
         )}
 
-        <button className="btn-primary">
+        <button className="btn-primary" onClick={handleResumeUpload}>
           Upload Resume
         </button>
       </div>
 
-      {/* ================= PASSWORD ================= */}
       <div className="card space-y-4">
         <h2 className="text-lg font-semibold">Change Password</h2>
 
@@ -101,9 +155,7 @@ const CandidateSettings = () => {
           type="password"
           label="New Password"
           value={password.new}
-          onChange={(e) =>
-            setPassword({ ...password, new: e.target.value })
-          }
+          onChange={(e) => setPassword({ ...password, new: e.target.value })}
         />
 
         <Input
@@ -115,13 +167,12 @@ const CandidateSettings = () => {
           }
         />
 
-        <button className="btn-primary">
+        <button className="btn-primary" onClick={handlePasswordChange}>
           Update Password
         </button>
       </div>
 
-      {/* ================= NOTIFICATIONS ================= */}
-      <div className="card space-y-4">
+      {/* <div className="card space-y-4">
         <h2 className="text-lg font-semibold">
           Notification Preferences
         </h2>
@@ -161,26 +212,17 @@ const CandidateSettings = () => {
           }
         />
 
-        <button className="btn-primary">
+        <button className="btn-primary" onClick={handleNotificationSave}>
           Save Preferences
         </button>
-      </div>
+      </div> */}
     </div>
   );
 };
 
-// resualble components
-const Input = ({
-  label,
-  value,
-  onChange,
-  type = "text",
-  disabled = false,
-}) => (
+const Input = ({ label, value, onChange, type = "text", disabled = false }) => (
   <div>
-    <label className="block text-sm mb-1 text-gray-600">
-      {label}
-    </label>
+    <label className="block text-sm mb-1 text-gray-600">{label}</label>
     <input
       type={type}
       value={value}

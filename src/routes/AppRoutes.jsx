@@ -5,7 +5,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import { lazy, Suspense } from "react";
-import { getRoleFromToken } from "../utils/jwt";
+import {  getTokenPayload } from "../utils/jwt";
 
 
 // ================= LAYOUTS (NO LAZY) =================
@@ -16,6 +16,7 @@ import CandidateLayout from "../layouts/CandidateLayout";
 import PrivateRoute from "./PrivateRoute";
 import CandidateSettings from "../pages/candidate/CandidateSettings";
 import JobDetailsView from "../pages/candidate/JobsDetailsView";
+import CompleteEmployerProfile from "../pages/employer/CompleteEmployerProfile";
 
 // ================= AUTH =================
 const Login = lazy(() => import("../pages/auth/Login"));
@@ -295,6 +296,17 @@ const AppRoutes = () => {
               </PrivateRoute>
             }
           />
+          <Route
+  path="/employer/complete-profile"
+  element={
+    <PrivateRoute allowedRoles={["EMPLOYER"]}>
+      
+
+      <CompleteEmployerProfile />
+      
+    </PrivateRoute>
+  }
+/>
 
           {/* CANDIDATE */}
           <Route
@@ -369,20 +381,34 @@ const AppRoutes = () => {
             }
           />
 
-         <Route
+          {/* <Route
   path="/dashboard"
   element={
     (() => {
-      const role = getRoleFromToken();
+      const payload = getTokenPayload();
+      // console.log("Dashboard access payload:", payload);
+      if (!payload) {
+        return <Navigate to="/login" replace />;
+      }
 
-      if (role === "ADMIN") return <Navigate to="/admin" />;
-      if (role === "EMPLOYER") return <Navigate to="/employer" />;
-      if (role === "CANDIDATE") return <Navigate to="/candidate" />;
+      const { role, profileCompleted } = payload;
+      // console.log("Role:", role, "Profile Completed:", profileCompleted);
 
-      return <Navigate to="/login" />;
+      if (role === "ADMIN") return <Navigate to="/admin" replace />;
+
+      if (role === "EMPLOYER") {
+        return profileCompleted
+          ? <Navigate to="/employer" replace />
+          : <Navigate to="/employer/complete-profile" replace />;
+      }
+
+      if (role === "CANDIDATE") return <Navigate to="/candidate" replace />;
+
+      return <Navigate to="/login" replace />;
     })()
   }
-/>
+/> */}
+
 
 
 
@@ -394,4 +420,4 @@ const AppRoutes = () => {
   );
 };
 
-export default AppRoutes;
+export default AppRoutes ;

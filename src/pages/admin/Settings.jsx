@@ -1,83 +1,108 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  useGetSettingsQuery,
+  useUpdateSettingsMutation,
+} from "../../services/endpoints/settingsApi";
+
 
 const Settings = () => {
+  const { data, isLoading } = useGetSettingsQuery();
+  const [updateSettings] = useUpdateSettingsMutation();
+
   const [settings, setSettings] = useState({
-    siteName: "Jobie Job Portal",
-    supportEmail: "support@jobie.com",
-    allowEmployerSignup: true,
-    allowCandidateSignup: true,
+    siteName: "",
+    supportEmail: "",
+    allowEmployerRegistration: false,
+    allowCandidateRegistration: false,
     maintenanceMode: false,
     defaultJobStatus: "Pending",
   });
 
+  // ✅ FIX 1: correct data mapping
+  useEffect(() => {
+    if (data?.data) {
+      setSettings((prev) => ({
+        ...prev,
+        ...data.data, // ✅ ONLY actual settings
+      }));
+    }
+  }, [data]);
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setSettings({
-      ...settings,
+    setSettings((prev) => ({
+      ...prev,
       [name]: type === "checkbox" ? checked : value,
-    });
+    }));
   };
+
+  const handleSave = async () => {
+    await updateSettings(settings).unwrap();
+    alert("Settings Saved");
+  };
+
+  if (isLoading) return <p>Loading...</p>;
 
   return (
     <div className="space-y-6">
-      {/* ================= GENERAL SETTINGS ================= */}
+      {/* GENERAL */}
       <div className="card">
         <h2 className="text-xl font-semibold mb-4">General Settings</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Input
-            label="Site Name"
-            name="siteName"
-            value={settings.siteName}
-            onChange={handleChange}
-          />
+        <Input
+          label="Site Name"
+          name="siteName"
+          value={settings.siteName}
+          onChange={handleChange}
+          
+        />
 
-          <Input
-            label="Support Email"
-            name="supportEmail"
-            value={settings.supportEmail}
-            onChange={handleChange}
-          />
+        <Input
+          label="Support Email"
+          name="supportEmail"
+          value={settings.supportEmail}
+          onChange={handleChange}
+        />
         </div>
       </div>
 
-      {/* ================= USER SETTINGS ================= */}
+      {/* USER */}
       <div className="card">
         <h2 className="text-xl font-semibold mb-4">User Settings</h2>
 
+        {/* ✅ FIX 2: correct names */}
         <Toggle
           label="Allow Employer Registration"
-          name="allowEmployerSignup"
-          checked={settings.allowEmployerSignup}
+          name="allowEmployerRegistration"
+          checked={settings.allowEmployerRegistration}
           onChange={handleChange}
         />
 
         <Toggle
           label="Allow Candidate Registration"
-          name="allowCandidateSignup"
-          checked={settings.allowCandidateSignup}
+          name="allowCandidateRegistration"
+          checked={settings.allowCandidateRegistration}
           onChange={handleChange}
         />
       </div>
 
-      {/* ================= JOB SETTINGS ================= */}
+      {/* JOB */}
       <div className="card">
         <h2 className="text-xl font-semibold mb-4">Job Settings</h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Select
-            label="Default Job Status"
-            name="defaultJobStatus"
-            value={settings.defaultJobStatus}
-            onChange={handleChange}
-            options={["Pending", "Active", "Blocked"]}
-          />
-        </div>
+        <Select
+          label="Default Job Status"
+          name="defaultJobStatus"
+          value={settings.defaultJobStatus}
+          onChange={handleChange}
+          options={["Pending", "Active", "Blocked"]}
+        />
       </div>
 
-      {/* ================= SYSTEM SETTINGS ================= */}
+      {/* SYSTEM */}
       <div className="card">
-        <h2 className="text-xl font-semibold mb-4">System Settings</h2>
+        <h2 className="text-xl font-semibold mb-4">System</h2>
 
         <Toggle
           label="Maintenance Mode"
@@ -87,9 +112,8 @@ const Settings = () => {
         />
       </div>
 
-      {/* ================= SAVE BUTTON ================= */}
       <div className="flex justify-end">
-        <button className="btn-primary px-8">
+        <button onClick={handleSave} className="btn-primary px-8">
           Save Settings
         </button>
       </div>
@@ -97,13 +121,15 @@ const Settings = () => {
   );
 };
 
+
+
+export default Settings;
+
 /* ================= SMALL COMPONENTS ================= */
 
 const Input = ({ label, ...props }) => (
   <div>
-    <label className="block text-sm font-medium mb-1">
-      {label}
-    </label>
+    <label className="block text-sm font-medium mb-1">{label}</label>
     <input
       {...props}
       className="w-full border px-4 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -113,9 +139,7 @@ const Input = ({ label, ...props }) => (
 
 const Select = ({ label, options, ...props }) => (
   <div>
-    <label className="block text-sm font-medium mb-1">
-      {label}
-    </label>
+    <label className="block text-sm font-medium mb-1">{label}</label>
     <select
       {...props}
       className="w-full border px-4 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -141,5 +165,3 @@ const Toggle = ({ label, name, checked, onChange }) => (
     />
   </div>
 );
-
-export default Settings;

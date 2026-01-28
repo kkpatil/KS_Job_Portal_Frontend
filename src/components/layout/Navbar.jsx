@@ -1,27 +1,44 @@
+import { useState } from "react";
 import {
   BellIcon,
   ChatBubbleLeftIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
-import { useState } from "react";
-import {
-  MdMessage,
-  MdNotificationImportant,
-  MdMenuOpen,
-} from "react-icons/md";
+import { MdMenuOpen, MdNotificationImportant } from "react-icons/md";
 
-const Navbar = ({ role = "admin",toggleSidebar ,setToggleSidebar }) => {
+import {
+  useGetMyNotificationsQuery,
+  useMarkAsReadMutation,
+  useMarkAllAsReadMutation,
+} from "../../services/endpoints/notificationApi";
+
+const Navbar = ({ toggleSidebar, setToggleSidebar }) => {
   const [openDropdown, setOpenDropdown] = useState(null);
- 
+
+  /* ================= API ================= */
+  const { data } = useGetMyNotificationsQuery();
+  const [markAsRead] = useMarkAsReadMutation();
+  const [markAllAsRead] = useMarkAllAsReadMutation();
+
+  const notifications = data?.data || [];
+  const unreadCount = notifications.filter(n => !n.isRead).length;
+
   const toggleSidebarHandle = () => {
-    setToggleSidebar(()=>!toggleSidebar);
-  }
-  const config = roleConfig[role];
+    setToggleSidebar(prev => !prev);
+  };
+
+  const handleNotificationClick = async (id) => {
+    await markAsRead(id);
+  };
+
+  const handleMarkAllRead = async () => {
+    await markAllAsRead();
+  };
 
   return (
     <>
       <div className="h-20 bg-linear-to-l from-[#eee9eb] to-[#ffff] flex items-center justify-between px-6 shadow-sm fixed top-0 left-0 md:left-64 right-0 z-50">
-        
+
         {/* LEFT */}
         <div className="flex items-center gap-4">
           <MdMenuOpen
@@ -30,27 +47,29 @@ const Navbar = ({ role = "admin",toggleSidebar ,setToggleSidebar }) => {
             onClick={toggleSidebarHandle}
           />
 
-          <div className="hidden md:flex bg-gray-100 px-4 py-2 rounded-full w-96">
+          {/* <div className="hidden md:flex bg-gray-100 px-4 py-2 rounded-full w-96">
             <MagnifyingGlassIcon className="w-5 h-5 text-gray-400" />
             <input
               type="text"
               placeholder="Search..."
               className="bg-transparent outline-none px-3 text-sm w-full"
             />
-          </div>
+          </div> */}
         </div>
 
         {/* RIGHT */}
         <div className="flex items-center gap-6 relative">
-          
-          {/* MESSAGES */}
-          <div onClick={() => setOpenDropdown(openDropdown === "messages" ? null : "messages")}>
-            <IconWithBadge icon={<ChatBubbleLeftIcon />} count={config.messages.length} />
-          </div>
+
+          {/* MESSAGES (future use) */}
+          <IconWithBadge icon={<ChatBubbleLeftIcon />} count={0} />
 
           {/* NOTIFICATIONS */}
-          <div onClick={() => setOpenDropdown(openDropdown === "notifications" ? null : "notifications")}>
-            <IconWithBadge icon={<BellIcon />} count={config.notifications.length} />
+          <div
+            onClick={() =>
+              setOpenDropdown(openDropdown === "notifications" ? null : "notifications")
+            }
+          >
+            <IconWithBadge icon={<BellIcon />} count={unreadCount} />
           </div>
 
           {/* PROFILE */}
@@ -61,30 +80,32 @@ const Navbar = ({ role = "admin",toggleSidebar ,setToggleSidebar }) => {
               className="w-10 h-10 rounded-full"
             />
             <div className="text-sm">
-              <p className="font-semibold">Oda Dink</p>
-              <p className="text-gray-400 text-xs">{config.roleLabel}</p>
+              <p className="font-semibold">Admin</p>
+              <p className="text-gray-400 text-xs">Administrator</p>
             </div>
           </div>
 
-          {/* DROPDOWNS */}
-          {openDropdown === "messages" && (
-            <Dropdown title="Messages">
-              {config.messages.map((msg, i) => (
-                <p key={i} className="flex gap-3 items-center">
-                  <MdMessage size={18} />
-                  {msg}
-                </p>
-              ))}
-            </Dropdown>
-          )}
-
+          {/* NOTIFICATION DROPDOWN */}
           {openDropdown === "notifications" && (
-            <Dropdown title="Notifications">
-              {config.notifications.map((note, i) => (
-                <p key={i} className="flex gap-3 items-center">
-                  <MdNotificationImportant color="#ff0000" size={18} />
-                  {note}
-                </p>
+            <Dropdown title="Notifications" onClear={handleMarkAllRead}>
+              {notifications.length === 0 && (
+                <p className="text-sm text-gray-400">No notifications</p>
+              )}
+
+              {notifications.map((note) => (
+                <div
+                  key={note._id}
+                  onClick={() => handleNotificationClick(note._id)}
+                  className={`flex gap-3 items-start cursor-pointer p-2 rounded ${
+                    note.isRead ? "opacity-60" : "bg-gray-50"
+                  }`}
+                >
+                  <MdNotificationImportant size={18} className="mt-1" />
+                  <div>
+                    <p className="font-medium text-sm">{note.title}</p>
+                    <p className="text-xs text-gray-500">{note.message}</p>
+                  </div>
+                </div>
               ))}
             </Dropdown>
           )}
@@ -115,43 +136,23 @@ const IconWithBadge = ({ icon, count }) => (
   </div>
 );
 
-const Dropdown = ({ title, children }) => (
-  <div className="absolute top-14 right-0 w-72 bg-white rounded-lg shadow-lg p-4 z-50">
-    <h4 className="font-semibold mb-3">{title}</h4>
-    <div className="space-y-2 text-sm text-gray-600">
+const Dropdown = ({ title, children, onClear }) => (
+  <div className="absolute top-14 right-0 w-80 bg-white rounded-lg shadow-lg p-4 z-50">
+    <div className="flex justify-between items-center mb-3">
+      <h4 className="font-semibold">{title}</h4>
+      {onClear && (
+        <button
+          onClick={onClear}
+          className="text-xs text-indigo-600"
+        >
+          Mark all read
+        </button>
+      )}
+    </div>
+    <div className="space-y-2 max-h-80 overflow-y-auto">
       {children}
     </div>
   </div>
 );
-
-/* ================= ROLE CONFIG ================= */
-
-const roleConfig = {
-  admin: {
-    roleLabel: "Super Admin",
-    messages: [
-      "New message from Rahul",
-      "Interview update",
-      "HR replied",
-    ],
-    notifications: [
-      "New job posted",
-      "Profile approved",
-      "New application received",
-    ],
-  },
-
-  employer: {
-    roleLabel: "Employer",
-    messages: ["Candidate applied", "Interview scheduled"],
-    notifications: ["New application received", "Job approved"],
-  },
-
-  candidate: {
-    roleLabel: "Candidate",
-    messages: ["Recruiter messaged you"],
-    notifications: ["Application shortlisted", "New job recommendation"],
-  },
-};
 
 export default Navbar;

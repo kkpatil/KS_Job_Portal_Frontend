@@ -1,64 +1,36 @@
 import { useParams, Link } from "react-router-dom";
-import { useState } from "react";
 import {
   ArrowLeftIcon,
   EyeIcon,
   CheckCircleIcon,
   XCircleIcon,
 } from "@heroicons/react/24/outline";
-
-/* ================= DUMMY APPLICATIONS ================= */
-const dummyApplications = [
-  {
-    id: 1,
-    jobId: 1,
-    candidate: "Amit Verma",
-    email: "amit@gmail.com",
-    experience: "2 Years",
-    appliedOn: "15 Feb 2026",
-    status: "New",
-  },
-  {
-    id: 2,
-    jobId: 1,
-    candidate: "Neha Sharma",
-    email: "neha@gmail.com",
-    experience: "3 Years",
-    appliedOn: "14 Feb 2026",
-    status: "Shortlisted",
-  },
-  {
-    id: 3,
-    jobId: 2,
-    candidate: "Rahul Singh",
-    email: "rahul@gmail.com",
-    experience: "4 Years",
-    appliedOn: "13 Feb 2026",
-    status: "Rejected",
-  },
-];
+import {
+  useGetJobApplicationsQuery,
+  useUpdateApplicationStatusMutation,
+} from "../../services/endpoints/applicationsApi";
 
 const statusColor = {
-  New: "bg-blue-100 text-blue-700",
-  Shortlisted: "bg-green-100 text-green-700",
-  Rejected: "bg-red-100 text-red-700",
+  APPLIED: "bg-blue-100 text-blue-700",
+  SHORTLISTED: "bg-green-100 text-green-700",
+  REJECTED: "bg-red-100 text-red-700",
 };
 
 const JobApplicationsEmployer = () => {
-  const { id } = useParams(); // jobId
-  const [applications, setApplications] = useState(dummyApplications);
+  const { id: jobId } = useParams();
 
-  const jobApplications = applications.filter(
-    (app) => app.jobId === Number(id)
-  );
+  const { data, isLoading } = useGetJobApplicationsQuery({jobId});
+  const [updateStatus] = useUpdateApplicationStatusMutation();
 
-  const updateStatus = (appId, status) => {
-    setApplications((prev) =>
-      prev.map((app) =>
-        app.id === appId ? { ...app, status } : app
-      )
-    );
+  const applications = data?.data || [];
+
+  const handleStatusUpdate = (appId, status) => {
+    updateStatus({ id: appId, status });
   };
+
+  if (isLoading) {
+    return <p className="text-gray-500">Loading applications...</p>;
+  }
 
   return (
     <div className="space-y-6">
@@ -73,11 +45,9 @@ const JobApplicationsEmployer = () => {
 
       {/* HEADER */}
       <div>
-        <h1 className="text-2xl font-bold">
-          Job Applications
-        </h1>
+        <h1 className="text-2xl font-bold">Job Applications</h1>
         <p className="text-gray-500">
-          Candidates who applied for this job
+          Total Applications: {data?.total || 0}
         </p>
       </div>
 
@@ -96,26 +66,26 @@ const JobApplicationsEmployer = () => {
             </thead>
 
             <tbody>
-              {jobApplications.map((app) => (
+              {applications.map((app) => (
                 <tr
-                  key={app.id}
+                  key={app._id}
                   className="border-b hover:bg-gray-50"
                 >
                   <td className="px-4 py-3">
                     <div className="font-medium">
-                      {app.candidate}
+                      {app.applicant?.name}
                     </div>
                     <div className="text-xs text-gray-500">
-                      {app.email}
+                      {app.applicant?.email}
                     </div>
                   </td>
 
                   <td className="px-4 py-3">
-                    {app.experience}
+                    {app.applicant?.experience || "-"}
                   </td>
 
                   <td className="px-4 py-3">
-                    {app.appliedOn}
+                    {new Date(app.createdAt).toLocaleDateString()}
                   </td>
 
                   <td className="px-4 py-3 text-center">
@@ -129,28 +99,26 @@ const JobApplicationsEmployer = () => {
                   <td className="px-4 py-3">
                     <div className="flex justify-center gap-3">
                       <Link
-                        to={`/employer/candidates/${app.id}`}
+                        to={`/employer/candidates/${app.applicant?._id}`}
                         title="View Profile"
                       >
                         <EyeIcon className="w-5 h-5 text-blue-600" />
                       </Link>
 
-                      {app.status !== "Shortlisted" && (
+                      {app.status !== "SHORTLISTED" && (
                         <button
-                          title="Shortlist"
                           onClick={() =>
-                            updateStatus(app.id, "Shortlisted")
+                            handleStatusUpdate(app._id, "SHORTLISTED")
                           }
                         >
                           <CheckCircleIcon className="w-5 h-5 text-green-600" />
                         </button>
                       )}
 
-                      {app.status !== "Rejected" && (
+                      {app.status !== "REJECTED" && (
                         <button
-                          title="Reject"
                           onClick={() =>
-                            updateStatus(app.id, "Rejected")
+                            handleStatusUpdate(app._id, "REJECTED")
                           }
                         >
                           <XCircleIcon className="w-5 h-5 text-red-600" />
@@ -161,7 +129,7 @@ const JobApplicationsEmployer = () => {
                 </tr>
               ))}
 
-              {jobApplications.length === 0 && (
+              {applications.length === 0 && (
                 <tr>
                   <td
                     colSpan="5"

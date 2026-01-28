@@ -1,88 +1,104 @@
 import { useState } from "react";
 import {
-  PlusIcon,
   PencilSquareIcon,
   TrashIcon,
-  EyeIcon,
   CheckCircleIcon,
   NoSymbolIcon,
 } from "@heroicons/react/24/outline";
 import { ImCross } from "react-icons/im";
 
-const initialContent = [
-  { id: 1, title: "About Us", type: "Page", status: "Published", updatedAt: "14 Jan 2026" },
-  { id: 2, title: "Privacy Policy", type: "Page", status: "Published", updatedAt: "10 Jan 2026" },
-  { id: 3, title: "How to Apply for Jobs", type: "Blog", status: "Draft", updatedAt: "12 Jan 2026" },
-  { id: 4, title: "Homepage Banner", type: "Banner", status: "Published", updatedAt: "08 Jan 2026" },
-];
+import {
+  useGetCMSContentsQuery,
+  useCreateCMSMutation,
+  useUpdateCMSMutation,
+  useDeleteCMSMutation,
+} from "../../services/endpoints/cmsApi";
 
-const statusColor = {
-  Published: "bg-green-100 text-green-700",
-  Draft: "bg-yellow-100 text-yellow-700",
+/* ================= CONSTANTS ================= */
+
+const typeMap = {
+  PAGE: "Page",
+  BLOG: "Blog",
+  BANNER: "Banner",
 };
 
-const CMS = () => {
-  const [contents, setContents] = useState(initialContent);
-  const [filter, setFilter] = useState("All");
+const statusMap = {
+  ACTIVE: "Published",
+  DRAFT: "Draft",
+  INACTIVE: "Inactive",
+};
 
-  const [showAdd, setShowAdd] = useState(false);
-  const [showEdit, setShowEdit] = useState(false);
+const statusColor = {
+  ACTIVE: "bg-green-100 text-green-700",
+  DRAFT: "bg-yellow-100 text-yellow-700",
+  INACTIVE: "bg-gray-100 text-gray-600",
+};
+
+/* ================= COMPONENT ================= */
+
+const CMS = () => {
+  const [filter, setFilter] = useState("All");
+  const [selected, setSelected] = useState(null);
+  const [showForm, setShowForm] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
 
-  const [selected, setSelected] = useState(null);
+  const { data, isLoading } = useGetCMSContentsQuery(
+    filter === "All" ? {} : { type: filter }
+  );
 
-  const filteredContent =
-    filter === "All" ? contents : contents.filter((c) => c.type === filter);
+  const [createCMS] = useCreateCMSMutation();
+  const [updateCMS] = useUpdateCMSMutation();
+  const [deleteCMS] = useDeleteCMSMutation();
 
-  const addContent = (data) => {
-    setContents((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        ...data,
-        status: "Draft",
-        updatedAt: new Date().toLocaleDateString(),
-      },
-    ]);
-    setShowAdd(false);
+  const contents = data?.data || [];
+
+  /* ================= HANDLERS ================= */
+
+  const toggleStatus = async (item) => {
+    await updateCMS({
+      id: item._id,
+      status: item.status === "ACTIVE" ? "INACTIVE" : "ACTIVE",
+    });
   };
 
-  const updateContent = (data) => {
-    setContents((prev) =>
-      prev.map((item) => (item.id === data.id ? data : item))
-    );
-    setShowEdit(false);
-  };
+  const handleSave = async (formData) => {
+  if (formData._id) {
+    const { _id, ...rest } = formData;
 
-  const deleteContent = () => {
-    setContents((prev) => prev.filter((item) => item.id !== selected.id));
+  await updateCMS({ id: _id, ...rest });
+
+  } else {
+    await createCMS(formData);
+  }
+
+  setShowForm(false);
+  setSelected(null);
+};
+
+
+  const handleDelete = async () => {
+    await deleteCMS(selected._id);
     setShowDelete(false);
+    setSelected(null);
   };
 
-  const toggleStatus = (id) => {
-    setContents((prev) =>
-      prev.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              status: item.status === "Published" ? "Draft" : "Published",
-            }
-          : item
-      )
-    );
-  };
+  /* ================= UI ================= */
 
   return (
     <div className="card">
+      {/* HEADER */}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold">CMS Management</h2>
-        {/* <button
-          onClick={() => setShowAdd(true)}
-          className="btn-primary flex items-center gap-1"
+
+        <button
+          className="btn-primary"
+          onClick={() => {
+            setSelected(null);
+            setShowForm(true);
+          }}
         >
-          <PlusIcon className="w-4 h-4" />
-          Add Content
-        </button> */}
+          + Create CMS
+        </button>
       </div>
 
       {/* FILTER */}
@@ -93,12 +109,13 @@ const CMS = () => {
           onChange={(e) => setFilter(e.target.value)}
         >
           <option value="All">All</option>
-          <option value="Page">Pages</option>
-          <option value="Blog">Blogs</option>
-          <option value="Banner">Banners</option>
+          <option value="PAGE">Pages</option>
+          <option value="BLOG">Blogs</option>
+          <option value="BANNER">Banners</option>
         </select>
       </div>
 
+      {/* TABLE */}
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
@@ -106,64 +123,74 @@ const CMS = () => {
               <th className="px-4 py-3">Title</th>
               <th className="px-4 py-3">Type</th>
               <th className="px-4 py-3 text-center">Status</th>
-              <th className="px-4 py-3">Last Updated</th>
+              <th className="px-4 py-3">Updated</th>
               <th className="px-4 py-3 text-center">Actions</th>
             </tr>
           </thead>
 
           <tbody>
-            {filteredContent.map((item) => (
-              <tr key={item.id} className="border-b hover:bg-gray-50">
+            {isLoading && (
+              <tr>
+                <td colSpan="5" className="text-center py-6">
+                  Loading...
+                </td>
+              </tr>
+            )}
+
+            {contents.map((item) => (
+              <tr key={item._id} className="border-b hover:bg-gray-50">
                 <td className="px-4 py-3 font-medium">{item.title}</td>
-                <td className="px-4 py-3">{item.type}</td>
+                <td className="px-4 py-3">{typeMap[item.type]}</td>
 
                 <td className="px-4 py-3 text-center">
-                  <span className={`px-3 py-1 rounded-full text-xs ${statusColor[item.status]}`}>
-                    {item.status}
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs ${
+                      statusColor[item.status]
+                    }`}
+                  >
+                    {statusMap[item.status]}
                   </span>
                 </td>
 
-                <td className="px-4 py-3">{item.updatedAt}</td>
+                <td className="px-4 py-3">
+                  {new Date(item.updatedAt).toLocaleDateString()}
+                </td>
 
                 <td className="px-4 py-3">
                   <div className="flex justify-center gap-3">
-                    <button title="View">
-                      <EyeIcon className="w-5 h-5 text-indigo-600" />
-                    </button>
-
-                    <button
-                      title="Edit"
+                    <PencilSquareIcon
+                      className="w-5 h-5 text-blue-600 cursor-pointer"
                       onClick={() => {
                         setSelected(item);
-                        setShowEdit(true);
+                        setShowForm(true);
                       }}
-                    >
-                      <PencilSquareIcon className="w-5 h-5 text-blue-600" />
-                    </button>
+                    />
 
-                    <button title="Toggle Status" onClick={() => toggleStatus(item.id)}>
-                      {item.status === "Published" ? (
-                        <NoSymbolIcon className="w-5 h-5 text-yellow-600" />
-                      ) : (
-                        <CheckCircleIcon className="w-5 h-5 text-green-600" />
-                      )}
-                    </button>
+                    {item.status === "ACTIVE" ? (
+                      <NoSymbolIcon
+                        className="w-5 h-5 text-yellow-600 cursor-pointer"
+                        onClick={() => toggleStatus(item)}
+                      />
+                    ) : (
+                      <CheckCircleIcon
+                        className="w-5 h-5 text-green-600 cursor-pointer"
+                        onClick={() => toggleStatus(item)}
+                      />
+                    )}
 
-                    <button
-                      title="Delete"
+                    <TrashIcon
+                      className="w-5 h-5 text-red-600 cursor-pointer"
                       onClick={() => {
                         setSelected(item);
                         setShowDelete(true);
                       }}
-                    >
-                      <TrashIcon className="w-5 h-5 text-red-600" />
-                    </button>
+                    />
                   </div>
                 </td>
               </tr>
             ))}
 
-            {filteredContent.length === 0 && (
+            {!isLoading && contents.length === 0 && (
               <tr>
                 <td colSpan="5" className="text-center py-6 text-gray-500">
                   No content found
@@ -174,35 +201,41 @@ const CMS = () => {
         </table>
       </div>
 
-      {showAdd && <CMSForm onClose={() => setShowAdd(false)} onSave={addContent} />}
-      {showEdit && (
+      {/* MODALS */}
+      {showForm && (
         <CMSForm
-          edit
           data={selected}
-          onClose={() => setShowEdit(false)}
-          onSave={updateContent}
+          onClose={() => setShowForm(false)}
+          onSave={handleSave}
         />
       )}
+
       {showDelete && (
         <DeletePopup
-          title={selected.title}
+          title={selected?.title}
           onClose={() => setShowDelete(false)}
-          onConfirm={deleteContent}
+          onConfirm={handleDelete}
         />
       )}
     </div>
   );
 };
 
-const CMSForm = ({ onClose, onSave, edit, data }) => {
-  const [form, setForm] = useState(
-    data || { title: "", type: "Page", content: "" }
-  );
+/* ================= FORM ================= */
+
+const CMSForm = ({ onClose, onSave, data }) => {
+  const [form, setForm] = useState({
+    _id: data?._id,
+    title: data?.title || "",
+    type: data?.type || "PAGE",
+    content: data?.content || "",
+    status: data?.status || "ACTIVE",
+  });
 
   return (
     <Modal onClose={onClose}>
       <h3 className="text-lg font-semibold mb-4">
-        {edit ? "Edit Content" : "Add Content"}
+        {data ? "Edit CMS" : "Create CMS"}
       </h3>
 
       <input
@@ -213,42 +246,35 @@ const CMSForm = ({ onClose, onSave, edit, data }) => {
       />
 
       <select
-        className="w-full border px-4 py-2 rounded mb-4"
+        className="w-full border px-4 py-2 rounded mb-3"
         value={form.type}
         onChange={(e) => setForm({ ...form, type: e.target.value })}
-        disabled
       >
-        <option>Page</option>
-        <option>Blog</option>
-        <option>Banner</option>
+        <option value="PAGE">Page</option>
+        <option value="BLOG">Blog</option>
+        <option value="BANNER">Banner</option>
       </select>
 
-       <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">
-            Content
-        </label>
-        <textarea
-          className="w-full border px-4 py-2 rounded h-32"
-            placeholder="Content body..."
-            value={form.content || ""}
-            onChange={(e) => setForm({ ...form, content: e.target.value })}
-        ></textarea>
-      </div>
+      <textarea
+        className="w-full border px-4 py-2 rounded h-32"
+        placeholder="Content"
+        value={form.content}
+        onChange={(e) => setForm({ ...form, content: e.target.value })}
+      />
 
-      <div className="flex justify-end gap-3">
+      <div className="flex justify-end gap-3 mt-4">
         <button onClick={onClose} className="px-4 py-2 border rounded">
           Cancel
         </button>
-        <button
-          onClick={() => onSave({ ...data, ...form })}
-          className="btn-primary"
-        >
+        <button onClick={() => onSave(form)} className="btn-primary">
           Save
         </button>
       </div>
     </Modal>
   );
 };
+
+/* ================= DELETE POPUP ================= */
 
 const DeletePopup = ({ title, onClose, onConfirm }) => (
   <Modal onClose={onClose}>
@@ -267,6 +293,8 @@ const DeletePopup = ({ title, onClose, onConfirm }) => (
     </div>
   </Modal>
 );
+
+/* ================= MODAL ================= */
 
 const Modal = ({ children, onClose }) => (
   <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">

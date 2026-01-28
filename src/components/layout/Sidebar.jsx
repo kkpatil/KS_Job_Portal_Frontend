@@ -6,7 +6,7 @@ import { MdOutlineAdminPanelSettings } from "react-icons/md";
 import { HiOutlineLightBulb } from "react-icons/hi2";
 import { MdOutlineDashboardCustomize } from "react-icons/md";
 import {  NavLink, useNavigate } from "react-router-dom";
-import { getRoleFromToken } from "../../utils/jwt";
+import { getTokenPayload } from "../../utils/jwt";
 
 
 const adminMenu = [
@@ -42,7 +42,7 @@ const Sidebar = ({ toggleSidebar, setToggleSidebar }) => {
   const navigate = useNavigate();
 
   // ✅ JWT se role
-  const role = getRoleFromToken(); // ADMIN | EMPLOYER | CANDIDATE
+  const {role} = getTokenPayload(); // ADMIN | EMPLOYER | CANDIDATE
 
   // ✅ SAFE menu selection (always array)
   const menu =

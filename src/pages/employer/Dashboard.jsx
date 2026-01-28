@@ -8,8 +8,19 @@ import {
 import { Link } from "react-router-dom";
 import PostJobModal from "../../components/employer/PostJobModal";
 import { useState } from "react";
+import { useGetRecentJobsQuery, useGetEmployerDashboardQuery, useGetRecentApplicationsQuery } from "../../services/endpoints/employerDashboardApi";
 
 const Dashboard = () => {
+
+  const { data: employerDashboard ,
+          loading: employerDashboardLoading, 
+          error: employerDashboardError} = useGetEmployerDashboardQuery();
+
+  const {data:employerRecentJobs} = useGetRecentJobsQuery(); 
+  
+  const {data:recentApplications} = useGetRecentApplicationsQuery();
+
+
   const [showCreateJobModal,setShowCreateJobModal] = useState(false);
   return (
     <div className="space-y-6 py-2 md:px-0">
@@ -23,22 +34,22 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Total Jobs"
-          value="12"
+          value={employerDashboard?.data?.totalJobs}
           icon={<BriefcaseIcon className="w-6 h-6" />}
         />
         <StatCard
           title="Active Jobs"
-          value="8"
+          value={employerDashboard?.data?.activeJobs}
           icon={<DocumentTextIcon className="w-6 h-6" />}
         />
         <StatCard
           title="Applications"
-          value="146"
+          value={employerDashboard?.data?.totalApplications}
           icon={<UsersIcon className="w-6 h-6" />}
         />
         <StatCard
           title="Profile Views"
-          value="1,284"
+          value={employerDashboard?.data?.profileViews}
           icon={<EyeIcon className="w-6 h-6" />}
         />
       </div>
@@ -76,7 +87,7 @@ const Dashboard = () => {
             </thead>
 
             <tbody>
-              {recentJobs.map((job) => (
+              {employerRecentJobs?.map((job) => (
                 <tr
                   key={job.id}
                   className="border-b hover:bg-gray-50"
@@ -90,7 +101,12 @@ const Dashboard = () => {
                       className={`px-3 py-1 rounded-full text-xs ${
                         job.status === "Active"
                           ? "bg-green-100 text-green-700"
-                          : "bg-yellow-100 text-yellow-700"
+                          : job.status === "Closed"
+                            ? "bg-red-100 text-red-700"
+                            : job.status === "Pending"
+                              ? "bg-yellow-100 text-yellow-700"
+                              : "bg-red-100 text-red-700"
+
                       }`}
                     >
                       {job.status}
@@ -117,7 +133,7 @@ const Dashboard = () => {
           </table>
         </div>
         <div className="space-y-4 block md:hidden">
-  {recentJobs.map((job) => (
+  {employerRecentJobs?.map((job) => (
     <div
       key={job.id}
       className=" rounded-lg p-4 tabl shadow  space-y-2"
@@ -159,7 +175,7 @@ const Dashboard = () => {
   ))}
 
   {/* Empty State */}
-  {recentJobs.length === 0 && (
+  {employerRecentJobs?.length === 0 && (
     <p className="text-center text-gray-500 py-6">
       No jobs posted yet
     </p>
@@ -174,7 +190,12 @@ const Dashboard = () => {
         </h2>
 
         <div className="space-y-3">
-          {recentApplications.map((app) => (
+          {recentApplications?.length === 0 && (
+            <p className="text-center text-gray-500">
+              No recent applications
+            </p>
+          )}
+          {recentApplications?.map((app) => (
             <div
               key={app.id}
               className="flex justify-between items-center border rounded-lg p-4"
@@ -227,49 +248,6 @@ const StatCard = ({ title, value, icon }) => (
 );
 
 
-const recentJobs = [
-  {
-    id: 1,
-    title: "Frontend Developer",
-    status: "Active",
-    applications: 28,
-    postedOn: "12 Feb 2026",
-  },
-  {
-    id: 2,
-    title: "Backend Developer",
-    status: "Pending",
-    applications: 14,
-    postedOn: "08 Feb 2026",
-  },
-  {
-    id: 3,
-    title: "UI/UX Designer",
-    status: "Active",
-    applications: 19,
-    postedOn: "05 Feb 2026",
-  },
-];
 
-const recentApplications = [
-  {
-    id: 1,
-    candidate: "Amit Verma",
-    job: "Frontend Developer",
-    status: "New",
-  },
-  {
-    id: 2,
-    candidate: "Neha Sharma",
-    job: "Backend Developer",
-    status: "Shortlisted",
-  },
-  {
-    id: 3,
-    candidate: "Rahul Singh",
-    job: "UI/UX Designer",
-    status: "New",
-  },
-];
 
 export default Dashboard;

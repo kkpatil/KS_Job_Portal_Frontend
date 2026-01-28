@@ -7,46 +7,14 @@ import {
   CheckCircleIcon,
   NoSymbolIcon,
 } from "@heroicons/react/24/outline";
-import Modal from "../../components/common/Modal";
 
-const dummyEmployers = [
-  {
-    id: 1,
-    company: "TechNova Pvt Ltd",
-    contact: "Rahul Sharma",
-    email: "hr@technova.com",
-    jobs: 12,
-    status: "Active",
-    joined: "12 Jan 2025",
-  },
-  {
-    id: 2,
-    company: "Bright Solutions",
-    contact: "Anjali Verma",
-    email: "careers@brightsol.com",
-    jobs: 4,
-    status: "Pending",
-    joined: "22 Jan 2025",
-  },
-  {
-    id: 3,
-    company: "NextGen Labs",
-    contact: "Amit Singh",
-    email: "jobs@nextgen.com",
-    jobs: 9,
-    status: "Blocked",
-    joined: "01 Feb 2025",
-  },
-  {
-    id: 4,
-    company: "CloudPeak",
-    contact: "Neha Patel",
-    email: "hr@cloudpeak.io",
-    jobs: 6,
-    status: "Active",
-    joined: "05 Feb 2025",
-  },
-];
+import Modal from "../../components/common/Modal";
+import {
+  useGetAllEmployersQuery,
+  useDeleteEmployerMutation,
+  useUpdateEmployerMutation,
+} from "../../services/endpoints/employerApi";
+import { formatDate } from "../../utils/formateDate";
 
 const statusColor = {
   Active: "bg-green-100 text-green-700",
@@ -55,66 +23,81 @@ const statusColor = {
 };
 
 const Employers = () => {
+  const navigate = useNavigate();
+
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
-  const [editForm, setEditForm] = useState(false);
-  const navigate = useNavigate();
-  const [selectedEmployer, setSelectedEmployer] = useState(null);
-  const [deleteModal, setDeleteModal] = useState(false);
 
-  const toggleEditForm = () => {
-    setEditForm(!editForm);
-  };
+  const [editForm, setEditForm] = useState(false);
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [selectedEmployer, setSelectedEmployer] = useState(null);
 
   const perPage = 3;
 
-  const filteredData = dummyEmployers.filter((emp) => {
-    const matchSearch =
-      emp.company.toLowerCase().includes(search.toLowerCase()) ||
-      emp.email.toLowerCase().includes(search.toLowerCase());
+  /* ================= API ================= */
+  const { data, isLoading } = useGetAllEmployersQuery({
+    page: currentPage,
+    limit: perPage,
+  });
 
-    const matchStatus = statusFilter === "All" || emp.status === statusFilter;
+  const [deleteEmployer] = useDeleteEmployerMutation();
+  const [updateEmployer] = useUpdateEmployerMutation();
+
+  const employers = data?.data || [];
+  const totalPages = data?.pagination?.pages || 1;
+
+  /* ================= FILTER ================= */
+  const filteredData = employers.filter((emp) => {
+    const matchSearch =
+      emp.companyName?.toUpperCase().includes(search.toUpperCase()) ||
+      emp.email?.toUpperCase().includes(search.toUpperCase());
+
+    const matchStatus =
+      statusFilter === "All" || emp.status === statusFilter;
 
     return matchSearch && matchStatus;
   });
 
-  const totalPages = Math.ceil(filteredData.length / perPage);
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * perPage,
-    currentPage * perPage,
-  );
+  /* ================= HANDLERS ================= */
+  const handleDelete = async () => {
+    if (!selectedEmployer?._id) return;
 
+    await deleteEmployer(selectedEmployer._id).unwrap();
+    setDeleteModal(false);
+    setSelectedEmployer(null);
+  };
 
-  const handleSave = () => {
-  console.log("Updated Employer:", selectedEmployer);
+  const handleSave = async () => {
+    await updateEmployer({
+      id: selectedEmployer._id,
+      data: {
+        companyName: selectedEmployer.companyName,
+        contactEmail: selectedEmployer.contactEmail,
+        industry: selectedEmployer.industry,
+        website: selectedEmployer.website,
+        status: selectedEmployer.status,
+        
+      },
+    }).unwrap();
 
-  //Future API
-  // await updateEmployer(selectedEmployer)
+    setEditForm(false);
 
-  setEditForm(false);
-};
+    setSelectedEmployer(null);
+  };
 
-  const handleDelete = () => {
-    console.log("Delete Employer:", selectedEmployer);
-    //Future API
-    // await deleteEmployer(selectedEmployer.id)
+  if (isLoading) {
+    return <div className="p-6">Loading employers...</div>;
   }
-  
-  const toggleDeleteModal = () => {
-    setDeleteModal(!deleteModal);
-  }
 
-
-
+  /* ================= UI ================= */
   return (
     <div className="bg-white rounded-xl shadow-sm p-6">
-      {/* header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 ">
+      {/* HEADER */}
+      <div className="flex flex-col md:flex-row md:justify-between gap-4 mb-6">
         <h2 className="text-xl font-semibold">Employers</h2>
 
-        <div className="flex flex-col sm:flex-row gap-3">
-          {/* search */}
+        <div className="flex gap-3 flex-col sm:flex-row">
           <input
             type="text"
             placeholder="Search company or email"
@@ -123,29 +106,28 @@ const Employers = () => {
             onChange={(e) => setSearch(e.target.value)}
           />
 
-          {/* Status Filter */}
           <select
-            className="border  px-4 py-3 rounded-lg text-sm"
+            className="border px-4 py-2 rounded-lg text-sm"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
             <option value="All">All</option>
-            <option value="Active">Active</option>
-            <option value="Pending">Pending</option>
-            <option value="Blocked">Blocked</option>
+            <option value="ACTIVE">Active</option>
+            <option value="PENDING">Pending</option>
+            <option value="BLOCKED">Blocked</option>
           </select>
         </div>
       </div>
 
-      {/* table */}
-      <div className="hidden md:block overflow-x-auto tabl">
+      {/* ================= DESKTOP TABLE ================= */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="tabl bg-[#c1ceb1] rounded-md text-left">
+            <tr className="bg-[#c1ceb1] text-left">
               <th className="px-4 py-3">Company</th>
               <th className="px-4 py-3">Contact</th>
               <th className="px-4 py-3">Email</th>
-              <th className="px-4 py-3 text-center">Jobs</th>
+              <th className="px-4 py-3 text-center">Industry</th>
               <th className="px-4 py-3 text-center">Status</th>
               <th className="px-4 py-3">Joined</th>
               <th className="px-4 py-3 text-center">Actions</th>
@@ -153,15 +135,14 @@ const Employers = () => {
           </thead>
 
           <tbody>
-            {paginatedData.map((emp) => (
-              <tr
-                key={emp.id}
-                className=" select-none transition-all duration-600 hover:scale-101 hover:bg-[#e7e8e5] hover:border-none rounded-full"
-              >
-                <td className="px-4 py-3 font-medium">{emp.company}</td>
-                <td className="px-4 py-3">{emp.contact}</td>
+            {filteredData.map((emp) => (
+              <tr key={emp._id} className="hover:bg-gray-50">
+                <td className="px-4 py-3 font-medium">
+                  {emp.companyName}
+                </td>
+                <td className="px-4 py-3">{emp.contactEmail}</td>
                 <td className="px-4 py-3 text-gray-600">{emp.email}</td>
-                <td className="px-4 py-3 text-center">{emp.jobs}</td>
+                <td className="px-4 py-3 text-center">{emp.industry}</td>
 
                 <td className="px-4 py-3 text-center">
                   <span
@@ -171,45 +152,43 @@ const Employers = () => {
                   </span>
                 </td>
 
-                <td className="px-4 py-3">{emp.joined}</td>
+                <td className="px-4 py-3">
+                  {formatDate(emp.createdAt)}
+                </td>
 
                 <td className="px-4 py-3">
                   <div className="flex justify-center gap-3">
                     <button
-                      title="View"
-                      onClick={() => navigate(`/admin/employers/${emp.id}`)}
+                      onClick={() =>
+                        navigate(`/admin/employers/${emp._id}`)
+                      }
                     >
-                      <EyeIcon className="w-5 h-5 text-blue-600 cursor-pointer scale-100 transition-all hover:scale-120" />
+                      <EyeIcon className="w-5 h-5 text-blue-600" />
                     </button>
+
                     <button
-                      title="Edit"
                       onClick={() => {
                         setSelectedEmployer(emp);
                         setEditForm(true);
                       }}
                     >
-                      <PencilSquareIcon className="w-5 h-5 text-green-600 hover:scale-120 transition-all" />
+                      <PencilSquareIcon className="w-5 h-5 text-green-600" />
                     </button>
 
-                    {emp.status !== "Active" ? (
-                      <button title="Approve">
-                        <CheckCircleIcon className="w-5 h-5 text-green-600 cursor-pointer scale-100 transition-all hover:scale-120" />
-                      </button>
-                    ) : (
-                      <button title="Block">
-                        <NoSymbolIcon className="w-5 h-5 text-yellow-600 cursor-pointer scale-100 transition-all hover:scale-120" />
-                      </button>
-                    )}
-
-                    <button title="Delete" onClick={()=> toggleDeleteModal()}>
-                      <TrashIcon className="w-5 h-5 text-red-600 cursor-pointer scale-100 transition-all hover:scale-120" />
+                    <button
+                      onClick={() => {
+                        setSelectedEmployer(emp);
+                        setDeleteModal(true);
+                      }}
+                    >
+                      <TrashIcon className="w-5 h-5 text-red-600" />
                     </button>
                   </div>
                 </td>
               </tr>
             ))}
 
-            {paginatedData.length === 0 && (
+            {filteredData.length === 0 && (
               <tr>
                 <td colSpan="7" className="text-center py-6 text-gray-500">
                   No employers found
@@ -219,86 +198,8 @@ const Employers = () => {
           </tbody>
         </table>
       </div>
-      {/* mobile view */}
-      {/* mobile view */}
-<div className="md:hidden space-y-4">
-  {paginatedData.map((emp) => (
-    <div
-      key={emp.id}
-      className="bg-white rounded-lg border p-4 space-y-3 shadow-sm"
-    >
-      {/* Company */}
-      <div className="text-base font-semibold">
-        {emp.company}
-      </div>
 
-      {/* Contact + Email */}
-      <div className="text-sm text-gray-600">
-        <p><span className="font-medium">Contact:</span> {emp.contact}</p>
-        <p><span className="font-medium">Email:</span> {emp.email}</p>
-      </div>
-
-      {/* Jobs + Joined */}
-      <div className="flex justify-between text-sm text-gray-500">
-        <span>Jobs: {emp.jobs}</span>
-        <span>{emp.joined}</span>
-      </div>
-
-      {/* Status */}
-      <div>
-        <span
-          className={`px-3 py-1 rounded-full text-xs font-medium ${statusColor[emp.status]}`}
-        >
-          {emp.status}
-        </span>
-      </div>
-
-      {/* Actions */}
-      <div className="flex justify-end gap-4 pt-2">
-        <button
-          title="View"
-          onClick={() => navigate(`/admin/employers/${emp.id}`)}
-        >
-          <EyeIcon className="w-5 h-5 text-blue-600" />
-        </button>
-
-        <button
-          title="Edit"
-          onClick={() => {
-            setSelectedEmployer(emp);
-            setEditForm(true);
-          }}
-        >
-          <PencilSquareIcon className="w-5 h-5 text-green-600" />
-        </button>
-
-        {emp.status !== "Active" ? (
-          <button title="Approve">
-            <CheckCircleIcon className="w-5 h-5 text-green-600" />
-          </button>
-        ) : (
-          <button title="Block">
-            <NoSymbolIcon className="w-5 h-5 text-yellow-600" />
-          </button>
-        )}
-
-        <button title="Delete" onClick={() => toggleDeleteModal()}>
-          <TrashIcon className="w-5 h-5 text-red-600" />
-        </button>
-      </div>
-    </div>
-  ))}
-
-  {/* Empty State */}
-  {paginatedData.length === 0 && (
-    <p className="text-center py-6 text-gray-500">
-      No employers found
-    </p>
-  )}
-</div>
-
-
-      {/* PAGINATION */}
+      {/* ================= PAGINATION ================= */}
       <div className="flex justify-between items-center mt-6 text-sm">
         <span>
           Page {currentPage} of {totalPages}
@@ -321,18 +222,30 @@ const Employers = () => {
           </button>
         </div>
       </div>
+
+      {/* ================= DELETE MODAL ================= */}
       {deleteModal && (
-        <Modal onClose={toggleDeleteModal}>
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold mb-4">Delete Employer</h3>
-            <p className="mb-6 text-sm">
-              Are you sure you want to delete <b>{selectedEmployer?.company}</b>?
+        <Modal onClose={() => setDeleteModal(false)}>
+          <div className="bg-white p-6 rounded-lg max-w-md">
+            <h3 className="text-lg font-semibold mb-4">
+              Delete Employer
+            </h3>
+            <p className="mb-6">
+              Are you sure you want to delete{" "}
+              <b>{selectedEmployer?.companyName}</b>?
             </p>
+
             <div className="flex justify-end gap-3">
-              <button onClick={toggleDeleteModal} className="px-4 py-2 border rounded cursor-pointer">
+              <button
+                onClick={() => setDeleteModal(false)}
+                className="px-4 py-2 border rounded"
+              >
                 Cancel
               </button>
-              <button onClick={handleDelete} className="btn-danger cursor-pointer">
+              <button
+                onClick={handleDelete}
+                className="btn-danger"
+              >
                 Delete
               </button>
             </div>
@@ -340,70 +253,97 @@ const Employers = () => {
         </Modal>
       )}
 
+      {/* ================= EDIT MODAL ================= */}
       {editForm && (
-        <Modal onClose={toggleEditForm}>
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold mb-4">Edit Employer</h3>
+        <Modal onClose={() => setEditForm(false)}>
+          <div className="bg-white p-6 rounded-lg max-w-md">
+            <h3 className="text-lg font-semibold mb-4">
+              Edit Employer
+            </h3>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1">
-                  Company Name
-                </label>
+                <label className="text-sm font-medium">Company Name</label>
                 <input
-                  type="text"
-                  value={selectedEmployer?.company || ""}
+                  className="w-full border px-3 py-2 rounded"
+                  value={selectedEmployer.companyName}
                   onChange={(e) =>
                     setSelectedEmployer({
                       ...selectedEmployer,
-                      company: e.target.value,
+                      companyName: e.target.value,
                     })
                   }
-                  className="w-full border px-3 py-2 rounded-lg"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">
-                  Contact Person
-                </label>
+                <label className="text-sm font-medium">Contact Email</label>
                 <input
-                  value={selectedEmployer?.contact || ""}
-                  onChange={(e)=>
+                  className="w-full border px-3 py-2 rounded"
+                  value={selectedEmployer.contactEmail}
+                  onChange={(e) =>
                     setSelectedEmployer({
                       ...selectedEmployer,
-                      contact:e.target.value,
+                      contactEmail: e.target.value,
                     })
                   }
+                />
+              </div>
+
+             
+
+              <div>
+                <label className="text-sm font-medium">Indurstry</label>
+                <input
                   type="text"
-                  className="w-full border px-3 py-2 rounded-lg"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">Email</label>
-                <input
-                  value={selectedEmployer?.email || ""}
-                  onChange={()=>
+                  onChange={(e) =>
                     setSelectedEmployer({
                       ...selectedEmployer,
-                      email:e.target.value
+                      industry: e.target.value,
                     })
                   }
-                  type="email"
-                  className="w-full border px-3 py-2 rounded-lg"
+                  className="w-full border px-3 py-2 rounded "
+                  value={selectedEmployer.industry}
                 />
               </div>
             </div>
 
+            <div>
+              <label className="text-sm font-medium">Website</label>
+              <input
+                type="text"
+                onChange={(e) =>
+                  setSelectedEmployer({
+                    ...selectedEmployer,
+                    website: e.target.value,
+                  })
+                }
+                className="w-full border px-3 py-2 rounded "
+                value={selectedEmployer.website}
+              />
+            </div>
+
+              <div className="mt-2 ">
+              <label className="text-sm font-medium ">Status</label>
+            <div className="space-y-4 border  w-fit rounded p-2" >
+
+               <select name="status" id="status" value={selectedEmployer.status} onChange={(e) => setSelectedEmployer({...selectedEmployer, status: e.target.value})}>
+                <option value="ACTIVE">Active</option>
+                <option value="PENDING">Pending</option>
+                <option value="BLOCKED">Blocked</option>
+              </select>
+            </div>
+              </div>
+
+
             <div className="flex justify-end gap-3 mt-6">
               <button
-                onClick={toggleEditForm}
-                className="px-4 py-2 border rounded cursor-pointer"
+                onClick={() => setEditForm(false)}
+                className="px-4 py-2 border rounded"
               >
                 Cancel
               </button>
-              <button onClick={handleSave} className="btn-primary cursor-pointer" >
+              <button onClick={handleSave} className="btn-primary">
                 Save
               </button>
             </div>

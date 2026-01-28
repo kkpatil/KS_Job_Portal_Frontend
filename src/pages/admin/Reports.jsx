@@ -1,8 +1,8 @@
 import {
-  ArrowDownTrayIcon,
   DocumentChartBarIcon,
   UsersIcon,
   BriefcaseIcon,
+  ArrowDownTrayIcon,
 } from "@heroicons/react/24/outline";
 
 import {
@@ -13,205 +13,170 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend,
   BarChart,
   Bar,
-  PieChart,
-  Pie,
-  Cell, Sector,
 } from "recharts";
 
- const applicationData = [
-        { name: "Week 1", applications: 240 },
-        { name: "Week 2", applications: 380 },
-        { name: "Week 3", applications: 520 },
-        { name: "Week 4", applications: 690 },
-      ];
-
-const jobCategoryData = [
-        { category: "IT", jobs: 450 },
-        { category: "Sales", jobs: 320 },
-        { category: "Marketing", jobs: 280 },
-        { category: "HR", jobs: 210 },
-      ];
-
+import {
+  useGetSummaryQuery,
+  useGetApplicationTrendQuery,
+  useGetJobsBySkillQuery,
+  useGetJobsReportQuery,
+  useGetApplicationsReportQuery,
+  useGetReportsListQuery,
+} from "../../services/endpoints/reportsApi";
 
 const Reports = () => {
+  const { data: summary } = useGetSummaryQuery();
+  const { data: applicationData = [] } = useGetApplicationTrendQuery();
+  const { data: jobCategoryData = [] } = useGetJobsBySkillQuery();
+  const { data: jobsReport = [] } = useGetJobsReportQuery();
+  const { data: applicationsReport = [] } = useGetApplicationsReportQuery();
+  const { data: reportsList = [] } = useGetReportsListQuery();
+
+ const downloadReport = async (key) => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/reports/download/${key}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to download report");
+    }
+
+    const blob = await response.blob();
+
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${key}-report.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error("Download error:", error);
+    alert("Failed to download report");
+  }
+};
+
+
+
   return (
     <div className="space-y-6">
+
+      {/* ================= SUMMARY CARDS ================= */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <ReportCard
-          title="Total Candidates"
-          value="12,540"
-          icon={<UsersIcon className="w-6 h-6" />}
-        />
-        <ReportCard
-          title="Total Jobs"
-          value="3,486"
-          icon={<BriefcaseIcon className="w-6 h-6" />}
-        />
-        <ReportCard
-          title="Applications"
-          value="9,284"
-          icon={<DocumentChartBarIcon className="w-6 h-6" />}
-        />
-        <ReportCard
-          title="Employers"
-          value="1,248"
-          icon={<UsersIcon className="w-6 h-6" />}
-        />
+        <ReportCard title="Total Candidates" value={summary?.candidates} icon={<UsersIcon className="w-6 h-6" />} />
+        <ReportCard title="Total Jobs" value={summary?.jobs} icon={<BriefcaseIcon className="w-6 h-6" />} />
+        <ReportCard title="Applications" value={summary?.applications} icon={<DocumentChartBarIcon className="w-6 h-6" />} />
+        <ReportCard title="Employers" value={summary?.employers} icon={<UsersIcon className="w-6 h-6" />} />
       </div>
 
-      {/* chart */}
+      {/* ================= CHARTS ================= */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="card">
-          <h3 className="text-lg font-semibold mb-4">Applications Trend</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={applicationData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Line type="monotone" dataKey="applications" stroke="#4f46e5" />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+        <ChartCard title="Applications Trend">
+          <LineChart data={applicationData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Line dataKey="applications" stroke="#4f46e5" />
+          </LineChart>
+        </ChartCard>
 
-        <div className="card">
-          <h3 className="text-lg font-semibold mb-4">Job Postings by Category</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={jobCategoryData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="category" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="jobs" fill="#4f46e5" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+        <ChartCard title="Jobs by Skill">
+          <BarChart data={jobCategoryData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="category" />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="jobs" fill="#4f46e5" />
+          </BarChart>
+        </ChartCard>
       </div>
 
-     
+      {/* ================= JOBS REPORT ================= */}
+      <ReportTable
+        title="Jobs Report"
+        headers={["Title", "Employer", "Status", "Posted On"]}
+        rows={jobsReport.map(j => [
+          j.title,
+          j.employer?.name || "—",
+          j.status,
+          new Date(j.createdAt).toLocaleDateString(),
+        ])}
+      />
 
-      <div className="card flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <h2 className="text-xl font-semibold">Reports</h2>
+      {/* ================= APPLICATIONS REPORT ================= */}
+      <ReportTable
+        title="Applications Report"
+        headers={["Candidate", "Job", "Status", "Applied On"]}
+        rows={applicationsReport.map(a => [
+          a.candidate?.name,
+          a.job?.title,
+          a.status,
+          new Date(a.createdAt).toLocaleDateString(),
+        ])}
+      />
 
-        <div className="flex flex-col sm:flex-row gap-3">
-          <select className="border px-4 py-2 rounded-lg text-sm" name="reportType">
-            <option>All Reports</option>
-            <option>User Reports</option>
-            <option>Job Reports</option>
-            <option>Application Reports</option>
-            <option>Employer Reports</option>
-          </select>
+      {/* ================= REPORTS LIST ================= */}
+    <div className="card">
+  <h3 className="text-lg font-semibold mb-4">Available Reports</h3>
 
-          <input
-            type="date"
-            name="reportDate"
-            className="border px-4 py-2 rounded-lg text-sm"
-          />
+  <table className="w-full text-sm">
+    <thead className="bg-[#ebf5c6]">
+      <tr>
+        <th className="px-4 py-2 text-left">Report</th>
+        <th className="px-4 py-2 text-center">Action</th>
+      </tr>
+    </thead>
 
-          <button className="btn-primary flex items-center gap-1 cursor-pointer">
-            <ArrowDownTrayIcon className="w-4 h-4" />
-            Export
-          </button>
-        </div>
-      </div>
+    <tbody>
+      {reportsList.map((report) => (
+        <tr key={report.key} className="border-b">
+          <td className="px-4 py-2 font-medium">
+            {report.title}
+          </td>
 
-      <div className="card">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="text-left">
-              <tr className="bg-[#ebf5c6]  text-left">
-                <th className="px-4 py-3">Report Name</th>
-                <th className="px-4 py-3">Type</th>
-                <th className="px-4 py-3">Generated By</th>
-                <th className="px-4 py-3">Date</th>
-                <th className="px-4 py-3 text-center">Status</th>
-                <th className="px-4 py-3 text-center">Action</th>
-              </tr>
-            </thead>
+          <td className="px-4 py-2 text-center">
+            <button
+              onClick={() => downloadReport(report.key)}
+              className="text-indigo-600 flex items-center gap-1 justify-center"
+            >
+              <ArrowDownTrayIcon className="w-4 h-4" />
+              Download
+            </button>
+          </td>
+        </tr>
+      ))}
 
-            <tbody>
-              {dummyReports.map((report) => (
-                <tr
-                  key={report.id}
-                  className="border-b hover:bg-gray-50"
-                >
-                  <td className="px-4 py-3 font-medium">
-                    {report.name}
-                  </td>
-                  <td className="px-4 py-3">{report.type}</td>
-                  <td className="px-4 py-3">{report.by}</td>
-                  <td className="px-4 py-3">{report.date}</td>
+      {reportsList.length === 0 && (
+        <tr>
+          <td colSpan="2" className="text-center py-6 text-gray-500">
+            No reports available
+          </td>
+        </tr>
+      )}
+    </tbody>
+  </table>
+</div>
 
-                  <td className="px-4 py-3 text-center">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        report.status === "Completed"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-yellow-100 text-yellow-700"
-                      }`}
-                    >
-                      {report.status}
-                    </span>
-                  </td>
 
-                  <td className="px-4 py-3 text-center">
-                    <button className="text-indigo-600 hover:underline text-sm">
-                      Download
-                    </button>
-                  </td>
-                </tr>
-              ))}
-
-              {dummyReports.length === 0 && (
-                <tr>
-                  <td
-                    colSpan="6"
-                    className="text-center py-6 text-gray-500"
-                  >
-                    No reports found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
     </div>
   );
 };
 
-
-const dummyReports = [
-  {
-    id: 1,
-    name: "Monthly Job Report",
-    type: "Jobs",
-    by: "Admin",
-    date: "15 Jan 2026",
-    status: "Completed",
-  },
-  {
-    id: 2,
-    name: "Employer Activity Report",
-    type: "Employers",
-    by: "System",
-    date: "14 Jan 2026",
-    status: "Completed",
-  },
-  {
-    id: 3,
-    name: "Applications Summary",
-    type: "Applications",
-    by: "Admin",
-    date: "13 Jan 2026",
-    status: "Processing",
-  },
-];
-
+/* ================= SMALL COMPONENTS ================= */
 
 const ReportCard = ({ title, value, icon }) => (
   <div className="card flex items-center gap-6">
@@ -220,8 +185,41 @@ const ReportCard = ({ title, value, icon }) => (
     </div>
     <div>
       <div className="text-sm text-gray-500">{title}</div>
-      <div className="text-2xl font-bold">{value}</div>
+      <div className="text-2xl font-bold">{value ?? 0}</div>
     </div>
+  </div>
+);
+
+const ChartCard = ({ title, children }) => (
+  <div className="card">
+    <h3 className="text-lg font-semibold mb-4">{title}</h3>
+    <ResponsiveContainer width="100%" height={300}>
+      {children}
+    </ResponsiveContainer>
+  </div>
+);
+
+const ReportTable = ({ title, headers, rows }) => (
+  <div className="card">
+    <h3 className="text-lg font-semibold mb-4">{title}</h3>
+    <table className="w-full text-sm">
+      <thead className="bg-[#ebf5c6]">
+        <tr>
+          {headers.map((h, i) => (
+            <th key={i} className="px-4 py-2 text-left">{h}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row, i) => (
+          <tr key={i} className="border-b">
+            {row.map((cell, j) => (
+              <td key={j} className="px-4 py-2">{cell}</td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
   </div>
 );
 

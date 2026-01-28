@@ -17,10 +17,15 @@ export const authApi = api.injectEndpoints({
         body: data,
       }),
     }),
+    changeEmployerPassword: builder.mutation({
+      query: (data) => ({
+        url: "/auth/change-password",
+        method: "PUT",
+        body: data,
+      }),
+    }),
+    
   }),
 });
 
-export const {
-  useRegisterMutation,
-  useLoginMutation,
-} = authApi;
+export const { useRegisterMutation, useLoginMutation, useChangeEmployerPasswordMutation } = authApi;
