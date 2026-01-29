@@ -5,8 +5,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import { lazy, Suspense } from "react";
-import {  getTokenPayload } from "../utils/jwt";
-
+import { getTokenPayload } from "../utils/jwt";
 
 // ================= LAYOUTS (NO LAZY) =================
 import AuthLayout from "../layouts/AuthLayout";
@@ -17,6 +16,10 @@ import PrivateRoute from "./PrivateRoute";
 import CandidateSettings from "../pages/candidate/CandidateSettings";
 import JobDetailsView from "../pages/candidate/JobsDetailsView";
 import CompleteEmployerProfile from "../pages/employer/CompleteEmployerProfile";
+import HomePage from "../pages/landingpage/Homepage";
+import AboutPage from "../pages/landingpage/AboutPage";
+import Job from "../pages/landingpage/Job";
+import ContactUs from "../pages/landingpage/ContactUs";
 
 // ================= AUTH =================
 const Login = lazy(() => import("../pages/auth/Login"));
@@ -41,28 +44,24 @@ const EmployerDashboard = lazy(() => import("../pages/employer/Dashboard"));
 const CompanyProfile = lazy(() => import("../pages/employer/CompanyProfile"));
 const MyJobs = lazy(() => import("../pages/employer/MyJobs"));
 const EmployerSettings = lazy(() => import("../pages/employer/Settings"));
-const ApplicationsEmployer = lazy(() =>
-  import("../pages/employer/ApplicationsEmployer")
+const ApplicationsEmployer = lazy(
+  () => import("../pages/employer/ApplicationsEmployer"),
 );
-const EmployerJobDetails = lazy(() =>
-  import("../pages/employer/EmployerJobDetails")
+const EmployerJobDetails = lazy(
+  () => import("../pages/employer/EmployerJobDetails"),
 );
-const JobApplicationsEmployer = lazy(() =>
-  import("../pages/employer/JobApplicationsEmployer")
+const JobApplicationsEmployer = lazy(
+  () => import("../pages/employer/JobApplicationsEmployer"),
 );
-const ApplicationsCandidateDetails = lazy(() =>
-  import("../pages/employer/ApplicationsCandidateDetails")
+const ApplicationsCandidateDetails = lazy(
+  () => import("../pages/employer/ApplicationsCandidateDetails"),
 );
 
 // ================= CANDIDATE =================
-const CandidateDashboard = lazy(() =>
-  import("../pages/candidate/Dashboard")
-);
+const CandidateDashboard = lazy(() => import("../pages/candidate/Dashboard"));
 const Profile = lazy(() => import("../pages/candidate/Profile"));
 const CandidateJobs = lazy(() => import("../pages/candidate/Jobs"));
-const MyApplications = lazy(() =>
-  import("../pages/candidate/MyApplications")
-);
+const MyApplications = lazy(() => import("../pages/candidate/MyApplications"));
 const SavedJobs = lazy(() => import("../pages/candidate/SavedJobs"));
 
 // ================= PUBLIC =================
@@ -76,21 +75,19 @@ const dummyUser = {
 
 // ================= LOADER =================
 const Loader = () => (
-  <div style={{ textAlign: "center", padding: "50px" }}>
-    Loading...
-  </div>
+  <div style={{ textAlign: "center", padding: "50px" }}>Loading...</div>
 );
 
 const AppRoutes = () => {
-  
-
   return (
     <Router>
       <Suspense fallback={<Loader />}>
         <Routes>
           {/* DEFAULT */}
-          <Route path="/" element={<Navigate to="/login" />} />
-
+          <Route path="/" element={<HomePage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/jobs" element={<Job />} />
+          <Route path="/contact" element={<ContactUs />} />
           {/* AUTH */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -127,7 +124,7 @@ const AppRoutes = () => {
           <Route
             path="/admin/employers/:id"
             element={
-              <PrivateRoute  allowedRoles={["ADMIN"]}>
+              <PrivateRoute allowedRoles={["ADMIN"]}>
                 <AdminLayout>
                   <EmployerDetails />
                 </AdminLayout>
@@ -297,16 +294,13 @@ const AppRoutes = () => {
             }
           />
           <Route
-  path="/employer/complete-profile"
-  element={
-    <PrivateRoute allowedRoles={["EMPLOYER"]}>
-      
-
-      <CompleteEmployerProfile />
-      
-    </PrivateRoute>
-  }
-/>
+            path="/employer/complete-profile"
+            element={
+              <PrivateRoute allowedRoles={["EMPLOYER"]}>
+                <CompleteEmployerProfile />
+              </PrivateRoute>
+            }
+          />
 
           {/* CANDIDATE */}
           <Route
@@ -339,9 +333,9 @@ const AppRoutes = () => {
               </PrivateRoute>
             }
           />
-          <Route 
+          <Route
             path="/candidate/jobs/:id"
-            element= {
+            element={
               <PrivateRoute allowedRoles={["CANDIDATE"]}>
                 <CandidateLayout>
                   <JobDetailsView />
@@ -349,7 +343,7 @@ const AppRoutes = () => {
               </PrivateRoute>
             }
           />
-          
+
           <Route
             path="/candidate/applications"
             element={
@@ -409,9 +403,6 @@ const AppRoutes = () => {
   }
 /> */}
 
-
-
-
           {/* 404 */}
           <Route path="*" element={<NotFound />} />
         </Routes>
@@ -420,4 +411,4 @@ const AppRoutes = () => {
   );
 };
 
-export default AppRoutes ;
+export default AppRoutes;
