@@ -58,6 +58,22 @@ export const applicationsApi = api.injectEndpoints({
       transformResponse: (response) => Array.isArray(response?.data) ? response.data : [],
       providesTags: ["Applications"],
     }),
+   getApplicationById: builder.query({
+  query: (id) => `/applications/employer/${id}`,
+}),
+
+    shortlistApplication: builder.mutation({
+      query: (applicationId) => ({
+        url: `/applications/${applicationId}/shortlist`,
+        method: "PATCH",
+      }),
+    }),
+    rejectApplication: builder.mutation({
+      query: (applicationId) => ({
+        url: `/applications/${applicationId}/reject`,
+        method: "PATCH",
+      }),
+    }),
   }),
 });
 
@@ -69,4 +85,8 @@ export const {
   useDeleteApplicationMutation,
   useGetEmployerApplicationsQuery,
   useGetCandidateApplicationsQuery,
+
+  useGetApplicationByIdQuery,
+  useShortlistApplicationMutation,
+  useRejectApplicationMutation,
 } = applicationsApi;

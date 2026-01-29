@@ -11,6 +11,7 @@ import {
   useUpdateSkillMutation,
   useDeleteSkillMutation,
 } from "../../services/endpoints/skillApi";
+import { useGetAllCategoriesQuery } from "../../services/endpoints/categoryApi";
 
 const Skills = () => {
   const { data: skills = [], isLoading } = useGetAdminSkillsQuery();
@@ -24,16 +25,27 @@ const Skills = () => {
   const [showDelete, setShowDelete] = useState(false);
   const [selectedSkill, setSelectedSkill] = useState(null);
 
-  /* ---------- handlers ---------- */
   const handleAdd = async (data) => {
-    await createSkill({ name: data.name }).unwrap();
-    setShowAdd(false);
+    try {
+      if(data.category === "")
+      {
+        return alert("Please select a category");
+      }
+      if(data.name === ""){
+        return alert("Please enter a skill name");
+      }
+      await createSkill({ name: data.name, category:data.category }).unwrap();
+      setShowAdd(false);
+      
+    } catch (error) {
+      alert(error?.data?.message || "Failed to add skill");
+    }
   };
 
   const handleUpdate = async (data) => {
     await updateSkill({
       id: selectedSkill._id,
-      data: { name: data.name, status: data.status },
+      data: { name: data.name, status: data.status, category: data.category },
     }).unwrap();
     setShowEdit(false);
   };
@@ -65,8 +77,11 @@ const Skills = () => {
           <thead className="bg-[#c1ceb1]">
             <tr>
               <th className="px-4 py-3 text-left">Skill</th>
+              <th className="px-4 py-3 text-left">Category</th>
+
               <th className="px-4 py-3 text-center">Jobs</th>
               <th className="px-4 py-3 text-center">Status</th>
+
               <th className="px-4 py-3 text-center">Actions</th>
             </tr>
           </thead>
@@ -75,10 +90,9 @@ const Skills = () => {
             {skills.map((skill) => (
               <tr key={skill._id} className="hover:bg-[#e7e8e5]">
                 <td className="px-4 py-3 font-medium">{skill.name}</td>
+                <td className="px-4 py-3">{skill.category?.name || "-"}</td>
 
-                <td className="px-4 py-3 text-center">
-                  {skill.jobsCount}
-                </td>
+                <td className="px-4 py-3 text-center">{skill.jobsCount}</td>
 
                 <td className="px-4 py-3 text-center">
                   <span
@@ -129,10 +143,7 @@ const Skills = () => {
 
       {/* ADD */}
       {showAdd && (
-        <SkillForm
-          onClose={() => setShowAdd(false)}
-          onSave={handleAdd}
-        />
+        <SkillForm onClose={() => setShowAdd(false)} onSave={handleAdd} />
       )}
 
       {/* EDIT */}
@@ -157,17 +168,36 @@ const Skills = () => {
   );
 };
 
-/* ================== FORM ================== */
 const SkillForm = ({ onClose, onSave, skill, edit }) => {
+  const { data: categories = [], isLoading } = useGetAllCategoriesQuery();
   const [name, setName] = useState(skill?.name || "");
   const [status, setStatus] = useState(skill?.status || "ACTIVE");
-
+  const [category, setCategory] = useState(skill?.category?._id || "");
   return (
     <Modal onClose={onClose}>
       <h3 className="text-lg font-semibold mb-4">
         {edit ? "Edit Skill" : "Add Skill"}
       </h3>
 
+   
+      <select
+        className="w-full border px-4 py-2 rounded mb-3"
+        value={category}
+        onChange={(e) => setCategory(e.target.value)}
+      >
+        <option value="">Select Category</option>
+
+        {isLoading ? (
+          <option>Loading...</option>
+        ) : (
+          categories.map((cat) => (
+            <option key={cat._id} value={cat._id}>
+              {cat.name}
+            </option>
+          ))
+        )}
+      </select>
+     
       <input
         className="w-full border px-4 py-2 rounded mb-3"
         placeholder="Skill name"
@@ -191,7 +221,7 @@ const SkillForm = ({ onClose, onSave, skill, edit }) => {
           Cancel
         </button>
         <button
-          onClick={() => onSave({ name, status })}
+          onClick={() => onSave({ name, status, category })}
           className="btn-primary"
         >
           Save
@@ -201,7 +231,6 @@ const SkillForm = ({ onClose, onSave, skill, edit }) => {
   );
 };
 
-/* ================== DELETE ================== */
 const DeletePopup = ({ skill, onClose, onConfirm }) => (
   <Modal onClose={onClose}>
     <h3 className="text-lg font-semibold mb-4">Delete Skill</h3>

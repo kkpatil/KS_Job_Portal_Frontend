@@ -6,71 +6,64 @@ import {
   DocumentArrowDownIcon,
   ViewfinderCircleIcon,
 } from "@heroicons/react/24/outline";
-
-/* ================= DUMMY APPLICATION DATA ================= */
-const dummyApplications = [
-  {
-    id: 1,
-    candidate: "Amit Verma",
-    email: "amit@gmail.com",
-    phone: "+91 98765 43210",
-    experience: "2 Years",
-    skills: ["React", "JavaScript", "HTML", "CSS"],
-    appliedOn: "15 Feb 2026",
-    status: "New",
-    jobTitle: "Frontend Developer",
-    resume: "amit-verma-resume.pdf",
-    coverLetter:
-      "I am very interested in this role and have hands-on experience with React and modern frontend tools.",
-  },
-  {
-    id: 2,
-    candidate: "Neha Sharma",
-    email: "neha@gmail.com",
-    phone: "+91 91234 56789",
-    experience: "3 Years",
-    skills: ["Node.js", "MongoDB", "Express"],
-    appliedOn: "14 Feb 2026",
-    status: "Shortlisted",
-    jobTitle: "Backend Developer",
-    resume: "neha-sharma-resume.pdf",
-    coverLetter:
-      "I have strong backend experience and would love to contribute to your team.",
-  },
-];
+import { useState } from "react";
+import {
+  useGetApplicationByIdQuery,
+  useShortlistApplicationMutation,
+  useRejectApplicationMutation,
+} from "../../services/endpoints/applicationsApi";
 
 const statusColor = {
-  New: "bg-blue-100 text-blue-700",
-  Shortlisted: "bg-green-100 text-green-700",
-  Rejected: "bg-red-100 text-red-700",
+  NEW: "bg-blue-100 text-blue-700",
+  SHORTLISTED: "bg-green-100 text-green-700",
+  REJECTED: "bg-red-100 text-red-700",
 };
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const ApplicationsCandidateDetails = () => {
+  const [action, setAction] = useState(null);
   const { id } = useParams();
-  const application = dummyApplications.find(
-    (app) => app.id === Number(id)
-  );
 
-  if (!application) {
+  const { data, isLoading, isError } = useGetApplicationByIdQuery(id);
+
+  const [shortlist] = useShortlistApplicationMutation();
+  const [reject] = useRejectApplicationMutation();
+
+  const handleConfirm = async () => {
+    if (action === "SHORTLIST") {
+      await shortlist(_id);
+    }
+
+    if (action === "REJECT") {
+      await reject(_id);
+    }
+
+    setAction(null);
+  };
+
+  if (isLoading) {
+    return <div className="card text-center">Loading...</div>;
+  }
+
+  if (isError || !data?.success) {
     return (
       <div className="card text-center">
         <p className="text-gray-500">Application not found</p>
-        <Link
-          to={-1}
-          className="text-indigo-600 underline"
-        >
+        <Link to={-1} className="text-indigo-600 underline">
           Back
         </Link>
       </div>
     );
   }
 
+  const application = data.data;
+  const { candidate, job, status, createdAt, _id } = application;
+
   return (
     <div className="space-y-6">
-      
       <Link
         to={-1}
-        className="flex items-center gap-1 text-sm text-gray-100 hover:text-white btn-primary w-fit "
+        className="flex items-center gap-1 text-sm text-gray-100 btn-primary w-fit"
       >
         <ArrowLeftIcon className="w-4 h-4" />
         Back
@@ -79,51 +72,42 @@ const ApplicationsCandidateDetails = () => {
       {/* HEADER */}
       <div className="card flex justify-between items-start">
         <div>
-          <h1 className="text-2xl font-bold">
-            {application.candidate}
-          </h1>
+          <h1 className="text-2xl font-bold">{candidate.name}</h1>
           <p className="text-gray-500">
-            Applied for <b>{application.jobTitle}</b>
+            Applied for <b>{job.title}</b>
           </p>
         </div>
 
         <span
-          className={`px-4 py-1 rounded-full text-sm ${statusColor[application.status]}`}
+          className={`px-4 py-1 rounded-full text-sm ${statusColor[status]}`}
         >
-          {application.status}
+          {status}
         </span>
       </div>
 
       {/* DETAILS */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* LEFT */}
         <div className="card space-y-3">
-          <Detail label="Email" value={application.email} />
-          <Detail label="Phone" value={application.phone} />
-          <Detail label="Experience" value={application.experience} />
-          <Detail label="Applied On" value={application.appliedOn} />
+          <Detail label="Email" value={candidate.email} />
+          <Detail label="Experience" value={candidate.experience || "—"} />
+          <Detail
+            label="Applied On"
+            value={new Date(createdAt).toDateString()}
+          />
         </div>
 
-        {/* RIGHT */}
         <div className="card">
           <h3 className="font-semibold mb-2">Skills</h3>
-          <div className="flex flex-wrap gap-2 mb-4">
-            {application.skills.map((skill, index) => (
+          <div className="flex flex-wrap gap-2">
+            {candidate.skills?.map((skill, i) => (
               <span
-                key={index}
+                key={i}
                 className="px-3 py-1 rounded-full text-xs bg-indigo-100 text-indigo-700"
               >
                 {skill}
               </span>
             ))}
           </div>
-
-          <h3 className="font-semibold mb-2">
-            Cover Letter
-          </h3>
-          <p className="text-sm text-gray-600">
-            {application.coverLetter}
-          </p>
         </div>
       </div>
 
@@ -132,43 +116,86 @@ const ApplicationsCandidateDetails = () => {
         <div>
           <p className="font-medium">Resume</p>
           <p className="text-sm text-gray-500">
-            {application.resume}
+            {candidate.resume?.split("/").pop()}
           </p>
         </div>
-        <div className="flex gap-6">
- 
-        <button className="btn-secondary flex items-center gap-1 cursor-pointer">
-          <ViewfinderCircleIcon className="w-4 h-4" />
-          View
-        </button>
-        <button className="btn-secondary flex items-center gap-1 cursor-pointer">
-          <DocumentArrowDownIcon className="w-4 h-4" />
-          Download
-        </button>
+
+        <div className="flex gap-4">
+          <a
+            href={`${API_URL}/${candidate?.resume}`}
+            target="_blank"
+            rel="noreferrer"
+            className="btn-secondary flex items-center gap-1"
+          >
+            <ViewfinderCircleIcon className="w-4 h-4" />
+            View
+          </a>
+
+          <a
+            href={`${API_URL}/applications/${_id}/download`}
+            className="btn-secondary flex items-center gap-1"
+          >
+            <DocumentArrowDownIcon className="w-4 h-4" />
+            Download
+          </a>
         </div>
       </div>
 
       {/* ACTIONS */}
       <div className="flex justify-end gap-3">
-        {application.status !== "Shortlisted" && (
-          <button className="btn-primary flex items-center gap-1  cursor-pointer">
+        {status !== "SHORTLISTED" && (
+          <button
+            onClick={() => setAction("SHORTLIST")}
+            className="btn-primary flex items-center gap-1"
+          >
             <CheckCircleIcon className="w-4 h-4" />
             Shortlist
           </button>
         )}
 
-        {application.status !== "Rejected" && (
-          <button className="btn-danger flex items-center gap-1 cursor-pointer">
+        {status !== "REJECTED" && (
+          <button
+            onClick={() => setAction("REJECT")}
+            className="btn-danger flex items-center gap-1"
+          >
             <XCircleIcon className="w-4 h-4" />
             Reject
           </button>
         )}
       </div>
+      {action && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-sm space-y-4">
+            <h3 className="text-lg font-semibold">
+              {action === "REJECT"
+                ? "Reject Candidate?"
+                : "Shortlist Candidate?"}
+            </h3>
+
+            <p className="text-sm text-gray-500">
+              Are you sure you want to{" "}
+              {action === "REJECT" ? "reject" : "shortlist"} this candidate?
+            </p>
+
+            <div className="flex justify-end gap-3">
+              <button onClick={() => setAction(null)} className="btn-secondary">
+                Cancel
+              </button>
+
+              <button
+                onClick={handleConfirm}
+                className={action === "REJECT" ? "btn-danger" : "btn-primary"}
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-/* ================= SMALL COMPONENT ================= */
 const Detail = ({ label, value }) => (
   <div className="flex justify-between text-sm">
     <span className="text-gray-500">{label}</span>

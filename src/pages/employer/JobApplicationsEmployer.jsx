@@ -73,15 +73,15 @@ const JobApplicationsEmployer = () => {
                 >
                   <td className="px-4 py-3">
                     <div className="font-medium">
-                      {app.applicant?.name}
+                      {app.candidate?.name}
                     </div>
                     <div className="text-xs text-gray-500">
-                      {app.applicant?.email}
+                      {app.candidate?.email}
                     </div>
                   </td>
 
                   <td className="px-4 py-3">
-                    {app.applicant?.experience || "-"}
+                    {app?.experience || "-"}
                   </td>
 
                   <td className="px-4 py-3">
@@ -99,7 +99,7 @@ const JobApplicationsEmployer = () => {
                   <td className="px-4 py-3">
                     <div className="flex justify-center gap-3">
                       <Link
-                        to={`/employer/candidates/${app.applicant?._id}`}
+                        to={`/employer/candidates/${app?._id}`}
                         title="View Profile"
                       >
                         <EyeIcon className="w-5 h-5 text-blue-600" />
