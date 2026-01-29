@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaGoogle } from "react-icons/fa";
 import { PiBagSimpleFill } from "react-icons/pi";
 import { Link, useNavigate } from "react-router-dom";
@@ -59,6 +59,21 @@ const Login = () => {
   }
 };
 
+ const token = localStorage.getItem("token");
+  useEffect(()=>{
+    if(token){
+     const {role, profileCompleted} = getTokenPayload();
+     if(role === "ADMIN"){
+      navigate("/admin", {replace: true});
+     }
+     if(role === "EMPLOYER"){
+      navigate(profileCompleted ? "/employer" : "/employer/complete-profile", {replace: true});
+     }
+     if(role === "CANDIDATE"){
+      navigate("/candidate", {replace: true});
+     }
+    }
+  },[token])
 
 
   return (

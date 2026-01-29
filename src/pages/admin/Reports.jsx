@@ -29,7 +29,9 @@ import {
 const Reports = () => {
   const { data: summary } = useGetSummaryQuery();
   const { data: applicationData = [] } = useGetApplicationTrendQuery();
+  // console.log(applicationData);
   const { data: jobCategoryData = [] } = useGetJobsBySkillQuery();
+  console.log(jobCategoryData);
   const { data: jobsReport = [] } = useGetJobsReportQuery();
   const { data: applicationsReport = [] } = useGetApplicationsReportQuery();
   const { data: reportsList = [] } = useGetReportsListQuery();

@@ -12,6 +12,7 @@ const statusColor = {
   SHORTLISTED: "bg-green-100 text-green-700",
   REJECTED: "bg-red-100 text-red-700",
   HIRED: "bg-purple-100 text-purple-700",
+  APPLIED: "bg-yellow-100 text-yellow-700",
 };
 
 const Applications = () => {
@@ -28,7 +29,7 @@ const Applications = () => {
   const applications = Array.isArray(applicationsData)
     ? applicationsData
     : [];
-  console.log("applications", applications);
+ 
 
 
   const [showViewModal, setShowViewModal] = useState(false);
@@ -106,7 +107,7 @@ const Applications = () => {
                   </td>
 
                   <td className="px-4 py-3">
-                    {app.company?.name || "—"}
+                    {app.job?.employer?.companyName || "—"}
                   </td>
 
                   <td className="px-4 py-3 text-center">
@@ -186,7 +187,7 @@ const Applications = () => {
                   <b>Job:</b> {app.job?.title || "—"}
                 </p>
                 <p>
-                  <b>Company:</b> {app.company?.name || "—"}
+                  <b>Company:</b> {app?.job?.employer?.companyName || "—"}
                 </p>
               </div>
 
@@ -254,7 +255,7 @@ const Applications = () => {
               <b>Job:</b> {selectedApp.job?.title}
             </p>
             <p>
-              <b>Company:</b> {selectedApp.company?.name || "—"}
+              <b>Company:</b> {selectedApp.job?.employer.companyName || "—"}
             </p>
             <p>
               <b>Status:</b>{" "}

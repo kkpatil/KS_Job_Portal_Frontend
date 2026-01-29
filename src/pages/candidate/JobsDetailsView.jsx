@@ -26,14 +26,12 @@ const JobDetailsView = () => {
   const [saved, setSaved] = useState(false);
   const [showApply, setShowApply] = useState(false);
 
-  // ✅ sync saved state
   useEffect(() => {
     if (job?.isSaved) {
       setSaved(true);
     }
   }, [job]);
 
-  // ✅ APPLY JOB
   const handleApply = async () => {
     try {
       await applyJob({
@@ -47,7 +45,6 @@ const JobDetailsView = () => {
     }
   };
 
-  // ✅ SAVE / UNSAVE JOB
   const handleSave = async () => {
     try {
       const res = await toggleSaveJob(id).unwrap();
@@ -57,7 +54,6 @@ const JobDetailsView = () => {
     }
   };
 
-  /* ================= STATES ================= */
 
   if (isLoading) {
     return <div className="card text-center">Loading job...</div>;

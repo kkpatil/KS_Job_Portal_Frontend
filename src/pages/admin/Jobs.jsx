@@ -36,6 +36,7 @@ const Jobs = () => {
   const [selectedJob, setSelectedJob] = useState(null);
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteJobId, setDeleteJobId] = useState(null);
 
   const { data: jobsData = [], isLoading, isError } = useGetAllJobsQuery();
   const [deleteJob] = useDeleteJobMutation();
@@ -188,7 +189,10 @@ const Jobs = () => {
                   <PencilSquareIcon className="w-5 h-5 text-green-600 cursor-pointer" />
                 </button>
 
-                <button onClick={() => setIsDeleteModalOpen(job._id)}>
+                <button onClick={() => {
+                   setDeleteJobId(job._id);
+                  setIsDeleteModalOpen(true);
+                }}>
                   <TrashIcon className="w-5 h-5 text-red-600 cursor-pointer" />
                 </button>
               </div>
@@ -244,7 +248,7 @@ const Jobs = () => {
             </button>
             <button
               onClick={async () => {
-                await handleDelete(isDeleteModalOpen);
+                await deleteJob(deleteJobId).unwrap();
                 setIsDeleteModalOpen(null);
               }}
               className="btn-danger cursor-pointer scale-100 hover:scale-95 transition flex items-center gap-1"
