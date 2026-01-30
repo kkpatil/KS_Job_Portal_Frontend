@@ -1,12 +1,12 @@
 import React from "react";
 import Header from "../../components/home/layout/Header";
-import HeroSection from "./Homepage/Hero";
+import HeroSection from "./Homepage/HeroSection";
 import RecentJobs from "./Homepage/RecentJobs";
 import JobCategory from "./Homepage/JobCategory";
-import CompanySection from "./Homepage/CompanyReview";
-import CTASection from "./homePage/Card";
-import Testimonials from "./homePage/Testinomials";
-import NewsBlog from "./homePage/NewsandBlogs";
+import CompanySection from "./Homepage/CompanySection";
+import CTASection from "./homePage/CTASection";
+import Testimonials from "./homePage/Testimonials";
+import NewsBlog from "./homePage/NewsBlog";
 import Footer from "../../components/home/layout/Footer";
 
 function HomePage() {

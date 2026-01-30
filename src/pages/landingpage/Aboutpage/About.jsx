@@ -1,10 +1,10 @@
 import React from "react";
-import InfoSection from "./Main";
-import HowItWorks from "./HowitWorks";
-import VideoHeroSection from "./Card";
-import FAQSection from "./Questions";
-import BestSection from "./workingBest";
-import NewsBlogSection from "./NewsandBlogs";
+// import InfoSection from "./InfoSection";
+// import HowItWorks from "./HowitWorks";
+// import VideoHeroSection from "./VideoHeroSection";
+// import FAQSection from "./FAQSection";
+// import BestSection from "./BestSection";
+// import NewsBlogSection from "./NewsBlogSection";
 function About() {
   return (
     <div>

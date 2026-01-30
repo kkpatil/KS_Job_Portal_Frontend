@@ -20,18 +20,10 @@ import HomePage from "../pages/landingpage/Homepage";
 import AboutPage from "../pages/landingpage/AboutPage";
 import Job from "../pages/landingpage/Job";
 import ContactUs from "../pages/landingpage/ContactUs";
-<<<<<<< Updated upstream
-import ScrollToTop from "../components/common/ScrollToTop";
-
-import PrivacyPolicy from "../pages/landingpage/privacyPolicy/PrivacyPolicy";
-
-
-=======
 import JobDetail from "../pages/landingpage/JobDetail";
 import PrivacyPolicy from "../pages/landingpage/privacyPolicy/PrivacyPolicy";
 import TermsAndConditions from "../pages/landingpage/TermsandCondition/TermsandCondition";
 import ScrollToTop from "../components/common/ScrollToTop";
->>>>>>> Stashed changes
 // ================= AUTH =================
 const Login = lazy(() => import("../pages/auth/Login"));
 const Register = lazy(() => import("../pages/auth/Register"));
