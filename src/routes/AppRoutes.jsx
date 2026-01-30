@@ -20,11 +20,18 @@ import HomePage from "../pages/landingpage/Homepage";
 import AboutPage from "../pages/landingpage/AboutPage";
 import Job from "../pages/landingpage/Job";
 import ContactUs from "../pages/landingpage/ContactUs";
+<<<<<<< Updated upstream
 import ScrollToTop from "../components/common/ScrollToTop";
 
 import PrivacyPolicy from "../pages/landingpage/privacyPolicy/PrivacyPolicy";
 
 
+=======
+import JobDetail from "../pages/landingpage/JobDetail";
+import PrivacyPolicy from "../pages/landingpage/privacyPolicy/PrivacyPolicy";
+import TermsAndConditions from "../pages/landingpage/TermsandCondition/TermsandCondition";
+import ScrollToTop from "../components/common/ScrollToTop";
+>>>>>>> Stashed changes
 // ================= AUTH =================
 const Login = lazy(() => import("../pages/auth/Login"));
 const Register = lazy(() => import("../pages/auth/Register"));
@@ -85,7 +92,7 @@ const Loader = () => (
 const AppRoutes = () => {
   return (
     <Router>
-       <ScrollToTop />
+      <ScrollToTop />
       <Suspense fallback={<Loader />}>
         <Routes>
           {/* DEFAULT */}
@@ -93,7 +100,9 @@ const AppRoutes = () => {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/jobs" element={<Job />} />
           <Route path="/contact" element={<ContactUs />} />
+          <Route path="/JobDetail" element={<JobDetail />} />
           <Route path="/privacy&policy" element={<PrivacyPolicy />} />
+          <Route path="/Terms&Condition" element={<TermsAndConditions />} />
           {/* AUTH */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
