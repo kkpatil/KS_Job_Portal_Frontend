@@ -1,7 +1,14 @@
 import React from "react";
 import { FaPlay } from "react-icons/fa";
+import DOMPurify from "dompurify";
 
-const VideoHeroSection = () => {
+const VideoHeroSection = ({ cms }) => {
+  const section = cms?.["about.videohero"];
+
+  if (!section) return null;
+
+const heading = section.heading || section; // fallback
+
   return (
     <section className="max-w-7xl mx-auto px-6 py-16 -mt-20">
       <div className="group relative rounded-2xl overflow-hidden">
@@ -33,9 +40,10 @@ const VideoHeroSection = () => {
             className="text-white text-2xl sm:text-3xl md:text-4xl font-semibold leading-snug
                  transition-all duration-300
                  md:group-hover:font-bold md:group-hover:scale-105"
-          >
-            Good Life Begins With <br /> A Good Company
-          </h2>
+            dangerouslySetInnerHTML={{
+              __html: DOMPurify.sanitize(heading),
+            }}
+          />
         </div>
 
         {/* Bottom Info Strip */}

@@ -1,5 +1,6 @@
 import React from "react";
 import { PiBagSimpleFill } from "react-icons/pi";
+import { Link } from "react-router-dom";
 
 function Footer() {
   return (
@@ -116,9 +117,9 @@ function Footer() {
 
           {/* Right */}
           <div className="flex gap-6">
-            <a href="#" className="underline hover:text-white">
+            <Link to={'/privacy&policy'} className="underline hover:text-white">
               Privacy Policy
-            </a>
+            </Link>
             <a href="#" className="underline hover:text-white">
               Terms & Conditions
             </a>

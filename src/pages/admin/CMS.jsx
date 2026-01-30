@@ -5,7 +5,6 @@ import {
   CheckCircleIcon,
   NoSymbolIcon,
 } from "@heroicons/react/24/outline";
-import { ImCross } from "react-icons/im";
 
 import {
   useGetCMSContentsQuery,
@@ -13,6 +12,9 @@ import {
   useUpdateCMSMutation,
   useDeleteCMSMutation,
 } from "../../services/endpoints/cmsApi";
+
+import CMSForm from "../../components/common/CMSForm";
+import Modal from "../../components/common/Modal";
 
 /* ================= CONSTANTS ================= */
 
@@ -42,6 +44,8 @@ const CMS = () => {
   const [showForm, setShowForm] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
 
+  /* ================= API ================= */
+
   const { data, isLoading } = useGetCMSContentsQuery(
     filter === "All" ? {} : { type: filter }
   );
@@ -54,32 +58,29 @@ const CMS = () => {
 
   /* ================= HANDLERS ================= */
 
-  const toggleStatus = async (item) => {
-    await updateCMS({
-      id: item._id,
-      status: item.status === "ACTIVE" ? "INACTIVE" : "ACTIVE",
-    });
-  };
-
   const handleSave = async (formData) => {
-  if (formData._id) {
-    const { _id, ...rest } = formData;
+    if (formData._id) {
+      const { _id, ...rest } = formData;
+      await updateCMS({ id: _id, ...rest });
+    } else {
+      await createCMS(formData);
+    }
 
-  await updateCMS({ id: _id, ...rest });
-
-  } else {
-    await createCMS(formData);
-  }
-
-  setShowForm(false);
-  setSelected(null);
-};
-
+    setShowForm(false);
+    setSelected(null);
+  };
 
   const handleDelete = async () => {
     await deleteCMS(selected._id);
     setShowDelete(false);
     setSelected(null);
+  };
+
+  const toggleStatus = async (item) => {
+    await updateCMS({
+      id: item._id,
+      status: item.status === "ACTIVE" ? "INACTIVE" : "ACTIVE",
+    });
   };
 
   /* ================= UI ================= */
@@ -122,6 +123,7 @@ const CMS = () => {
             <tr className="bg-gray-50 border-b">
               <th className="px-4 py-3">Title</th>
               <th className="px-4 py-3">Type</th>
+              <th className="px-4 py-3">Slug</th>
               <th className="px-4 py-3 text-center">Status</th>
               <th className="px-4 py-3">Updated</th>
               <th className="px-4 py-3 text-center">Actions</th>
@@ -131,7 +133,7 @@ const CMS = () => {
           <tbody>
             {isLoading && (
               <tr>
-                <td colSpan="5" className="text-center py-6">
+                <td colSpan="6" className="text-center py-6">
                   Loading...
                 </td>
               </tr>
@@ -141,12 +143,13 @@ const CMS = () => {
               <tr key={item._id} className="border-b hover:bg-gray-50">
                 <td className="px-4 py-3 font-medium">{item.title}</td>
                 <td className="px-4 py-3">{typeMap[item.type]}</td>
+                <td className="px-4 py-3 text-xs text-gray-600">
+                  {item.slug}
+                </td>
 
                 <td className="px-4 py-3 text-center">
                   <span
-                    className={`px-3 py-1 rounded-full text-xs ${
-                      statusColor[item.status]
-                    }`}
+                    className={`px-3 py-1 rounded-full text-xs ${statusColor[item.status]}`}
                   >
                     {statusMap[item.status]}
                   </span>
@@ -192,7 +195,7 @@ const CMS = () => {
 
             {!isLoading && contents.length === 0 && (
               <tr>
-                <td colSpan="5" className="text-center py-6 text-gray-500">
+                <td colSpan="6" className="text-center py-6 text-gray-500">
                   No content found
                 </td>
               </tr>
@@ -201,113 +204,50 @@ const CMS = () => {
         </table>
       </div>
 
-      {/* MODALS */}
+      {/* CREATE / EDIT MODAL */}
       {showForm && (
-        <CMSForm
-          data={selected}
-          onClose={() => setShowForm(false)}
-          onSave={handleSave}
-        />
+        <Modal onClose={() => setShowForm(false)}>
+          <h3 className="text-lg font-semibold mb-4">
+            {selected ? "Edit CMS" : "Create CMS"}
+          </h3>
+
+          <CMSForm
+            key={selected?._id || "create"}  
+            initialData={selected}
+            onSubmit={handleSave}
+            onCancel={() => setShowForm(false)}
+          />
+        </Modal>
       )}
 
+      {/* DELETE MODAL */}
       {showDelete && (
-        <DeletePopup
-          title={selected?.title}
-          onClose={() => setShowDelete(false)}
-          onConfirm={handleDelete}
-        />
+        <Modal onClose={() => setShowDelete(false)}>
+          <h3 className="text-lg font-semibold mb-4">Delete Content</h3>
+
+          <p className="mb-6 text-sm">
+            Are you sure you want to delete <b>{selected?.title}</b>?
+          </p>
+
+          <div className="flex justify-end gap-3">
+            <button
+              onClick={() => setShowDelete(false)}
+              className="px-4 py-2 border rounded"
+            >
+              Cancel
+            </button>
+
+            <button
+              onClick={handleDelete}
+              className="btn-danger"
+            >
+              Delete
+            </button>
+          </div>
+        </Modal>
       )}
     </div>
   );
 };
-
-/* ================= FORM ================= */
-
-const CMSForm = ({ onClose, onSave, data }) => {
-  const [form, setForm] = useState({
-    _id: data?._id,
-    title: data?.title || "",
-    type: data?.type || "PAGE",
-    content: data?.content || "",
-    status: data?.status || "ACTIVE",
-  });
-
-  return (
-    <Modal onClose={onClose}>
-      <h3 className="text-lg font-semibold mb-4">
-        {data ? "Edit CMS" : "Create CMS"}
-      </h3>
-
-      <input
-        className="w-full border px-4 py-2 rounded mb-3"
-        placeholder="Title"
-        value={form.title}
-        onChange={(e) => setForm({ ...form, title: e.target.value })}
-      />
-
-      <select
-        className="w-full border px-4 py-2 rounded mb-3"
-        value={form.type}
-        onChange={(e) => setForm({ ...form, type: e.target.value })}
-      >
-        <option value="PAGE">Page</option>
-        <option value="BLOG">Blog</option>
-        <option value="BANNER">Banner</option>
-      </select>
-
-      <textarea
-        className="w-full border px-4 py-2 rounded h-32"
-        placeholder="Content"
-        value={form.content}
-        onChange={(e) => setForm({ ...form, content: e.target.value })}
-      />
-
-      <div className="flex justify-end gap-3 mt-4">
-        <button onClick={onClose} className="px-4 py-2 border rounded">
-          Cancel
-        </button>
-        <button onClick={() => onSave(form)} className="btn-primary">
-          Save
-        </button>
-      </div>
-    </Modal>
-  );
-};
-
-/* ================= DELETE POPUP ================= */
-
-const DeletePopup = ({ title, onClose, onConfirm }) => (
-  <Modal onClose={onClose}>
-    <h3 className="text-lg font-semibold mb-4">Delete Content</h3>
-    <p className="mb-6 text-sm">
-      Are you sure you want to delete <b>{title}</b>?
-    </p>
-
-    <div className="flex justify-end gap-3">
-      <button onClick={onClose} className="px-4 py-2 border rounded">
-        Cancel
-      </button>
-      <button onClick={onConfirm} className="btn-danger">
-        Delete
-      </button>
-    </div>
-  </Modal>
-);
-
-/* ================= MODAL ================= */
-
-const Modal = ({ children, onClose }) => (
-  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-    <div className="bg-white rounded-xl p-6 w-full max-w-md relative">
-      <button
-        onClick={onClose}
-        className="absolute top-3 right-4 text-gray-400"
-      >
-        <ImCross size={16} />
-      </button>
-      {children}
-    </div>
-  </div>
-);
 
 export default CMS;

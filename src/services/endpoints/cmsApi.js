@@ -8,7 +8,7 @@ export const cmsApi = api.injectEndpoints({
     // Get all CMS (pagination, filter, search)
     getCMSContents: build.query({
       query: (params) => ({
-        url: "/cms/admin",
+        url: "/cms",
         params,
       }),
       providesTags: ["CMS"],
@@ -17,7 +17,7 @@ export const cmsApi = api.injectEndpoints({
     // Create CMS
     createCMS: build.mutation({
       query: (data) => ({
-        url: "/cms/admin",
+        url: "/cms",
         method: "POST",
         body: data,
       }),
@@ -27,7 +27,7 @@ export const cmsApi = api.injectEndpoints({
     // Update CMS
     updateCMS: build.mutation({
       query: ({ id, ...data }) => ({
-        url: `/cms/admin/${id}`,
+        url: `/cms/${id}`,
         method: "PUT",
         body: data,
       }),
@@ -37,7 +37,7 @@ export const cmsApi = api.injectEndpoints({
     // Soft delete CMS
     deleteCMS: build.mutation({
       query: (id) => ({
-        url: `/cms/admin/${id}`,
+        url: `/cms/${id}`,
         method: "DELETE",
       }),
       invalidatesTags: ["CMS"],
@@ -46,19 +46,11 @@ export const cmsApi = api.injectEndpoints({
     /* ================= PUBLIC ================= */
 
     // Get CMS page by slug (About, Contact, Privacy)
-    getCMSPageBySlug: build.query({
-      query: (slug) => `/cms/page/${slug}`,
+    getCMSBySlug: build.query({
+      query: (slug) => `/cms/${slug}`,
     }),
 
-    // Get all blogs
-    getBlogs: build.query({
-      query: () => "/cms/blogs",
-    }),
-
-    // Get blog detail by slug
-    getBlogBySlug: build.query({
-      query: (slug) => `/cms/blog/${slug}`,
-    }),
+    
 
   }),
 });
@@ -68,7 +60,6 @@ export const {
   useCreateCMSMutation,
   useUpdateCMSMutation,
   useDeleteCMSMutation,
-  useGetCMSPageBySlugQuery,
-  useGetBlogsQuery,
-  useGetBlogBySlugQuery,
+  useGetCMSBySlugQuery,
+  
 } = cmsApi;
