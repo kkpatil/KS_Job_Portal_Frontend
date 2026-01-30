@@ -16,65 +16,61 @@ const Login = () => {
   const [login, { isLoading, error }] = useLoginMutation();
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  try {
-    const res = await login(formData).unwrap();
-    const token = res.data.token;
+    try {
+      const res = await login(formData).unwrap();
+      const token = res.data.token;
 
-    localStorage.setItem("token", token);
+      localStorage.setItem("token", token);
 
-    const payload = getTokenPayload();
+      const payload = getTokenPayload();
 
-    if (!payload) {
-      navigate("/login", { replace: true });
-      return;
+      if (!payload) {
+        navigate("/login", { replace: true });
+        return;
+      }
+
+      const { role, profileCompleted } = payload;
+
+      // 🔥 DIRECT REDIRECT (NO /dashboard)
+      if (role === "ADMIN") {
+        navigate("/admin", { replace: true });
+        return;
+      }
+
+      if (role === "EMPLOYER") {
+        navigate(
+          profileCompleted ? "/employer" : "/employer/complete-profile",
+          { replace: true },
+        );
+        return;
+      }
+
+      if (role === "CANDIDATE") {
+        navigate("/candidate", { replace: true });
+        return;
+      }
+    } catch (err) {
+      console.error("Login error:", err);
     }
+  };
 
-    const { role, profileCompleted } = payload;
-
-    // 🔥 DIRECT REDIRECT (NO /dashboard)
-    if (role === "ADMIN") {
-      navigate("/admin", { replace: true });
-      return;
-    }
-
-    if (role === "EMPLOYER") {
-      navigate(
-        profileCompleted
-          ? "/employer"
-          : "/employer/complete-profile",
-        { replace: true }
-      );
-      return;
-    }
-
-    if (role === "CANDIDATE") {
-      navigate("/candidate", { replace: true });
-      return;
-    }
-
-  } catch (err) {
-    console.error("Login error:", err);
-  }
-};
-
- const token = localStorage.getItem("token");
-  useEffect(()=>{
-    if(token){
-     const {role, profileCompleted} = getTokenPayload();
-     if(role === "ADMIN"){
-      navigate("/admin", {replace: true});
-     }
-     if(role === "EMPLOYER"){
-      navigate(profileCompleted ? "/employer" : "/employer/complete-profile", {replace: true});
-     }
-     if(role === "CANDIDATE"){
-      navigate("/candidate", {replace: true});
-     }
-    }
-  },[token])
-
+  //  const token = localStorage.getItem("token");
+  //   useEffect(()=>{
+  //     if(token){
+  //      const {role, profileCompleted} = getTokenPayload();
+  //      if(role === "ADMIN"){
+  //       navigate("/admin", {replace: true});
+  //      }
+  //      if(role === "EMPLOYER"){
+  //       navigate(profileCompleted ? "/employer" : "/employer/complete-profile", {replace: true});
+  //      }
+  //      if(role === "CANDIDATE"){
+  //       navigate("/candidate", {replace: true});
+  //      }
+  //     }
+  //   },[token])
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black px-4">
@@ -97,10 +93,12 @@ const Login = () => {
               We hope you had a great day.
             </p>
 
-            <button className="flex items-center gap-3 w-fit px-6 py-3 rounded-full
+            <button
+              className="flex items-center gap-3 w-fit px-6 py-3 rounded-full
               border border-gray-600 text-sm
               hover:border-[#309689] hover:text-[#309689]
-              transition-all duration-300">
+              transition-all duration-300"
+            >
               <FaGoogle />
               Login with Google
             </button>

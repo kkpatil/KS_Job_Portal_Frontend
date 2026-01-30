@@ -43,5 +43,24 @@
   .input {
   @apply border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300;
 }
+@font-face {
+  font-family: "Figtree";
+  src: url("./assets/fonts/Figtree-Regular.ttf") format("truetype");
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "Figtree";
+  src: url("./assets/fonts/Figtree-Bold.ttf") format("truetype");
+  font-weight: 700;
+}
+
+body {
+  font-family: "Figtree", sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
 
 }
