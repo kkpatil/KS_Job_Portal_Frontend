@@ -20,6 +20,7 @@ import HomePage from "../pages/landingpage/Homepage";
 import AboutPage from "../pages/landingpage/AboutPage";
 import Job from "../pages/landingpage/Job";
 import ContactUs from "../pages/landingpage/ContactUs";
+import ScrollToTop from "../components/common/ScrollToTop";
 
 // ================= AUTH =================
 const Login = lazy(() => import("../pages/auth/Login"));
@@ -81,6 +82,7 @@ const Loader = () => (
 const AppRoutes = () => {
   return (
     <Router>
+       <ScrollToTop />
       <Suspense fallback={<Loader />}>
         <Routes>
           {/* DEFAULT */}

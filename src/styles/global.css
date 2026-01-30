@@ -35,3 +35,7 @@ body {
   
   
 }
+
+#banner {
+  background-image: url("../assets/images/hero.webp");
+}

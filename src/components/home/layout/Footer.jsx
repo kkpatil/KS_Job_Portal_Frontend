@@ -110,8 +110,8 @@ function Footer() {
         >
           {/* Left */}
           <p className="text-gray-500">
-            © Copyright Job Portal 2024. Designed by{" "}
-            <span className="font-semibold">Figma.guru</span>
+            © Copyright Job Portal 2026. Designed by{" "}
+            <span className="font-semibold">Krishaa IT Soft Solutions</span>
           </p>
 
           {/* Right */}

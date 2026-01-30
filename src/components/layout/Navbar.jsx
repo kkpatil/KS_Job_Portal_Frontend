@@ -12,6 +12,8 @@ import {
   useMarkAllAsReadMutation,
 } from "../../services/endpoints/notificationApi";
 
+import { useGetMyProfileQuery } from "../../services/endpoints/profileApi";
+
 const Navbar = ({ toggleSidebar, setToggleSidebar }) => {
   const [openDropdown, setOpenDropdown] = useState(null);
 
@@ -20,11 +22,16 @@ const Navbar = ({ toggleSidebar, setToggleSidebar }) => {
   const [markAsRead] = useMarkAsReadMutation();
   const [markAllAsRead] = useMarkAllAsReadMutation();
 
+  const { data: profileData } = useGetMyProfileQuery();
+
+  const user = profileData?.data;
+  const role = user?.role;
+
   const notifications = data?.data || [];
-  const unreadCount = notifications.filter(n => !n.isRead).length;
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   const toggleSidebarHandle = () => {
-    setToggleSidebar(prev => !prev);
+    setToggleSidebar((prev) => !prev);
   };
 
   const handleNotificationClick = async (id) => {
@@ -35,10 +42,21 @@ const Navbar = ({ toggleSidebar, setToggleSidebar }) => {
     await markAllAsRead();
   };
 
+  const roleLabel = {
+    ADMIN: "Administrator",
+    EMPLOYER: "Employer",
+    CANDIDATE: "Candidate",
+  };
+
+  const roleAvatar = {
+    ADMIN: "https://i.pravatar.cc/40?img=1",
+    EMPLOYER: "https://i.pravatar.cc/40?img=5",
+    CANDIDATE: "https://i.pravatar.cc/40?img=8",
+  };
+
   return (
     <>
       <div className="h-20 bg-linear-to-l from-[#eee9eb] to-[#ffff] flex items-center justify-between px-6 shadow-sm fixed top-0 left-0 md:left-64 right-0 z-50">
-
         {/* LEFT */}
         <div className="flex items-center gap-4">
           <MdMenuOpen
@@ -59,29 +77,41 @@ const Navbar = ({ toggleSidebar, setToggleSidebar }) => {
 
         {/* RIGHT */}
         <div className="flex items-center gap-6 relative">
-
           {/* MESSAGES (future use) */}
           <IconWithBadge icon={<ChatBubbleLeftIcon />} count={0} />
 
           {/* NOTIFICATIONS */}
           <div
             onClick={() =>
-              setOpenDropdown(openDropdown === "notifications" ? null : "notifications")
+              setOpenDropdown(
+                openDropdown === "notifications" ? null : "notifications",
+              )
             }
           >
-            <IconWithBadge icon={<BellIcon />} count={unreadCount} />
+            {role === "ADMIN" && (
+              <IconWithBadge icon={<BellIcon />} count={unreadCount} />
+            )}
+
+            {role === "EMPLOYER" && (
+              <IconWithBadge icon={<ChatBubbleLeftIcon />} count={0} />
+            )}
           </div>
 
           {/* PROFILE */}
           <div className="flex items-center gap-3 cursor-pointer">
             <img
-              src="https://i.pravatar.cc/40"
+              src={
+                user?.avatar
+                  ? `${import.meta.env.VITE_API_URL}/${user.avatar}`
+                  : roleAvatar[role]
+              }
               alt="profile"
-              className="w-10 h-10 rounded-full"
+              className="w-10 h-10 rounded-full object-cover"
             />
+
             <div className="text-sm">
-              <p className="font-semibold">Admin</p>
-              <p className="text-gray-400 text-xs">Administrator</p>
+              <p className="font-semibold">{user?.name || "User"}</p>
+              <p className="text-gray-400 text-xs">{roleLabel[role]}</p>
             </div>
           </div>
 
@@ -141,17 +171,12 @@ const Dropdown = ({ title, children, onClear }) => (
     <div className="flex justify-between items-center mb-3">
       <h4 className="font-semibold">{title}</h4>
       {onClear && (
-        <button
-          onClick={onClear}
-          className="text-xs text-indigo-600"
-        >
+        <button onClick={onClear} className="text-xs text-indigo-600">
           Mark all read
         </button>
       )}
     </div>
-    <div className="space-y-2 max-h-80 overflow-y-auto">
-      {children}
-    </div>
+    <div className="space-y-2 max-h-80 overflow-y-auto">{children}</div>
   </div>
 );
 

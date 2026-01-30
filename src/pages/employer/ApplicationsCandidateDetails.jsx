@@ -18,28 +18,19 @@ const statusColor = {
   SHORTLISTED: "bg-green-100 text-green-700",
   REJECTED: "bg-red-100 text-red-700",
 };
+
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const ApplicationsCandidateDetails = () => {
-  const [action, setAction] = useState(null);
   const { id } = useParams();
+  const [action, setAction] = useState(null);
 
   const { data, isLoading, isError } = useGetApplicationByIdQuery(id);
 
-  const [shortlist] = useShortlistApplicationMutation();
-  const [reject] = useRejectApplicationMutation();
-
-  const handleConfirm = async () => {
-    if (action === "SHORTLIST") {
-      await shortlist(_id);
-    }
-
-    if (action === "REJECT") {
-      await reject(_id);
-    }
-
-    setAction(null);
-  };
+  const [shortlist, { isLoading: shortlisting }] =
+    useShortlistApplicationMutation();
+  const [reject, { isLoading: rejecting }] =
+    useRejectApplicationMutation();
 
   if (isLoading) {
     return <div className="card text-center">Loading...</div>;
@@ -59,8 +50,23 @@ const ApplicationsCandidateDetails = () => {
   const application = data.data;
   const { candidate, job, status, createdAt, _id } = application;
 
+  const handleConfirm = async () => {
+    try {
+      if (action === "SHORTLIST") {
+        await shortlist(_id).unwrap();
+      }
+
+      if (action === "REJECT") {
+        await reject(_id).unwrap();
+      }
+    } finally {
+      setAction(null);
+    }
+  };
+
   return (
     <div className="space-y-6">
+      {/* BACK */}
       <Link
         to={-1}
         className="flex items-center gap-1 text-sm text-gray-100 btn-primary w-fit"
@@ -141,28 +147,30 @@ const ApplicationsCandidateDetails = () => {
         </div>
       </div>
 
-      {/* ACTIONS */}
-      <div className="flex justify-end gap-3">
-        {status !== "SHORTLISTED" && (
+      {/* ACTIONS – ONLY WHEN NEW */}
+      {status === "NEW" && (
+        <div className="flex justify-end gap-3">
           <button
             onClick={() => setAction("SHORTLIST")}
+            disabled={shortlisting || rejecting}
             className="btn-primary flex items-center gap-1"
           >
             <CheckCircleIcon className="w-4 h-4" />
             Shortlist
           </button>
-        )}
 
-        {status !== "REJECTED" && (
           <button
             onClick={() => setAction("REJECT")}
+            disabled={shortlisting || rejecting}
             className="btn-danger flex items-center gap-1"
           >
             <XCircleIcon className="w-4 h-4" />
             Reject
           </button>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* CONFIRM MODAL */}
       {action && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 w-full max-w-sm space-y-4">
@@ -178,13 +186,18 @@ const ApplicationsCandidateDetails = () => {
             </p>
 
             <div className="flex justify-end gap-3">
-              <button onClick={() => setAction(null)} className="btn-secondary">
+              <button
+                onClick={() => setAction(null)}
+                className="btn-secondary"
+              >
                 Cancel
               </button>
 
               <button
                 onClick={handleConfirm}
-                className={action === "REJECT" ? "btn-danger" : "btn-primary"}
+                className={
+                  action === "REJECT" ? "btn-danger" : "btn-primary"
+                }
               >
                 Confirm
               </button>

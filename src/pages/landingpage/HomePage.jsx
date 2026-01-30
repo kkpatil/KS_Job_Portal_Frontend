@@ -1,6 +1,6 @@
 import React from "react";
 import Header from "../../components/home/layout/Header";
-import HeroSection from "./homePage/Hero";
+import HeroSection from "./Homepage/Hero";
 import RecentJobs from "./Homepage/RecentJobs";
 import JobCategory from "./Homepage/JobCategory";
 import CompanySection from "./Homepage/CompanyReview";

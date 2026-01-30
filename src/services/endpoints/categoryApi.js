@@ -39,6 +39,11 @@ export const categoryApi = api.injectEndpoints({
       }),
       invalidatesTags: ["Categories"],
     }),
+    getLandingCategories: builder.query({
+      query: () => '/categories/landing',
+      method: "GET",
+      providesTags: ["Categories"],
+    })
   }),
 });
 
@@ -47,4 +52,5 @@ export const {
   useCreateCategoryMutation,
   useUpdateCategoryMutation,
   useDeleteCategoryMutation,
+  useGetLandingCategoriesQuery,
 } = categoryApi;

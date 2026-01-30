@@ -60,19 +60,23 @@ export const applicationsApi = api.injectEndpoints({
     }),
    getApplicationById: builder.query({
   query: (id) => `/applications/employer/${id}`,
+  providesTags: ["Application"],
 }),
 
     shortlistApplication: builder.mutation({
       query: (applicationId) => ({
         url: `/applications/${applicationId}/shortlist`,
         method: "PATCH",
+
       }),
+      invalidatesTags: ["Applications", "Application"],
     }),
     rejectApplication: builder.mutation({
       query: (applicationId) => ({
         url: `/applications/${applicationId}/reject`,
         method: "PATCH",
       }),
+      invalidatesTags: ["Applications", "Application"],
     }),
   }),
 });

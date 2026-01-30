@@ -2,56 +2,21 @@ import React from "react";
 import { FaBookmark, FaMapMarkerAlt } from "react-icons/fa";
 import { HiOutlineClock } from "react-icons/hi";
 import { MdWork } from "react-icons/md";
-
-const jobs = [
-  {
-    time: "10 min ago",
-    title: "Forward Security Director",
-    company: "Bauch, Schuppe and Schultz Co",
-    category: "Hotels & Tourism",
-    type: "Full time",
-    salary: "$40000-$42000",
-    location: "New York, USA",
-  },
-  {
-    time: "12 min ago",
-    title: "Regional Creative Facilitator",
-    company: "Wisozk - Becker Co",
-    category: "Media",
-    type: "Part time",
-    salary: "$28000-$32000",
-    location: "Los Angeles, USA",
-  },
-  {
-    time: "15 min ago",
-    title: "Internal Integration Planner",
-    company: "Mraz, Quigley and Feest Inc.",
-    category: "Construction",
-    type: "Full time",
-    salary: "$48000-$50000",
-    location: "Texas, USA",
-  },
-  {
-    time: "24 min ago",
-    title: "District Intranet Director",
-    company: "VonRueden - Weber Co",
-    category: "Commerce",
-    type: "Full time",
-    salary: "$42000-$48000",
-    location: "Florida, USA",
-  },
-  {
-    time: "26 min ago",
-    title: "Corporate Tactics Facilitator",
-    company: "Cormier, Turner and Flatley Inc",
-    category: "Commerce",
-    type: "Full time",
-    salary: "$38000-$40000",
-    location: "Boston, USA",
-  },
-];
+import { useGetRecentJobsQuery } from "../../../services/endpoints/jobApi";
+import { Link } from "react-router-dom";
 
 function RecentJobs() {
+  const { data: jobs = [], isLoading } = useGetRecentJobsQuery();
+
+  const timeAgo = (date) => {
+    const mins = Math.floor((Date.now() - new Date(date)) / 60000);
+    return mins < 60 ? `${mins} min ago` : "1 hr ago";
+  };
+
+  if (isLoading) {
+    return <p className="text-center py-10">Loading recent jobs...</p>;
+  }
+
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16">
       {/* Header */}
@@ -65,43 +30,45 @@ function RecentJobs() {
           </p>
         </div>
 
-        <a
-          href="#"
+        <Link
+          to={"/jobs"}
           className="text-[#309689] text-sm font-semibold hover:underline self-start sm:self-auto"
         >
           View All
-        </a>
+        </Link>
       </div>
 
       {/* Job Cards */}
       <div className="space-y-6">
         {jobs.map((job, index) => (
           <div
-            key={index}
+            key={job._id}
+            style={{ animationDelay: `${index * 100}ms` }}
             className="
-  bg-white
-  rounded-xl
-  shadow-md
-  hover:shadow-2xl
-  transition-all
-  duration-300
-  ease-in-out
-  p-5 sm:p-6
-  flex
-  flex-col
-  md:flex-row
-  md:items-center
-  md:justify-between
-  gap-6
-  hover:scale-[1.02]
-  hover:border
-  hover:border-[#309689]
-"
+              bg-white
+              rounded-xl
+              shadow-md
+              hover:shadow-2xl
+              transition-all
+              duration-300
+              ease-in-out
+              p-5 sm:p-6
+              flex
+              flex-col
+              md:flex-row
+              md:items-center
+              md:justify-between
+              gap-6
+              hover:scale-[1.02]
+              hover:border
+              hover:border-[#309689]
+              animate-[fadeUp_0.8s_ease-out]
+            "
           >
             {/* Left Section */}
             <div className="flex-1">
               <span className="inline-block text-xs text-[#309689] bg-[#e6f4f2] px-3 py-1 rounded-full">
-                {job.time}
+                {timeAgo(job.createdAt)}
               </span>
 
               <h3 className="text-lg sm:text-xl font-semibold mt-3">
@@ -132,21 +99,22 @@ function RecentJobs() {
 
             {/* Right Section */}
             <div className="flex flex-row md:flex-col items-center md:items-end justify-between md:justify-center gap-4">
-              <FaBookmark className="text-gray-400 hover:text-[#309689] cursor-pointer text-lg" />
+              {/* <FaBookmark className="text-gray-400 hover:text-[#309689] cursor-pointer text-lg transition" /> */}
 
               <button
                 className="
-  bg-[#309689]
-  text-white
-  px-5 py-2
-  rounded
-  text-sm
-  transition-all
-  duration-300
-  hover:bg-[#257a6f]
-  hover:scale-105
-  hover:shadow-lg
-"
+                  bg-[#309689]
+                  text-white
+                  px-5 py-2
+                  rounded
+                  text-sm
+                  transition-all
+                  duration-300
+                  hover:bg-[#257a6f]
+                  hover:scale-105
+                  hover:shadow-lg
+                  cursor-pointer
+                "
               >
                 Job Details
               </button>

@@ -2,10 +2,11 @@ import { api } from "../api.js";
 
 export const jobApi = api.injectEndpoints({
   endpoints: (builder) => ({
-    getActiveJob : builder.query({
-        query: () => '/jobs/active',
-        transformResponse: (response) => Array.isArray(response?.data) ? response.data : [],
-        providesTags: ['Jobs']
+    getActiveJob: builder.query({
+      query: () => "/jobs/active",
+      transformResponse: (response) =>
+        Array.isArray(response?.data) ? response.data : [],
+      providesTags: ["Jobs"],
     }),
     getAllJobs: builder.query({
       query: () => "/jobs",
@@ -15,12 +16,11 @@ export const jobApi = api.injectEndpoints({
     }),
 
     getJobById: builder.query({
-  query: (id) => `/jobs/${id}`,
-  transformResponse: (response) => response?.data,
-  
-  providesTags: ["  Job","Application"]
-}),
+      query: (id) => `/jobs/${id}`,
+      transformResponse: (response) => response?.data,
 
+      providesTags: ["  Job", "Application"],
+    }),
 
     getMyJobs: builder.query({
       query: () => "/jobs/employer/my-jobs",
@@ -94,11 +94,52 @@ export const jobApi = api.injectEndpoints({
       query: (id) => ({
         url: `/jobs/${id}/close`,
         method: "PATCH",
-
       }),
       invalidatesTags: ["Jobs"],
     }),
-    
+    getRecentJobs: builder.query({
+      query: () => "/jobs/landing/recent",
+      transformResponse: (response) =>
+        Array.isArray(response?.data) ? response.data : [],
+      providesTags: ["Jobs"],
+    }),
+    searchLandingJobs: builder.query({
+      query: ({ keyword }) =>
+        `/jobs/landing/search?keyword=${encodeURIComponent(keyword)}`,
+      transformResponse: (res) => (Array.isArray(res?.data) ? res.data : []),
+    }),
+    getJobsForBoard: builder.query({
+      query: (filters = {}) => {
+        const params = new URLSearchParams();
+
+        if (filters.search?.trim()) {
+          params.append("search", filters.search.trim());
+        }
+
+        if (filters.location) {
+          params.append("location", filters.location);
+        }
+
+        if (filters.type?.length) {
+          params.append("type", filters.type.join(","));
+        }
+        if (filters.category?.length) {
+          params.append("category", filters.category.join(","));
+        }
+
+        if (filters.experience?.length) {
+          params.append("experience", filters.experience.join(","));
+        }
+
+        if (filters.posted) {
+          params.append("posted", filters.posted);
+        }
+
+        return `/jobs/board?${params.toString()}`;
+      },
+
+      refetchOnMountOrArgChange: true,
+    }),
   }),
 });
 
@@ -121,4 +162,7 @@ export const {
   useGetCategoriesQuery,
 
   useCloseJobMutation,
+  useGetRecentJobsQuery,
+  useSearchLandingJobsQuery,
+  useGetJobsForBoardQuery,
 } = jobApi;
