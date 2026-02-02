@@ -1,12 +1,14 @@
 import React from "react";
 import { FaBookmark, FaMapMarkerAlt } from "react-icons/fa";
-import { HiOutlineClock } from "react-icons/hi";
+import { HiLink, HiOutlineClock } from "react-icons/hi";
 import { MdWork } from "react-icons/md";
 import { useGetRecentJobsQuery } from "../../../services/endpoints/jobApi";
 import { Link } from "react-router-dom";
 
 function RecentJobs() {
   const { data: jobs = [], isLoading } = useGetRecentJobsQuery();
+
+  console.log("jobs", jobs);
 
   const timeAgo = (date) => {
     const mins = Math.floor((Date.now() - new Date(date)) / 60000);
@@ -92,7 +94,7 @@ function RecentJobs() {
 
                 <span className="flex items-center gap-2">
                   <FaMapMarkerAlt className="text-[#309689]" />
-                  {job.location}
+                  {job?.location}
                 </span>
               </div>
             </div>
@@ -101,7 +103,8 @@ function RecentJobs() {
             <div className="flex flex-row md:flex-col items-center md:items-end justify-between md:justify-center gap-4">
               {/* <FaBookmark className="text-gray-400 hover:text-[#309689] cursor-pointer text-lg transition" /> */}
 
-              <button
+              <Link
+                to={`/job/${job._id}`}
                 className="
                   bg-[#309689]
                   text-white
@@ -117,7 +120,7 @@ function RecentJobs() {
                 "
               >
                 Job Details
-              </button>
+              </Link>
             </div>
           </div>
         ))}

@@ -6,6 +6,7 @@ import {
   NoSymbolIcon,
   XCircleIcon,
 } from "@heroicons/react/24/outline";
+import {FaCheckCircle,} from "react-icons/fa"
 import {
   useGetAllJobsQuery,
   useApproveJobMutation,
@@ -30,37 +31,36 @@ const JobsDetails = () => {
   const [rejectJob] = useRejectJobMutation();
 
   const [actionType, setActionType] = useState(null); // "approve" | "reject" | "block"
-const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
-const openActionModal = (type) => {
-  setActionType(type);
-  setShowModal(true);
-};
+  const openActionModal = (type) => {
+    setActionType(type);
+    setShowModal(true);
+  };
 
-const closeModal = () => {
-  setShowModal(false);
-  setActionType(null);
-};
+  const closeModal = () => {
+    setShowModal(false);
+    setActionType(null);
+  };
 
-const handleConfirmAction = async () => {
-  try {
-    if (actionType === "approve") {
-      await approveJob(job._id).unwrap();
+  const handleConfirmAction = async () => {
+    try {
+      if (actionType === "approve") {
+        await approveJob(job._id).unwrap();
+      }
+      if (actionType === "reject") {
+        await rejectJob(job._id).unwrap();
+      }
+      if (actionType === "block") {
+        await blockJob(job._id).unwrap();
+      }
+
+      closeModal();
+    } catch (error) {
+      console.error("Action failed:", error);
+      closeModal();
     }
-    if (actionType === "reject") {
-      await rejectJob(job._id).unwrap();
-    }
-    if (actionType === "block") {
-      await blockJob(job._id).unwrap();
-    }
-
-    closeModal();
-  } catch (error) {
-    console.error("Action failed:", error);
-    closeModal();
-  }
-};
-
+  };
 
   const jobs = Array.isArray(jobsData) ? jobsData : [];
   const job = jobs.find((job) => job._id === id);
@@ -133,12 +133,12 @@ const handleConfirmAction = async () => {
 
           <div className="flex flex-wrap gap-2">
             {job.skills?.length > 0 ? (
-              job.skills.map((skill, index) => (
+              job.skills.map((skill) => (
                 <span
-                  key={index}
+                  key={skill._id}
                   className="px-3 py-1 text-xs rounded-full bg-indigo-100 text-indigo-700"
                 >
-                  {skill}
+                  {skill.name}
                 </span>
               ))
             ) : (
@@ -147,69 +147,116 @@ const handleConfirmAction = async () => {
           </div>
         </div>
       </div>
+      <div className="card space-y-3">
+        <h3 className="text-lg font-semibold text-gray-900">Job Description</h3>
+
+        <p className="text-sm text-gray-700 leading-relaxed">
+          {job.description || "No description provided."}
+        </p>
+      </div>
+
+      <div className="card space-y-4">
+        <h3 className="text-lg font-semibold text-gray-900">
+          Job Requirements
+        </h3>
+
+        {job.keyResponsibilities?.length > 0 ? (
+          <ul className="space-y-3 ">
+            {job?.keyResponsibilities.map((item, index) => (
+              <li
+                key={index}
+                className="flex items-start gap-3 text-sm text-gray-700"
+              >
+                <FaCheckCircle size={18} className="text-indigo-600 mt-1 flex-shrink-0" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-gray-500 text-center">No requirements mentioned.</p>
+        )}
+      </div>
+
+      <div className="card space-y-4">
+        <h3 className="text-lg font-semibold text-gray-900">
+          Professional Skills
+        </h3>
+
+        {job?.professionalSkills?.length > 0 ? (
+          <ul className="space-y-3 ">
+            {job.professionalSkills.map((item, index) => (
+              <li
+                key={index}
+                className="flex items-start gap-3 text-sm text-gray-700"
+              >
+                <FaCheckCircle size={18} className="text-indigo-600 mt-1 flex-shrink-0" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-gray-500">No skills listed.</p>
+        )}
+      </div>
 
       {/* ACTIONS */}
-     <div className="flex justify-end gap-3">
-  {job.status === "PENDING" && (
-    <>
-      <button
-        onClick={() => openActionModal("approve")}
-        className="btn-primary flex items-center gap-1"
-      >
-        <CheckCircleIcon className="w-4 h-4" />
-        Approve Job
-      </button>
+      <div className="flex justify-end gap-3">
+        {job.status === "PENDING" && (
+          <>
+            <button
+              onClick={() => openActionModal("approve")}
+              className="btn-primary flex items-center gap-1"
+            >
+              <CheckCircleIcon className="w-4 h-4" />
+              Approve Job
+            </button>
 
-      <button
-        onClick={() => openActionModal("reject")}
-        className="btn-danger flex items-center gap-1"
-      >
-        <XCircleIcon className="w-4 h-4" />
-        Reject Job
-      </button>
-    </>
-  )}
+            <button
+              onClick={() => openActionModal("reject")}
+              className="btn-danger flex items-center gap-1"
+            >
+              <XCircleIcon className="w-4 h-4" />
+              Reject Job
+            </button>
+          </>
+        )}
 
-  {job.status === "ACTIVE" && (
-    <button
-      onClick={() => openActionModal("block")}
-      className="btn-danger flex items-center gap-1"
-    >
-      <NoSymbolIcon className="w-4 h-4" />
-      Block Job
-    </button>
-  )}
-</div>
+        {job.status === "ACTIVE" && (
+          <button
+            onClick={() => openActionModal("block")}
+            className="btn-danger flex items-center gap-1"
+          >
+            <NoSymbolIcon className="w-4 h-4" />
+            Block Job
+          </button>
+        )}
+      </div>
 
       {showModal && (
-  <PopupModal
-    title={
-      actionType === "approve"
-        ? "Approve Job"
-        : actionType === "reject"
-        ? "Reject Job"
-        : "Block Job"
-    }
-    buttonText={
-      actionType === "approve"
-        ? "Approve"
-        : actionType === "reject"
-        ? "Reject"
-        : "Block"
-    }
-    onConfirm={handleConfirmAction}
-    onClose={closeModal}
-  />
-)}
-
-
+        <PopupModal
+          title={
+            actionType === "approve"
+              ? "Approve Job"
+              : actionType === "reject"
+                ? "Reject Job"
+                : "Block Job"
+          }
+          buttonText={
+            actionType === "approve"
+              ? "Approve"
+              : actionType === "reject"
+                ? "Reject"
+                : "Block"
+          }
+          onConfirm={handleConfirmAction}
+          onClose={closeModal}
+        />
+      )}
     </div>
   );
 };
 
-const PopupModal = ({
-  title, buttonText, onConfirm, onClose
-}) => {
+const PopupModal = ({ title, buttonText, onConfirm, onClose }) => {
   return (
     <Modal title={title} onClose={onClose}>
       <p>Are you sure you want to {buttonText} this job?</p>
@@ -222,8 +269,8 @@ const PopupModal = ({
         </button>
       </div>
     </Modal>
-  )
-}
+  );
+};
 
 // SMALL COMPONENT
 const Detail = ({ label, value }) => (

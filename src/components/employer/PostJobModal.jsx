@@ -19,16 +19,16 @@ const PostJobModal = ({ onClose }) => {
     category: "",
     skills: [],
     description: "",
+    keyResponsibilities: [],
+    professionalSkills: [],
   });
 
   const [selectedSkill, setSelectedSkill] = useState("");
 
-  const {
-    data: skillsData = [],
-    isFetching: skillsLoading,
-  } = useGetSkillsByCategoryQuery(job.category, {
-    skip: !job.category,
-  });
+  const { data: skillsData = [], isFetching: skillsLoading } =
+    useGetSkillsByCategoryQuery(job.category, {
+      skip: !job.category,
+    });
 
   const handleChange = (e) => {
     setJob({ ...job, [e.target.name]: e.target.value });
@@ -176,9 +176,7 @@ const PostJobModal = ({ onClose }) => {
             {job.skills.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-2">
                 {job.skills.map((skillId) => {
-                  const skill = skillsData.find(
-                    (s) => s._id === skillId
-                  );
+                  const skill = skillsData.find((s) => s._id === skillId);
 
                   return (
                     <span
@@ -207,6 +205,17 @@ const PostJobModal = ({ onClose }) => {
           value={job.description}
           onChange={handleChange}
         />
+        <ListInput
+          label="Key Responsibilities"
+          values={job.keyResponsibilities}
+          onChange={(list) => setJob({ ...job, keyResponsibilities: list })}
+        />
+
+        <ListInput
+          label="Professional Skills"
+          values={job.professionalSkills}
+          onChange={(list) => setJob({ ...job, professionalSkills: list })}
+        />
       </div>
 
       <div className="flex justify-end gap-3 mt-6">
@@ -224,7 +233,61 @@ const PostJobModal = ({ onClose }) => {
     </Modal>
   );
 };
+const ListInput = ({ label, values, onChange }) => {
+  const [input, setInput] = useState("");
 
+  const addItem = () => {
+    if (!input.trim()) return;
+    onChange([...values, input.trim()]);
+    setInput("");
+  };
+
+  const removeItem = (index) => {
+    onChange(values.filter((_, i) => i !== index));
+  };
+
+  return (
+    <div className="space-y-2">
+      <label className="block text-sm text-gray-600">{label}</label>
+
+      <div className="flex gap-2">
+        <input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder={`Add ${label}`}
+          className="flex-1 border px-4 py-2 rounded-lg text-sm"
+        />
+        <button
+          type="button"
+          onClick={addItem}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm"
+        >
+          Add
+        </button>
+      </div>
+
+      {values.length > 0 && (
+        <ul className="space-y-2 mt-2">
+          {values.map((item, i) => (
+            <li
+              key={i}
+              className="flex justify-between items-center bg-gray-100 px-3 py-2 rounded text-sm"
+            >
+              {item}
+              <button
+                type="button"
+                onClick={() => removeItem(i)}
+                className="text-red-500 font-bold"
+              >
+                ×
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+};
 
 const Input = ({ label, name, value, onChange, placeholder = "" }) => (
   <div>

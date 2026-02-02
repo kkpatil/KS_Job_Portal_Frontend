@@ -16,6 +16,8 @@ import {
   useBlockJobMutation,
   useDeleteJobMutation,
   useUpdateJobMutation,
+  useGetCategoriesQuery,
+  useGetSkillsByCategoryQuery,
 } from "../../services/endpoints/jobApi";
 
 const statusColor = {
@@ -48,7 +50,6 @@ const Jobs = () => {
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
-
 
   const filteredJobs = jobs.filter((job) => {
     const matchSearch =
@@ -135,7 +136,9 @@ const Jobs = () => {
 
       {/* JOB CARDS */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {filteredJobs.length === 0 && <p className="text-center py-6 ">No jobs found</p>}
+        {filteredJobs.length === 0 && (
+          <p className="text-center py-6 ">No jobs found</p>
+        )}
         {filteredJobs.map((job) => (
           <div
             key={job._id}
@@ -189,10 +192,12 @@ const Jobs = () => {
                   <PencilSquareIcon className="w-5 h-5 text-green-600 cursor-pointer" />
                 </button>
 
-                <button onClick={() => {
-                   setDeleteJobId(job._id);
-                  setIsDeleteModalOpen(true);
-                }}>
+                <button
+                  onClick={() => {
+                    setDeleteJobId(job._id);
+                    setIsDeleteModalOpen(true);
+                  }}
+                >
                   <TrashIcon className="w-5 h-5 text-red-600 cursor-pointer" />
                 </button>
               </div>
@@ -310,9 +315,66 @@ const Jobs = () => {
     </div>
   );
 };
+const ListInput = ({ label, values, onChange }) => {
+  const [input, setInput] = useState("");
+
+  const addItem = () => {
+    if (!input.trim()) return;
+    onChange([...values, input.trim()]);
+    setInput("");
+  };
+
+  const removeItem = (index) => {
+    onChange(values.filter((_, i) => i !== index));
+  };
+
+  return (
+    <div className="space-y-2">
+      <label className="text-sm font-medium text-gray-700">{label}</label>
+
+      <div className="flex gap-2">
+        <input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder={`Add ${label}`}
+          className="flex-1 border px-3 py-2 rounded text-sm"
+        />
+        <button
+          type="button"
+          onClick={addItem}
+          className="px-4 py-2 btn-secondary text-white rounded text-sm"
+        >
+          Add
+        </button>
+      </div>
+
+      {values.length > 0 && (
+        <ul className="space-y-2">
+          {values.map((item, i) => (
+            <li
+              key={i}
+              className="flex justify-between items-center bg-gray-100 px-3 py-2 rounded text-sm"
+            >
+              {item}
+              <button
+                type="button"
+                onClick={() => removeItem(i)}
+                className="text-red-500 font-bold"
+              >
+                ×
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+};
 
 const EditJobModal = ({ job, onClose }) => {
-  const [updateJob] = useUpdateJobMutation();
+  const [selectedSkill, setSelectedSkill] = useState("");
+
+  const [updateJob, { isLoading }] = useUpdateJobMutation();
 
   const [form, setForm] = useState({
     title: job.title || "",
@@ -320,10 +382,54 @@ const EditJobModal = ({ job, onClose }) => {
     location: job.location || "",
     experience: job.experience || "",
     salary: job.salary || "",
+    description: job.description || "",
+    keyResponsibilities: job.keyResponsibilities || [],
+    professionalSkills: job.professionalSkills || [],
+    category: job.category?._id || job.category || "",
+     skills: Array.isArray(job.skills)
+    ? job.skills.map((s) => (typeof s === "string" ? s : s._id))
+    : [],
   });
 
+  const { data: categories = [] } = useGetCategoriesQuery();
+
+  const { data: skillsData = [] } = useGetSkillsByCategoryQuery(form.category, {
+    skip: !form.category,
+  });
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleCategoryChange = (e) => {
+  const newCategory = e.target.value;
+
+  setForm((prev) => ({
+    ...prev,
+    category: newCategory,
+    skills: prev.skills.filter((skillId) =>
+      skillsData.some((s) => s._id === skillId)
+    ),
+  }));
+};
+
+
+  const handleAddSkill = () => {
+    if (!selectedSkill) return;
+    if (form.skills.includes(selectedSkill)) return;
+
+    setForm({
+      ...form,
+      skills: [...form.skills, selectedSkill],
+    });
+
+    setSelectedSkill("");
+  };
+
+  const handleRemoveSkill = (id) => {
+    setForm({
+      ...form,
+      skills: form.skills.filter((s) => s !== id),
+    });
   };
 
   const handleSave = async () => {
@@ -333,19 +439,23 @@ const EditJobModal = ({ job, onClose }) => {
         data: form,
       }).unwrap();
 
-      onClose();
       alert("Job updated successfully");
+      onClose();
     } catch (error) {
-      alert("Failed to update job");
-
       console.error("Update job failed", error);
+      alert("Failed to update job");
     }
   };
 
   return (
     <Modal title="Edit Job" onClose={onClose}>
-      <div className="space-y-3">
+      <div className="space-y-4 ">
+        <label htmlFor="title">
+
+         <span className="text-gray-500 ">Job Title</span>
+         </label>
         <input
+         id="title"
           name="title"
           value={form.title}
           onChange={handleChange}
@@ -353,15 +463,23 @@ const EditJobModal = ({ job, onClose }) => {
           className="w-full border px-3 py-2 rounded"
         />
 
+        <label htmlFor="type">
+          <span className="text-gray-500 ">Job Type</span>
+        </label>
         <input
+        id="type"
           name="type"
           value={form.type}
           onChange={handleChange}
           placeholder="Job Type"
           className="w-full border px-3 py-2 rounded"
         />
+        <label htmlFor="location">
 
+         <span className="text-gray-500 ">Job location</span>
+         </label>
         <input
+         id="location"
           name="location"
           value={form.location}
           onChange={handleChange}
@@ -369,28 +487,132 @@ const EditJobModal = ({ job, onClose }) => {
           className="w-full border px-3 py-2 rounded"
         />
 
+        <label htmlFor="experience">
+
+         <span className="text-gray-500 ">Job Experience</span>
+         </label>
         <input
+          id="experience"
           name="experience"
           value={form.experience}
           onChange={handleChange}
           placeholder="Experience"
           className="w-full border px-3 py-2 rounded"
         />
-
+         <label htmlFor="salary">
+          <span className="text-gray-500">Salary</span>
+         </label>
         <input
+          id="salary"
           name="salary"
           value={form.salary}
           onChange={handleChange}
           placeholder="Salary"
           className="w-full border px-3 py-2 rounded"
         />
+        <label htmlFor="category">
+          <span className="text-gray-500">Category</span>
+        </label>
+        <select
+          id="category"
+          value={form.category}
+          onChange={handleCategoryChange}
+          className="w-full border px-3 py-2 rounded"
+        >
+          <option value="">Select Category</option>
+          {categories.map((cat) => (
+            <option key={cat._id} value={cat._id}>
+              {cat.name}
+            </option>
+          ))}
+        </select>
+        {form.category && (
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Skills</label>
+
+            <div className="flex gap-2">
+              <select
+                value={selectedSkill}
+                onChange={(e) => setSelectedSkill(e.target.value)}
+                className="flex-1 border px-3 py-2 rounded"
+              >
+                <option value="">Select skill</option>
+                {skillsData.map((skill) => (
+                  <option key={skill._id} value={skill._id}>
+                    {skill.name}
+                  </option>
+                ))}
+              </select>
+
+              <button
+                type="button"
+                onClick={handleAddSkill}
+                className="px-4 py-2 btn-secondary text-white rounded"
+              >
+                Add
+              </button>
+            </div>
+
+            {/* Selected Skills */}
+            <div className="flex flex-wrap gap-2 mt-2">
+              {form.skills.map((skillId) => {
+                const skill = skillsData.find((s) => s._id === skillId);
+
+                return (
+                  <span
+                    key={skillId}
+                    className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm flex items-center gap-2"
+                  >
+                    {skill?.name || "Skill"}
+                    <button
+                      onClick={() => handleRemoveSkill(skillId)}
+                      className="text-red-500 font-bold"
+                    >
+                      ×
+                    </button>
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+        )}
+        <label htmlFor="description">
+          <span className="text-gray-500">Description</span>
+        </label>
+        <textarea
+          id="description"
+          name="description"
+          value={form.description}
+          onChange={handleChange}
+          placeholder="Job Description"
+          rows={4}
+          className="w-full border px-3 py-2 rounded"
+        />
+
+        {/* 🔥 Key Responsibilities */}
+        <ListInput
+          label="Key Responsibilities"
+          values={form.keyResponsibilities}
+          onChange={(list) => setForm({ ...form, keyResponsibilities: list })}
+        />
+
+        {/* 🔥 Professional Skills */}
+        <ListInput
+          label="Professional Skills"
+          values={form.professionalSkills}
+          onChange={(list) => setForm({ ...form, professionalSkills: list })}
+        />
 
         <div className="flex justify-end gap-3 mt-4">
           <button onClick={onClose} className="border px-4 py-2 rounded">
             Cancel
           </button>
-          <button onClick={handleSave} className="btn-primary">
-            Save Changes
+          <button
+            onClick={handleSave}
+            disabled={isLoading}
+            className="btn-primary disabled:opacity-50"
+          >
+            {isLoading ? "Saving..." : "Save Changes"}
           </button>
         </div>
       </div>

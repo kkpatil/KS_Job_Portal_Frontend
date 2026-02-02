@@ -148,7 +148,7 @@ function HeroSection() {
                 <div
                   key={job._id}
                   onMouseEnter={() => setActiveIndex(index)}
-                  onClick={() => navigate(`/jobs/${job._id}`)}
+                  onClick={() => navigate(`/job/${job._id}`)}
                   className={`
                     px-4 py-3 sm:py-4
     cursor-pointer transition-all

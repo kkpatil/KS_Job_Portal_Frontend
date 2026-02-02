@@ -140,6 +140,9 @@ export const jobApi = api.injectEndpoints({
 
       refetchOnMountOrArgChange: true,
     }),
+    getJobLocations: builder.query({
+      query: ()=> '/jobs/landing/locations'
+    })
   }),
 });
 
@@ -165,4 +168,5 @@ export const {
   useGetRecentJobsQuery,
   useSearchLandingJobsQuery,
   useGetJobsForBoardQuery,
+  useGetJobLocationsQuery
 } = jobApi;

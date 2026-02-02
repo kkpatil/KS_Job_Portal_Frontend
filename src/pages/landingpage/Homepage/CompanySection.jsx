@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 function CompanySection() {
   return (
@@ -62,7 +63,7 @@ function CompanySection() {
   justify-center md:justify-start
 "
             >
-              <button
+              <Link to={"/jobs"}
                 className="
                   bg-[#309689]
                   text-white
@@ -78,7 +79,7 @@ function CompanySection() {
                 "
               >
                 Search Job
-              </button>
+              </Link>
 
               <button
                 className="

@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 function CTASection() {
   return (
@@ -48,7 +49,8 @@ function CTASection() {
               Blandit a massa elementum id scelerisque rhoncus.
             </p>
 
-            <button
+            <Link 
+              to="/jobs"
               className="
                 bg-[#309689]
                 text-white
@@ -65,7 +67,7 @@ function CTASection() {
               "
             >
               Search Job
-            </button>
+            </Link>
           </div>
 
           {/* Right Side Spacer (for balance like design) */}

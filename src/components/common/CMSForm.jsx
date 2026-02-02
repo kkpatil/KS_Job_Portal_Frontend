@@ -15,7 +15,7 @@ const CMSForm = ({ initialData, onSubmit, onCancel, showSlug = true }) => {
         slug: initialData.slug || "",
         type: initialData.type || "PAGE",
         status: initialData.status || "ACTIVE",
-        content: initialData.content || {}, // 🔥 keep object
+        content: initialData.content || {},
       };
     }
 
@@ -29,7 +29,6 @@ const CMSForm = ({ initialData, onSubmit, onCancel, showSlug = true }) => {
     };
   });
 
-  /* ================= SUBMIT ================= */
   const handleSave = () => {
     if (!form.slug) {
       alert("Slug is required");
@@ -160,13 +159,13 @@ const CMSForm = ({ initialData, onSubmit, onCancel, showSlug = true }) => {
       {/* STEPS (How It Works) */}
       {/* STEPS */}
       {schema?.fields.includes("steps") && (
-        <div className="mt-14 space-y-4">
-          <div className="flex justify-between items-center">
+        <div className="mt-14 space-y-4  ">
+          <div className="flex justify-between items-center ">
             <label className="text-sm font-medium text-gray-700">Steps</label>
 
             <button
               type="button"
-              className="text-sm text-blue-600"
+              className="text-sm btn-secondary px-4 py-1 rounded-md"
               onClick={() =>
                 setForm({
                   ...form,
@@ -187,12 +186,12 @@ const CMSForm = ({ initialData, onSubmit, onCancel, showSlug = true }) => {
           {(form.content.steps || []).map((step, index) => (
             <div
               key={index}
-              className="border rounded-lg p-4 space-y-3 relative"
+              className="border rounded-lg p-4 pb-8 pt-8 space-y-3 relative "
             >
               {/* REMOVE */}
               <button
                 type="button"
-                className="absolute top-2 right-2 text-red-500 text-xs"
+                className="absolute top-1 right-2 text-white bg-red-400 px-2 py-1 rounded-md  text-xs cursor-pointer"
                 onClick={() => {
                   const updated = form.content.steps.filter(
                     (_, i) => i !== index,
@@ -366,7 +365,7 @@ const CMSForm = ({ initialData, onSubmit, onCancel, showSlug = true }) => {
 
       {/* ACTIONS */}
       <div className="flex justify-end gap-3 pt-4 mt-8 border-t">
-        <button onClick={onCancel} className="px-4 py-2 border rounded">
+        <button onClick={onCancel} className="px-4 py-2 border rounded cursor-pointer hover:bg-red-50 transition hover:scale-102 ">
           Cancel
         </button>
 

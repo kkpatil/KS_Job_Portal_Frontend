@@ -91,7 +91,7 @@ const CMS = () => {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold">CMS Management</h2>
 
-        <button
+        {/* <button
           className="btn-primary"
           onClick={() => {
             setSelected(null);
@@ -99,7 +99,7 @@ const CMS = () => {
           }}
         >
           + Create CMS
-        </button>
+        </button> */}
       </div>
 
       {/* FILTER */}

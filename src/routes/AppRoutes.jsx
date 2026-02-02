@@ -92,7 +92,7 @@ const AppRoutes = () => {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/jobs" element={<Job />} />
           <Route path="/contact" element={<ContactUs />} />
-          <Route path="/JobDetail" element={<JobDetail />} />
+          <Route path="/job/:id" element={<JobDetail />} />
           <Route path="/privacy&policy" element={<PrivacyPolicy />} />
           <Route path="/Terms&Condition" element={<TermsAndConditions />} />
           {/* AUTH */}

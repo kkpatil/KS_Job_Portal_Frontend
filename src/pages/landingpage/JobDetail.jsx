@@ -5,11 +5,12 @@ import Main from "./JobDetail/Main";
 import Header from "../../components/home/layout/Header";
 import Footer from "../../components/home/layout/Footer";
 function JobDetail() {
-  return (
+  
+   return (
     <>
       <Header />
       <Hero />
-      <Head />
+      {/* <Head /> */}
       <Main />
       <Footer />
     </>

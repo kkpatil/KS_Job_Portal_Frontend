@@ -31,7 +31,7 @@ function NewsBlog() {
                 alt="News"
                 className="
                   w-full
-                  h-[280px]
+                  h-70
                   object-cover
                   blur-[2px]
                   transition-all

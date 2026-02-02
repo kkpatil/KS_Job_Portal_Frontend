@@ -4,6 +4,7 @@ import { MdWork } from "react-icons/md";
 import { useEffect, useState } from "react";
 import {
   useGetCategoriesQuery,
+  useGetJobLocationsQuery,
   useGetJobsForBoardQuery,
 } from "../../../services/endpoints/jobApi";
 
@@ -15,6 +16,16 @@ const timeAgo = (date) => {
 };
 
 const JobBoardMain = () => {
+  const { data: jobLocations } = useGetJobLocationsQuery();
+  console.log("job location", jobLocations);
+
+  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
+  const [locationInput, setLocationInput] = useState("");
+
+  const filteredLocations = jobLocations?.data?.filter((loc) =>
+    loc.toLowerCase().includes(locationInput.toLowerCase()),
+  );
+
   const [filters, setFilters] = useState({
     search: "",
     location: "",
@@ -51,20 +62,61 @@ const JobBoardMain = () => {
             onChange={(e) => setFilters({ ...filters, search: e.target.value })}
           />
         </div>
+        <div className="relative">
+          <h4 className="font-semibold mb-2 text-gray-800">Location</h4>
 
-        <div>
-          <h4 className="font-semibold mb-2">Location</h4>
-          <select
-            value={filters.location}
-            className="w-full border rounded-md px-3 py-2 text-sm"
-            onChange={(e) =>
-              setFilters({ ...filters, location: e.target.value })
-            }
-          >
-            <option value="">Choose city</option>
-            <option value="Remote">Remote</option>
-            <option value="Delhi">Delhi</option>
-          </select>
+          <div className="relative">
+            {/* Location Icon */}
+            <FaMapMarkerAlt className="absolute left-3 top-1/2 -translate-y-1/2 text-teal-600 text-sm" />
+
+            <input
+              type="text"
+              value={locationInput}
+              placeholder="Search city (Delhi, Indore...)"
+              className="
+        w-full border rounded-lg pl-9 pr-3 py-2 text-sm
+        focus:outline-none focus:ring-2 focus:ring-teal-500
+        focus:border-teal-500 transition
+      "
+              onChange={(e) => {
+                const value = e.target.value;
+                setLocationInput(value);
+                setShowLocationDropdown(value.length > 0);
+              }}
+            />
+          </div>
+
+          {/* DROPDOWN */}
+          {showLocationDropdown && (
+            <div
+              className="
+        absolute z-50 bg-white border rounded-lg mt-1 w-full
+        max-h-52 overflow-auto shadow-lg
+      "
+            >
+              {filteredLocations?.length > 0 ? (
+                filteredLocations.map((loc, i) => (
+                  <div
+                    key={i}
+                    className="
+              px-4 py-2 text-sm cursor-pointer
+              hover:bg-teal-50 flex items-center gap-2
+            "
+                    onMouseDown={() => {
+                      setFilters((p) => ({ ...p, location: loc }));
+                      setLocationInput(loc);
+                      setShowLocationDropdown(false);
+                    }}
+                  >
+                    <FaMapMarkerAlt className="text-teal-500 text-xs" />
+                    <span className="text-gray-700">{loc}</span>
+                  </div>
+                ))
+              ) : (
+                <p className="px-4 py-2 text-sm text-gray-400">No city found</p>
+              )}
+            </div>
+          )}
         </div>
 
         <div>
@@ -156,7 +208,7 @@ const JobBoardMain = () => {
         <button
           disabled={!hasFilters}
           className={`btn-primary ${!hasFilters ? "opacity-50 cursor-not-allowed" : ""}`}
-          onClick={() =>
+          onClick={() => {
             setFilters({
               search: "",
               location: "",
@@ -164,8 +216,10 @@ const JobBoardMain = () => {
               type: [],
               experience: [],
               posted: "",
-            })
-          }
+            });
+            setLocationInput("");
+            setShowLocationDropdown(false);
+          }}
         >
           Clear All Filters
         </button>
