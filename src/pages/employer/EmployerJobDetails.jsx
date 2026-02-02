@@ -30,8 +30,8 @@ const EmployerJobDetails = () => {
     return (
       <div className="card text-center">
         <p className="text-gray-500">Job not found</p>
-        <Link to="/employer/jobs" className="text-indigo-600 underline">
-          Back to My Jobs
+        <Link to={-1} className="text-indigo-600 underline">
+          Back
         </Link>
       </div>
     );
@@ -41,11 +41,11 @@ const EmployerJobDetails = () => {
     <div className="space-y-6">
       {/* BACK */}
       <Link
-        to="/employer/jobs"
+        to={-1}
         className="flex items-center gap-1 text-sm text-gray-600 hover:text-black"
       >
         <ArrowLeftIcon className="w-4 h-4" />
-        Back to My Jobs
+        Back
       </Link>
 
       {/* HEADER */}

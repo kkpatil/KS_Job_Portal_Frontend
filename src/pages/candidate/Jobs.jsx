@@ -26,6 +26,7 @@ const Jobs = () => {
   const handleSave = async (jobId) => {
     try {
       await toggleSaveJob(jobId).unwrap();
+      setShowSavedModel(false);
     } catch (err) {
       alert(err?.data?.message || "Failed to save job");
     }

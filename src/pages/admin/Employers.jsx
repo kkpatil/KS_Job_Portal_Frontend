@@ -225,11 +225,9 @@ const Employers = () => {
 
       {/* ================= DELETE MODAL ================= */}
       {deleteModal && (
-        <Modal onClose={() => setDeleteModal(false)}>
-          <div className="bg-white p-6 rounded-lg max-w-md">
-            <h3 className="text-lg font-semibold mb-4">
-              Delete Employer
-            </h3>
+        <Modal title="Delete Employer" maxWidth="max-w-sm" maxHieght="max-h-[40vh]" onClose={() => setDeleteModal(false)}>
+          <div className="bg-white rounded-lg max-w-md">
+            
             <p className="mb-6">
               Are you sure you want to delete{" "}
               <b>{selectedEmployer?.companyName}</b>?
@@ -243,7 +241,7 @@ const Employers = () => {
                 Cancel
               </button>
               <button
-                onClick={handleDelete}
+                onClick={ handleDelete}
                 className="btn-danger"
               >
                 Delete
@@ -255,9 +253,9 @@ const Employers = () => {
 
       {/* ================= EDIT MODAL ================= */}
       {editForm && (
-        <Modal onClose={() => setEditForm(false)}>
-          <div className="bg-white p-6 rounded-lg max-w-md">
-            <h3 className="text-lg font-semibold mb-4">
+        <Modal title="Edit Employer" maxWidth="max-w-sm" maxHieght="max-w-sm" onClose={() => setEditForm(false)}>
+          <div className="bg-white  rounded-lg max-w-md">
+            <h3 className="text-lg font-semibold ">
               Edit Employer
             </h3>
 

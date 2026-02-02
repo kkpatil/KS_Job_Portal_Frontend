@@ -8,7 +8,7 @@ import {
 import { Link } from "react-router-dom";
 import PostJobModal from "../../components/employer/PostJobModal";
 import { useState } from "react";
-import { useGetRecentJobsQuery, useGetEmployerDashboardQuery, useGetRecentApplicationsQuery } from "../../services/endpoints/employerDashboardApi";
+import {  useGetEmployerDashboardQuery, useGetRecentApplicationsQuery, useGetRecentEmployersJobsQuery } from "../../services/endpoints/employerDashboardApi";
 
 const Dashboard = () => {
 
@@ -16,9 +16,10 @@ const Dashboard = () => {
           loading: employerDashboardLoading, 
           error: employerDashboardError} = useGetEmployerDashboardQuery();
 
-  const {data:employerRecentJobs} = useGetRecentJobsQuery(); 
+  const {data:employerRecentJobs} = useGetRecentEmployersJobsQuery(); 
   
   const {data:recentApplications} = useGetRecentApplicationsQuery();
+  console.log("employerRecentJobs",employerRecentJobs);
 
 
   const [showCreateJobModal,setShowCreateJobModal] = useState(false);
@@ -135,7 +136,7 @@ const Dashboard = () => {
         <div className="space-y-4 block md:hidden">
   {employerRecentJobs?.map((job) => (
     <div
-      key={job.id}
+      key={job._id}
       className=" rounded-lg p-4 tabl shadow  space-y-2"
     >
       {/* Job Title */}
@@ -197,7 +198,7 @@ const Dashboard = () => {
           )}
           {recentApplications?.map((app) => (
             <div
-              key={app.id}
+              key={app._id}
               className="flex justify-between items-center border rounded-lg p-4"
             >
               <div>

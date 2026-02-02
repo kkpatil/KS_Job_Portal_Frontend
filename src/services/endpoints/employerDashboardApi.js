@@ -7,8 +7,8 @@ export const EmployerDashboardApi = api.injectEndpoints({
            
             providesTags: ["EmployerDashboard"],
         }),
-        getRecentJobs : builder.query({
-            query: () => '/employers/dashboard/recent-jobs',
+        getRecentEmployersJobs : builder.query({
+            query: () => '/employers/dashboard/recent-jobs/emp',
             transformResponse: (response) => Array.isArray(response?.data) ? response.data : [],
             providesTags: ['Jobs']
         })
@@ -20,4 +20,4 @@ export const EmployerDashboardApi = api.injectEndpoints({
     })
 })
 
-export const { useGetEmployerDashboardQuery, useGetRecentJobsQuery, useGetRecentApplicationsQuery } = EmployerDashboardApi
+export const { useGetEmployerDashboardQuery, useGetRecentEmployersJobsQuery, useGetRecentApplicationsQuery } = EmployerDashboardApi

@@ -258,7 +258,7 @@ const JobsDetails = () => {
 
 const PopupModal = ({ title, buttonText, onConfirm, onClose }) => {
   return (
-    <Modal title={title} onClose={onClose}>
+    <Modal title={title} onClose={onClose} maxWidth="max-w-sm">
       <p>Are you sure you want to {buttonText} this job?</p>
       <div className="flex justify-end gap-3 mt-4">
         <button onClick={onClose} className="px-4 py-2 border rounded">

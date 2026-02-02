@@ -279,6 +279,7 @@ const Applications = () => {
       {showDeleteModal && (
         <Modal
           title="Confirm Delete"
+          maxWidth="max-w-sm"
           onClose={() => setShowDeleteModal(false)}
         >
           <p className="text-sm text-gray-600">

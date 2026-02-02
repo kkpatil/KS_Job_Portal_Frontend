@@ -240,6 +240,7 @@ const Jobs = () => {
       </div>
       {isDeleteModalOpen && (
         <Modal
+         maxWidth="max-w-sm"
           title="Confirm Delete"
           onClose={() => setIsDeleteModalOpen(null)}
         >
@@ -266,6 +267,7 @@ const Jobs = () => {
 
       {actionModal.open && (
         <Modal
+          maxWidth="max-w-md"
           title={
             actionModal.type === "approve"
               ? "Approve Job"
@@ -589,14 +591,14 @@ const EditJobModal = ({ job, onClose }) => {
           className="w-full border px-3 py-2 rounded"
         />
 
-        {/* 🔥 Key Responsibilities */}
+       
         <ListInput
           label="Key Responsibilities"
           values={form.keyResponsibilities}
           onChange={(list) => setForm({ ...form, keyResponsibilities: list })}
         />
 
-        {/* 🔥 Professional Skills */}
+ 
         <ListInput
           label="Professional Skills"
           values={form.professionalSkills}

@@ -174,10 +174,10 @@ const SkillForm = ({ onClose, onSave, skill, edit }) => {
   const [status, setStatus] = useState(skill?.status || "ACTIVE");
   const [category, setCategory] = useState(skill?.category?._id || "");
   return (
-    <Modal onClose={onClose}>
-      <h3 className="text-lg font-semibold mb-4">
+    <Modal title={edit ? "Edit Skill" : "Add Skill"} onClose={onClose} maxWidth="max-w-md">
+      {/* <h3 className="text-lg font-semibold mb-4">
         {edit ? "Edit Skill" : "Add Skill"}
-      </h3>
+      </h3> */}
 
    
       <select
@@ -232,8 +232,7 @@ const SkillForm = ({ onClose, onSave, skill, edit }) => {
 };
 
 const DeletePopup = ({ skill, onClose, onConfirm }) => (
-  <Modal onClose={onClose}>
-    <h3 className="text-lg font-semibold mb-4">Delete Skill</h3>
+  <Modal onClose={onClose} title="Delete Skill" maxWidth="max-w-sm">
     <p className="text-sm mb-6">
       Are you sure you want to delete <b>{skill.name}</b>?
     </p>

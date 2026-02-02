@@ -35,38 +35,41 @@ const SavedJobs = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {savedJobs?.map((item) => (
-          <div key={item._id} className="card">
-            <div className="flex justify-between mb-2">
-              <h3 className="font-semibold text-lg">
-                {item.job.title}
-              </h3>
+      {savedJobs
+  ?.filter((item) => item.job)
+  .map((item) => (
+    <div key={item._id} className="card">
+      <div className="flex justify-between mb-2">
+        <h3 className="font-semibold text-lg">
+          {item.job.title}
+        </h3>
 
-              <BookmarkIcon
-                className="w-5 h-5 text-indigo-600 cursor-pointer"
-                onClick={() => {
-                  setShowDeleteModal(true);
-                  setDeleteId(item._id); // ✅ SAVED JOB ID
-                }}
-              />
-            </div>
+        <BookmarkIcon
+          className="w-5 h-5 text-indigo-600 cursor-pointer"
+          onClick={() => {
+            setShowDeleteModal(true);
+            setDeleteId(item._id);
+          }}
+        />
+      </div>
 
-            <p className="text-sm text-gray-500">
-              {item.job.employer.companyName}
-            </p>
+      <p className="text-sm text-gray-500">
+        {item.job.employer?.companyName || "Company not available"}
+      </p>
 
-            <div className="text-sm text-gray-600 space-y-1 my-3">
-              <p><b>Location:</b> {item.job.location}</p>
-              <p><b>Type:</b> {item.job.type}</p>
-              <p><b>Salary:</b> {item.job.salary}</p>
-            </div>
+      <div className="text-sm text-gray-600 space-y-1 my-3">
+        <p><b>Location:</b> {item.job.location || "-"}</p>
+        <p><b>Type:</b> {item.job.type || "-"}</p>
+        <p><b>Salary:</b> {item.job.salary || "-"}</p>
+      </div>
 
-            <button className="btn-primary flex items-center gap-1">
-              <PaperAirplaneIcon className="w-4 h-4" />
-              Apply Now
-            </button>
-          </div>
-        ))}
+      <button className="btn-primary flex items-center gap-1">
+        <PaperAirplaneIcon className="w-4 h-4" />
+        Apply Now
+      </button>
+    </div>
+))}
+
 
         {savedJobs?.length === 0 && (
           <p className="text-gray-500 text-center col-span-full">
