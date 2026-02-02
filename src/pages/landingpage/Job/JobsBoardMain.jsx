@@ -7,6 +7,7 @@ import {
   useGetJobLocationsQuery,
   useGetJobsForBoardQuery,
 } from "../../../services/endpoints/jobApi";
+import { Link } from "react-router-dom";
 
 const timeAgo = (date) => {
   const diff = Math.floor((Date.now() - new Date(date)) / 60000);
@@ -254,9 +255,12 @@ const JobBoardMain = () => {
 
             <div className="flex md:flex-col gap-3 justify-end">
               {/* <FaBookmark className="text-gray-400" /> */}
-              <button className="bg-teal-600 text-white px-4 py-2 rounded-md text-sm">
+              <Link
+                to={`/job/${job?._id}`}
+                className="bg-teal-600 text-white px-4 py-2 rounded-md text-sm"
+              >
                 Job Details
-              </button>
+              </Link>
             </div>
           </div>
         ))}

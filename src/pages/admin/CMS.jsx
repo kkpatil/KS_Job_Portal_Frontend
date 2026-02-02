@@ -15,6 +15,7 @@ import {
 
 import CMSForm from "../../components/common/CMSForm";
 import Modal from "../../components/common/Modal";
+import BlogNews from "./cms/BlogNews";
 
 /* ================= CONSTANTS ================= */
 
@@ -47,7 +48,7 @@ const CMS = () => {
   /* ================= API ================= */
 
   const { data, isLoading } = useGetCMSContentsQuery(
-    filter === "All" ? {} : { type: filter }
+    filter === "All" ? {} : { type: filter },
   );
 
   const [createCMS] = useCreateCMSMutation();
@@ -86,12 +87,13 @@ const CMS = () => {
   /* ================= UI ================= */
 
   return (
-    <div className="card">
-      {/* HEADER */}
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold">CMS Management</h2>
+    <>
+      <div className="card">
+        {/* HEADER */}
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-semibold">CMS Management</h2>
 
-        {/* <button
+          {/* <button
           className="btn-primary"
           onClick={() => {
             setSelected(null);
@@ -100,153 +102,152 @@ const CMS = () => {
         >
           + Create CMS
         </button> */}
-      </div>
+        </div>
 
-      {/* FILTER */}
-      <div className="mb-6">
-        <select
-          className="border px-4 py-2 rounded-lg text-sm"
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-        >
-          <option value="All">All</option>
-          <option value="PAGE">Pages</option>
-          <option value="BLOG">Blogs</option>
-          <option value="BANNER">Banners</option>
-        </select>
-      </div>
+        {/* FILTER */}
+        <div className="mb-6">
+          <select
+            className="border px-4 py-2 rounded-lg text-sm"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+          >
+            <option value="All">All</option>
+            <option value="PAGE">Pages</option>
+            <option value="BLOG">Blogs</option>
+            <option value="BANNER">Banners</option>
+          </select>
+        </div>
 
-      {/* TABLE */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-gray-50 border-b">
-              <th className="px-4 py-3">Title</th>
-              <th className="px-4 py-3">Type</th>
-              <th className="px-4 py-3">Slug</th>
-              <th className="px-4 py-3 text-center">Status</th>
-              <th className="px-4 py-3">Updated</th>
-              <th className="px-4 py-3 text-center">Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {isLoading && (
-              <tr>
-                <td colSpan="6" className="text-center py-6">
-                  Loading...
-                </td>
+        {/* TABLE */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-gray-50 border-b">
+                <th className="px-4 py-3">Title</th>
+                <th className="px-4 py-3">Type</th>
+                <th className="px-4 py-3">Slug</th>
+                <th className="px-4 py-3 text-center">Status</th>
+                <th className="px-4 py-3">Updated</th>
+                <th className="px-4 py-3 text-center">Actions</th>
               </tr>
-            )}
+            </thead>
 
-            {contents.map((item) => (
-              <tr key={item._id} className="border-b hover:bg-gray-50">
-                <td className="px-4 py-3 font-medium">{item.title}</td>
-                <td className="px-4 py-3">{typeMap[item.type]}</td>
-                <td className="px-4 py-3 text-xs text-gray-600">
-                  {item.slug}
-                </td>
+            <tbody>
+              {isLoading && (
+                <tr>
+                  <td colSpan="6" className="text-center py-6">
+                    Loading...
+                  </td>
+                </tr>
+              )}
 
-                <td className="px-4 py-3 text-center">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs ${statusColor[item.status]}`}
-                  >
-                    {statusMap[item.status]}
-                  </span>
-                </td>
+              {contents.map((item) => (
+                <tr key={item._id} className="border-b hover:bg-gray-50">
+                  <td className="px-4 py-3 font-medium">{item.title}</td>
+                  <td className="px-4 py-3">{typeMap[item.type]}</td>
+                  <td className="px-4 py-3 text-xs text-gray-600">
+                    {item.slug}
+                  </td>
 
-                <td className="px-4 py-3">
-                  {new Date(item.updatedAt).toLocaleDateString()}
-                </td>
+                  <td className="px-4 py-3 text-center">
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs ${statusColor[item.status]}`}
+                    >
+                      {statusMap[item.status]}
+                    </span>
+                  </td>
 
-                <td className="px-4 py-3">
-                  <div className="flex justify-center gap-3">
-                    <PencilSquareIcon
-                      className="w-5 h-5 text-blue-600 cursor-pointer"
-                      onClick={() => {
-                        setSelected(item);
-                        setShowForm(true);
-                      }}
-                    />
+                  <td className="px-4 py-3">
+                    {new Date(item.updatedAt).toLocaleDateString()}
+                  </td>
 
-                    {item.status === "ACTIVE" ? (
-                      <NoSymbolIcon
-                        className="w-5 h-5 text-yellow-600 cursor-pointer"
-                        onClick={() => toggleStatus(item)}
+                  <td className="px-4 py-3">
+                    <div className="flex justify-center gap-3">
+                      <PencilSquareIcon
+                        className="w-5 h-5 text-blue-600 cursor-pointer"
+                        onClick={() => {
+                          setSelected(item);
+                          setShowForm(true);
+                        }}
                       />
-                    ) : (
-                      <CheckCircleIcon
-                        className="w-5 h-5 text-green-600 cursor-pointer"
-                        onClick={() => toggleStatus(item)}
+
+                      {item.status === "ACTIVE" ? (
+                        <NoSymbolIcon
+                          className="w-5 h-5 text-yellow-600 cursor-pointer"
+                          onClick={() => toggleStatus(item)}
+                        />
+                      ) : (
+                        <CheckCircleIcon
+                          className="w-5 h-5 text-green-600 cursor-pointer"
+                          onClick={() => toggleStatus(item)}
+                        />
+                      )}
+
+                      <TrashIcon
+                        className="w-5 h-5 text-red-600 cursor-pointer"
+                        onClick={() => {
+                          setSelected(item);
+                          setShowDelete(true);
+                        }}
                       />
-                    )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
 
-                    <TrashIcon
-                      className="w-5 h-5 text-red-600 cursor-pointer"
-                      onClick={() => {
-                        setSelected(item);
-                        setShowDelete(true);
-                      }}
-                    />
-                  </div>
-                </td>
-              </tr>
-            ))}
+              {!isLoading && contents.length === 0 && (
+                <tr>
+                  <td colSpan="6" className="text-center py-6 text-gray-500">
+                    No content found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
 
-            {!isLoading && contents.length === 0 && (
-              <tr>
-                <td colSpan="6" className="text-center py-6 text-gray-500">
-                  No content found
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+        {/* CREATE / EDIT MODAL */}
+        {showForm && (
+          <Modal onClose={() => setShowForm(false)}>
+            <h3 className="text-lg font-semibold mb-4">
+              {selected ? "Edit CMS" : "Create CMS"}
+            </h3>
+
+            <CMSForm
+              key={selected?._id || "create"}
+              initialData={selected}
+              onSubmit={handleSave}
+              onCancel={() => setShowForm(false)}
+            />
+          </Modal>
+        )}
+
+        {/* DELETE MODAL */}
+        {showDelete && (
+          <Modal onClose={() => setShowDelete(false)}>
+            <h3 className="text-lg font-semibold mb-4">Delete Content</h3>
+
+            <p className="mb-6 text-sm">
+              Are you sure you want to delete <b>{selected?.title}</b>?
+            </p>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowDelete(false)}
+                className="px-4 py-2 border rounded"
+              >
+                Cancel
+              </button>
+
+              <button onClick={handleDelete} className="btn-danger">
+                Delete
+              </button>
+            </div>
+          </Modal>
+        )}
       </div>
-
-      {/* CREATE / EDIT MODAL */}
-      {showForm && (
-        <Modal onClose={() => setShowForm(false)}>
-          <h3 className="text-lg font-semibold mb-4">
-            {selected ? "Edit CMS" : "Create CMS"}
-          </h3>
-
-          <CMSForm
-            key={selected?._id || "create"}  
-            initialData={selected}
-            onSubmit={handleSave}
-            onCancel={() => setShowForm(false)}
-          />
-        </Modal>
-      )}
-
-      {/* DELETE MODAL */}
-      {showDelete && (
-        <Modal onClose={() => setShowDelete(false)}>
-          <h3 className="text-lg font-semibold mb-4">Delete Content</h3>
-
-          <p className="mb-6 text-sm">
-            Are you sure you want to delete <b>{selected?.title}</b>?
-          </p>
-
-          <div className="flex justify-end gap-3">
-            <button
-              onClick={() => setShowDelete(false)}
-              className="px-4 py-2 border rounded"
-            >
-              Cancel
-            </button>
-
-            <button
-              onClick={handleDelete}
-              className="btn-danger"
-            >
-              Delete
-            </button>
-          </div>
-        </Modal>
-      )}
-    </div>
+      <BlogNews />
+    </>
   );
 };
 

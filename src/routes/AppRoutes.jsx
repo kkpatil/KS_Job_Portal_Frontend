@@ -63,7 +63,7 @@ const ApplicationsCandidateDetails = lazy(
 // ================= CANDIDATE =================
 const CandidateDashboard = lazy(() => import("../pages/candidate/Dashboard"));
 const Profile = lazy(() => import("../pages/candidate/Profile"));
-const ProfilePage = lazy(() => import("../pages/candidate/ProfilePage"));
+const ProfilePage = lazy(() => import("../pages/candidate/CompleteProfile"));
 const CandidateJobs = lazy(() => import("../pages/candidate/Jobs"));
 const MyApplications = lazy(() => import("../pages/candidate/MyApplications"));
 const SavedJobs = lazy(() => import("../pages/candidate/SavedJobs"));
