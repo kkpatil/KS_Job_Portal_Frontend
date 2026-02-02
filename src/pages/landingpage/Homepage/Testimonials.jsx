@@ -1,34 +1,21 @@
 import React from "react";
 import { FaStar } from "react-icons/fa";
-
-const testimonials = [
-  {
-    title: "Amazing services",
-    text: `Metus faucibus sed turpis lectus feugiat tincidunt.
-    Rhoncus sed tristique in dolor. Mus etiam et vestibulum venenatis`,
-    name: "Marco Kihn",
-    role: "Happy Client",
-    image: "https://i.pravatar.cc/100?img=12",
-  },
-  {
-    title: "Everything simple",
-    text: `Mus etiam et vestibulum venenatis viverra ut.
-    Elit morbi bibendum ullamcorper augue faucibus`,
-    name: "Kristin Hester",
-    role: "Happy Client",
-    image: "https://i.pravatar.cc/100?img=32",
-  },
-  {
-    title: "Awesome, thank you!",
-    text: `Rhoncus sed tristique in dolor. Mus etiam et
-    vestibulum venenatis viverra ut. Elit morbi bibendum ullamcorper`,
-    name: "Zion Cisneros",
-    role: "Happy Client",
-    image: "https://i.pravatar.cc/100?img=45",
-  },
-];
+import { useGetAllTestimonialsQuery } from "../../../services/endpoints/testimonialApi";
 
 function Testimonials() {
+  // RTK Query hook se API call
+  const { data, isLoading, isError } = useGetAllTestimonialsQuery();
+  const testimonialsArray = data?.data || [];
+  console.log("Testimonials fetched:", testimonialsArray); // debug
+
+  if (isLoading) return <p className="text-center py-10">Loading...</p>;
+  if (isError)
+    return (
+      <p className="text-center py-10 text-red-500">
+        Error fetching testimonials
+      </p>
+    );
+
   return (
     <section className="bg-[#eef7f6] py-24">
       <div className="max-w-7xl mx-auto px-6">
@@ -45,48 +32,42 @@ function Testimonials() {
 
         {/* Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {testimonials.map((item, index) => (
+          {testimonialsArray?.map((item) => (
             <div
-              key={index}
-              className="
-                group
-                bg-white
-                rounded-2xl
-                p-8
-                shadow
-                transition-all
-                duration-300
-                hover:shadow-2xl
-                hover:-translate-y-2
-                animate-[fadeUp_1s_ease-out]
-              "
+              key={item._id}
+              className="group bg-white rounded-2xl p-8 shadow transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 animate-[fadeUp_1s_ease-out]"
             >
               {/* Stars */}
               <div className="flex gap-1 mb-4 text-yellow-400">
                 {[...Array(5)].map((_, i) => (
-                  <FaStar key={i} />
+                  <FaStar
+                    key={i}
+                    className={
+                      i < item.rating ? "text-yellow-400" : "text-gray-300"
+                    }
+                  />
                 ))}
               </div>
 
               {/* Title */}
               <h3 className="text-lg font-semibold mb-3">{item.title}</h3>
 
-              {/* Text */}
+              {/* Description */}
               <p className="text-gray-500 text-sm leading-relaxed mb-8">
-                {item.text}
+                {item.description}
               </p>
 
               {/* Footer */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <img
-                    src={item.image}
+                    src={item.avatar}
                     alt={item.name}
                     className="w-12 h-12 rounded-full object-cover"
                   />
                   <div>
                     <h4 className="text-sm font-semibold">{item.name}</h4>
-                    <p className="text-xs text-gray-400">{item.role}</p>
+                    <p className="text-xs text-gray-400">{item.subText}</p>
                   </div>
                 </div>
 

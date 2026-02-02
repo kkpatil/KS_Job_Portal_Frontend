@@ -63,6 +63,7 @@ const ApplicationsCandidateDetails = lazy(
 // ================= CANDIDATE =================
 const CandidateDashboard = lazy(() => import("../pages/candidate/Dashboard"));
 const Profile = lazy(() => import("../pages/candidate/Profile"));
+const ProfilePage = lazy(() => import("../pages/candidate/ProfilePage"));
 const CandidateJobs = lazy(() => import("../pages/candidate/Jobs"));
 const MyApplications = lazy(() => import("../pages/candidate/MyApplications"));
 const SavedJobs = lazy(() => import("../pages/candidate/SavedJobs"));
@@ -95,6 +96,7 @@ const AppRoutes = () => {
           <Route path="/job/:id" element={<JobDetail />} />
           <Route path="/privacy&policy" element={<PrivacyPolicy />} />
           <Route path="/Terms&Condition" element={<TermsAndConditions />} />
+          <Route path="/ProfilePage" element={<ProfilePage />} />
           {/* AUTH */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />

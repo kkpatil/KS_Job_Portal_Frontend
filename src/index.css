@@ -3,7 +3,7 @@
 
 @import "./styles/global.css";
 
-
+/* @import url('https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700&display=swap'); */
 
 
 @layer components {
@@ -55,9 +55,9 @@
   font-weight: 700;
 }
 
-body {
+/* body {
   font-family: "Figtree", sans-serif;
-}
+} */
 
 html {
   scroll-behavior: smooth;
