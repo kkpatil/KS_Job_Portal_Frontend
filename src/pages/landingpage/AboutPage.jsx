@@ -32,15 +32,15 @@ function AboutPage() {
     return map;
   }, [data]);
 
-  if (isLoading) return null;
+  if (isLoading) return <p >Loading...</p>;
   return (
     <>
       <Header />
       <About />
-      <InfoSection />
-      <HowItWorks />
+      <InfoSection cms={cms}/>
+      <HowItWorks cms={cms}/>
       <VideoHeroSection cms={cms} />
-      <FAQSection />
+      <FAQSection cms={cms}/>
       <BestSection />
       <NewsBlogSection />
       <Footer />

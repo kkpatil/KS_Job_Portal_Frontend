@@ -5,7 +5,7 @@ const RichTextEditor = ({ value, onChange }) => {
   return (
     <ReactQuill
       theme="snow"
-      value={value}
+     value={typeof value === "string" ? value : ""}
       onChange={onChange}
       className="h-40 mb-4"
     />

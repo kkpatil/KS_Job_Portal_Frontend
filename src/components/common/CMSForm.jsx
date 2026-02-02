@@ -1,10 +1,12 @@
 import { useState } from "react";
 import RichTextEditor from "./RichTextEditor";
+import { cmsSchemas } from "../../utils/cmsSchemas";
 
 const CMSForm = ({ initialData, onSubmit, onCancel, showSlug = true }) => {
   const isEditMode = Boolean(initialData && initialData._id);
+  const slug = initialData?.slug || "";
+  const schema = cmsSchemas[slug];
 
-  // ✅ FIX: Initialize state directly from props (No useEffect needed)
   const [form, setForm] = useState(() => {
     if (initialData && initialData._id) {
       return {
@@ -12,20 +14,18 @@ const CMSForm = ({ initialData, onSubmit, onCancel, showSlug = true }) => {
         title: initialData.title || "",
         slug: initialData.slug || "",
         type: initialData.type || "PAGE",
-        // Flatten the nested content structure here
-        content: initialData.content?.heading || "", 
         status: initialData.status || "ACTIVE",
+        content: initialData.content || {}, // 🔥 keep object
       };
     }
 
-    // Default "Create" State
     return {
       _id: null,
       title: "",
       slug: "",
       type: "PAGE",
-      content: "",
       status: "ACTIVE",
+      content: {},
     };
   });
 
@@ -42,21 +42,27 @@ const CMSForm = ({ initialData, onSubmit, onCancel, showSlug = true }) => {
       slug: form.slug,
       type: form.type,
       status: form.status,
-      // Re-nest the content for the backend
-      content: {
-        heading: form.content,
-      },
+      content: form.content,
     });
   };
 
+  if (isEditMode && !schema) {
+    return (
+      <p className="text-sm text-red-500">
+        No CMS schema found for slug: <b>{slug}</b>
+      </p>
+    );
+  }
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 overflow-y-auto overflow-x-hidden">
       {/* TITLE */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Title
+        </label>
         <input
-          className="w-full border px-4 py-2 rounded focus:ring-2 focus:ring-blue-500 outline-none"
-          placeholder="Enter title..."
+          className="w-full border px-4 py-2 rounded"
           value={form.title}
           onChange={(e) => setForm({ ...form, title: e.target.value })}
         />
@@ -65,25 +71,27 @@ const CMSForm = ({ initialData, onSubmit, onCancel, showSlug = true }) => {
       {/* SLUG */}
       {showSlug && (
         <div>
-           <label className="block text-sm font-medium text-gray-700 mb-1">Slug</label>
-           <input
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Slug
+          </label>
+          <input
             className={`w-full border px-4 py-2 rounded ${
-              isEditMode ? "bg-gray-100 text-gray-500 cursor-not-allowed" : "focus:ring-2 focus:ring-blue-500"
+              isEditMode ? "bg-gray-100 cursor-not-allowed" : ""
             }`}
-            placeholder="example-slug-name"
             value={form.slug}
-            readOnly={isEditMode} // 🔒 Lock slug in edit mode
+            readOnly={isEditMode}
             onChange={(e) => setForm({ ...form, slug: e.target.value })}
-            required
           />
         </div>
       )}
 
       {/* TYPE */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Type
+        </label>
         <select
-          className="w-full border px-4 py-2 rounded focus:ring-2 focus:ring-blue-500 outline-none"
+          className="w-full border px-4 py-2 rounded"
           value={form.type}
           onChange={(e) => setForm({ ...form, type: e.target.value })}
         >
@@ -93,28 +101,276 @@ const CMSForm = ({ initialData, onSubmit, onCancel, showSlug = true }) => {
         </select>
       </div>
 
-      {/* RICH EDITOR */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Content</label>
+      {/* ================= DYNAMIC FIELDS ================= */}
+
+      {/* HEADING */}
+      {schema?.fields.includes("heading") && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Heading
+          </label>
+          <RichTextEditor
+            value={form.content.heading || ""}
+            onChange={(html) =>
+              setForm({
+                ...form,
+                content: { ...form.content, heading: html },
+              })
+            }
+          />
+        </div>
+      )}
+
+      {/* DESCRIPTION */}
+      {schema?.fields.includes("description") && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1 mt-14">
+            Description
+          </label>
+          <RichTextEditor
+            value={form.content.description || ""}
+            onChange={(html) =>
+              setForm({
+                ...form,
+                content: { ...form.content, description: html },
+              })
+            }
+          />
+        </div>
+      )}
+
+      {/* IMAGE */}
+      {schema?.fields.includes("image") && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1 mt-14">
+            Image URL
+          </label>
+          <input
+            className="w-full border px-4 py-2 rounded"
+            value={form.content.image || ""}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                content: { ...form.content, image: e.target.value },
+              })
+            }
+          />
+        </div>
+      )}
+      {/* STEPS (How It Works) */}
+      {/* STEPS */}
+      {schema?.fields.includes("steps") && (
+        <div className="mt-14 space-y-4">
+          <div className="flex justify-between items-center">
+            <label className="text-sm font-medium text-gray-700">Steps</label>
+
+            <button
+              type="button"
+              className="text-sm text-blue-600"
+              onClick={() =>
+                setForm({
+                  ...form,
+                  content: {
+                    ...form.content,
+                    steps: [
+                      ...(form.content.steps || []),
+                      { icon: "", title: "", text: "" },
+                    ],
+                  },
+                })
+              }
+            >
+              + Add Step
+            </button>
+          </div>
+
+          {(form.content.steps || []).map((step, index) => (
+            <div
+              key={index}
+              className="border rounded-lg p-4 space-y-3 relative"
+            >
+              {/* REMOVE */}
+              <button
+                type="button"
+                className="absolute top-2 right-2 text-red-500 text-xs"
+                onClick={() => {
+                  const updated = form.content.steps.filter(
+                    (_, i) => i !== index,
+                  );
+
+                  setForm({
+                    ...form,
+                    content: { ...form.content, steps: updated },
+                  });
+                }}
+              >
+                Remove
+              </button>
+
+              {/* ICON */}
+              <input
+                className="w-full border px-3 py-2 rounded"
+                placeholder="Icon (FaUser)"
+                value={step.icon}
+                onChange={(e) => {
+                  const updated = form.content.steps.map((s, i) =>
+                    i === index ? { ...s, icon: e.target.value } : s,
+                  );
+
+                  setForm({
+                    ...form,
+                    content: { ...form.content, steps: updated },
+                  });
+                }}
+              />
+
+              {/* TITLE */}
+              <input
+                className="w-full border px-3 py-2 rounded"
+                placeholder="Step Title"
+                value={step.title}
+                onChange={(e) => {
+                  const updated = form.content.steps.map((s, i) =>
+                    i === index ? { ...s, title: e.target.value } : s,
+                  );
+
+                  setForm({
+                    ...form,
+                    content: { ...form.content, steps: updated },
+                  });
+                }}
+              />
+
+              {/* TEXT */}
+              <RichTextEditor
+                value={step.text || ""}
+                onChange={(html) => {
+                  const updated = form.content.steps.map((s, i) =>
+                    i === index ? { ...s, text: html } : s,
+                  );
+
+                  setForm({
+                    ...form,
+                    content: { ...form.content, steps: updated },
+                  });
+                }}
+              />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* FAQS */}
+      {schema?.fields.includes("faqs") && (
+        <div className="mt-14 space-y-4">
+          <div className="flex justify-between items-center">
+            <label className="text-sm font-medium text-gray-700">FAQs</label>
+
+            <button
+              type="button"
+              className="text-sm text-blue-600"
+              onClick={() =>
+                setForm({
+                  ...form,
+                  content: {
+                    ...form.content,
+                    faqs: [
+                      ...(form.content.faqs || []),
+                      {
+                        id: String(
+                          (form.content.faqs?.length || 0) + 1,
+                        ).padStart(2, "0"),
+                        question: "",
+                        answer: "",
+                      },
+                    ],
+                  },
+                })
+              }
+            >
+              + Add FAQ
+            </button>
+          </div>
+
+          {(form.content.faqs || []).map((faq, index) => (
+            <div
+              key={index}
+              className="border rounded-lg p-4 space-y-3 relative"
+            >
+              {/* REMOVE */}
+              <button
+                type="button"
+                className="absolute top-2 right-2 text-red-500 text-xs"
+                onClick={() => {
+                  const updated = form.content.faqs.filter(
+                    (_, i) => i !== index,
+                  );
+
+                  setForm({
+                    ...form,
+                    content: { ...form.content, faqs: updated },
+                  });
+                }}
+              >
+                Remove
+              </button>
+
+              {/* QUESTION */}
+              <input
+                className="w-full border px-3 py-2 rounded"
+                placeholder="Question"
+                value={faq.question}
+                onChange={(e) => {
+                  const updated = form.content.faqs.map((f, i) =>
+                    i === index ? { ...f, question: e.target.value } : f,
+                  );
+
+                  setForm({
+                    ...form,
+                    content: { ...form.content, faqs: updated },
+                  });
+                }}
+              />
+
+              {/* ANSWER */}
+              <RichTextEditor
+                value={faq.answer || ""}
+                onChange={(html) => {
+                  const updated = form.content.faqs.map((f, i) =>
+                    i === index ? { ...f, answer: html } : f,
+                  );
+
+                  setForm({
+                    ...form,
+                    content: { ...form.content, faqs: updated },
+                  });
+                }}
+              />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* HTML (privacy policy etc) */}
+      {schema?.fields.includes("html") && (
         <RichTextEditor
-          value={form.content}
-          onChange={(html) => setForm({ ...form, content: html })}
+          value={form.content.html || ""}
+          onChange={(html) =>
+            setForm({
+              ...form,
+              content: { html },
+            })
+          }
         />
-      </div>
+      )}
 
       {/* ACTIONS */}
       <div className="flex justify-end gap-3 pt-4 mt-8 border-t">
-        <button
-          onClick={onCancel}
-          className="px-4 py-2 border rounded hover:bg-gray-50 transition-colors cursor-pointer"
-        >
+        <button onClick={onCancel} className="px-4 py-2 border rounded">
           Cancel
         </button>
 
-        <button
-          onClick={handleSave}
-          className="btn-primary text-white px-4 py-2  rounded hover:bg-blue-950 transition-colors"
-        >
+        <button onClick={handleSave} className="btn-primary px-4 py-2">
           {isEditMode ? "Update" : "Save"}
         </button>
       </div>
