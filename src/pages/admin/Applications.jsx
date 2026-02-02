@@ -25,7 +25,7 @@ const Applications = () => {
 
   const [deleteApplication] = useDeleteApplicationMutation();
 
-  // extra safety (optional but good)
+
   const applications = Array.isArray(applicationsData)
     ? applicationsData
     : [];
@@ -55,12 +55,12 @@ const Applications = () => {
   return (
     <>
       <div className="card">
-        {/* HEADER */}
+        
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold">Job Applications</h2>
         </div>
 
-        {/* DESKTOP TABLE */}
+       
         <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-[#c1ceb1]">
@@ -166,7 +166,7 @@ const Applications = () => {
           </table>
         </div>
 
-        {/* MOBILE VIEW */}
+
         <div className="md:hidden space-y-4">
           {applications.map((app) => (
             <div
@@ -238,7 +238,7 @@ const Applications = () => {
         </div>
       </div>
 
-      {/* VIEW MODAL */}
+
       {showViewModal && selectedApp && (
         <Modal
           title="Application Details"
@@ -275,7 +275,7 @@ const Applications = () => {
         </Modal>
       )}
 
-      {/* DELETE MODAL (UI ONLY) */}
+  
       {showDeleteModal && (
         <Modal
           title="Confirm Delete"

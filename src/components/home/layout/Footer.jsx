@@ -120,9 +120,9 @@ function Footer() {
             <Link to={'/privacy&policy'} className="underline hover:text-white">
               Privacy Policy
             </Link>
-            <a href="#" className="underline hover:text-white">
+            <Link to="/terms&conditions" className="underline hover:text-white">
               Terms & Conditions
-            </a>
+            </Link>
           </div>
         </div>
       </div>

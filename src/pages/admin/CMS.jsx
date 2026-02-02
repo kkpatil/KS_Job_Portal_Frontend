@@ -121,11 +121,11 @@ const CMS = () => {
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-gray-50 border-b">
-              <th className="px-4 py-3">Title</th>
-              <th className="px-4 py-3">Type</th>
-              <th className="px-4 py-3">Slug</th>
-              <th className="px-4 py-3 text-center">Status</th>
-              <th className="px-4 py-3">Updated</th>
+              <th className="px-4 py-3 text-start">Title</th>
+              <th className="px-4 py-3 text-start">Type</th>
+              <th className="px-4 py-3 text-start">Slug</th>
+              <th className="px-4 py-3 text-start">Status</th>
+              <th className="px-4 py-3 text-start">Updated</th>
               <th className="px-4 py-3 text-center">Actions</th>
             </tr>
           </thead>
@@ -147,7 +147,7 @@ const CMS = () => {
                   {item.slug}
                 </td>
 
-                <td className="px-4 py-3 text-center">
+                <td className="px-4 py-3 text-start">
                   <span
                     className={`px-3 py-1 rounded-full text-xs ${statusColor[item.status]}`}
                   >

@@ -95,7 +95,7 @@ const AppRoutes = () => {
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/job/:id" element={<JobDetail />} />
           <Route path="/privacy&policy" element={<PrivacyPolicy />} />
-          <Route path="/Terms&Condition" element={<TermsAndConditions />} />
+          <Route path="/terms&conditions" element={<TermsAndConditions />} />
           <Route path="/ProfilePage" element={<ProfilePage />} />
           {/* AUTH */}
           <Route path="/login" element={<Login />} />
