@@ -5,7 +5,10 @@ import {
   Navigate,
 } from "react-router-dom";
 import { lazy, Suspense } from "react";
-import { getTokenPayload } from "../utils/jwt";
+
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 // ================= LAYOUTS (NO LAZY) =================
 import AuthLayout from "../layouts/AuthLayout";
@@ -87,6 +90,7 @@ const AppRoutes = () => {
   return (
     <Router>
       <ScrollToTop />
+       <ToastContainer position="top-right" autoClose={3000} />
       <Suspense fallback={<Loader />}>
         <Routes>
           {/* DEFAULT */}

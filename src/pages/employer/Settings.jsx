@@ -5,6 +5,7 @@ import {
   
 } from "../../services/endpoints/employerApi";
 import { useChangeEmployerPasswordMutation } from "../../services/endpoints/authApi";
+import { toast } from "react-toastify";
 
 const Settings = () => {
   const { data: profile, isLoading, error } = useGetProfileQuery();
@@ -65,15 +66,15 @@ const Settings = () => {
         location: company.location,
       }).unwrap();
 
-      alert("Profile updated successfully");
+      toast.success("Profile updated successfully");
     } catch (err) {
-      alert(err?.data?.message || "Profile update failed");
+      toast.error(err?.data?.message || "Profile update failed");
     }
   };
 
   const handlePasswordUpdate = async () => {
     if (password.new !== password.confirm) {
-      return alert("Passwords do not match");
+      return toast.error("Passwords do not match");
     }
 
     try {
@@ -82,10 +83,10 @@ const Settings = () => {
         newPassword: password.new,
       }).unwrap();
 
-      alert("Password updated successfully");
+      toast.success("Password updated successfully");
       setPassword({ current: "", new: "", confirm: "" });
     } catch (err) {
-      alert(err?.data?.message || "Password update failed");
+      toast.error(err?.data?.message || "Password update failed");
     }
   };
 

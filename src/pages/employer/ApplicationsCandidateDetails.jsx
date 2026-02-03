@@ -12,6 +12,7 @@ import {
   useShortlistApplicationMutation,
   useRejectApplicationMutation,
 } from "../../services/endpoints/applicationsApi";
+import { toast } from "react-toastify";
 
 const statusColor = {
   NEW: "bg-blue-100 text-blue-700",
@@ -54,15 +55,20 @@ const ApplicationsCandidateDetails = () => {
     try {
       if (action === "SHORTLIST") {
         await shortlist(_id).unwrap();
+        toast.success("Candidate shortlisted successfully");
       
       }
 
       if (action === "REJECT") {
         await reject(_id).unwrap();
        
+        toast.success("Candidate rejected successfully");
       }
+    }catch(error) {
+      toast.error(error.data.message || "Failed to perform action");
     } finally {
       setAction(null);
+
     }
   };
 

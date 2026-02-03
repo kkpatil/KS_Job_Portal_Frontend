@@ -7,8 +7,11 @@ import {
 } from "@heroicons/react/24/outline";
 import {
   useGetJobApplicationsQuery,
+  useRejectApplicationMutation,
+  useShortlistApplicationMutation,
   useUpdateApplicationStatusMutation,
 } from "../../services/endpoints/applicationsApi";
+import { toast } from "react-toastify";
 
 const statusColor = {
   APPLIED: "bg-blue-100 text-blue-700",
@@ -20,12 +23,24 @@ const JobApplicationsEmployer = () => {
   const { id: jobId } = useParams();
 
   const { data, isLoading } = useGetJobApplicationsQuery({jobId});
-  const [updateStatus] = useUpdateApplicationStatusMutation();
+  const [handleShortlisted] = useShortlistApplicationMutation();
+  const [handleRejected] = useRejectApplicationMutation();
 
   const applications = data?.data || [];
 
-  const handleStatusUpdate = (appId, status) => {
-    updateStatus({ id: appId, status });
+  const handleStatusChange = async (applicationId, status) => {
+    try {
+      if (status === "shortlisted") {
+        await handleShortlisted(applicationId);
+        toast.success("Application shortlisted successfully");
+      } else {
+        await handleRejected(applicationId);
+        toast.success("Application rejected successfully");
+      }
+    } catch (error) {
+      toast.error("Failed to update application status");
+      console.log(error);
+    }
   };
 
   if (isLoading) {
@@ -105,24 +120,21 @@ const JobApplicationsEmployer = () => {
                         <EyeIcon className="w-5 h-5 text-blue-600" />
                       </Link>
 
-                      {app.status !== "SHORTLISTED" && (
-                        <button
-                          onClick={() =>
-                            handleStatusUpdate(app._id, "SHORTLISTED")
-                          }
-                        >
-                          <CheckCircleIcon className="w-5 h-5 text-green-600" />
-                        </button>
-                      )}
-
-                      {app.status !== "REJECTED" && (
-                        <button
-                          onClick={() =>
-                            handleStatusUpdate(app._id, "REJECTED")
-                          }
-                        >
-                          <XCircleIcon className="w-5 h-5 text-red-600" />
-                        </button>
+                      {app.status === "NEW" && (
+                        <>
+                          <button
+                            onClick={() => handleStatusChange(app._id, "SHORTLISTED")}
+                            title="Shortlist"
+                          >
+                            <CheckCircleIcon className="w-5 h-5 text-green-600" />
+                          </button>
+                          <button
+                            onClick={() => handleStatusChange(app._id, "REJECTED")}
+                            title="Reject"
+                          >
+                            <XCircleIcon className="w-5 h-5 text-red-600" />
+                          </button>
+                        </>
                       )}
                     </div>
                   </td>

@@ -13,6 +13,7 @@ import {
   useGetMyJobsQuery,
   useDeleteJobMutation,
 } from "../../services/endpoints/jobApi";
+import { toast } from "react-toastify";
 
 const statusMap = {
   ACTIVE: "Active",
@@ -57,8 +58,9 @@ const MyJobs = () => {
       await deleteJob(selectedJob._id).unwrap();
       setShowDeleteModal(false);
       setSelectedJob(null);
+      toast.success("Job deleted successfully");
     } catch (err) {
-      alert("Failed to delete job");
+      toast.error("Failed to delete job");
     }
   };
 

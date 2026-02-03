@@ -16,6 +16,7 @@ import {
 import CMSForm from "../../components/common/CMSForm";
 import Modal from "../../components/common/Modal";
 import BlogNews from "./cms/BlogNews";
+import { toast } from "react-toastify";
 
 /* ================= CONSTANTS ================= */
 
@@ -63,8 +64,10 @@ const CMS = () => {
     if (formData._id) {
       const { _id, ...rest } = formData;
       await updateCMS({ id: _id, ...rest });
+      toast.success("CMS updated successfully");
     } else {
       await createCMS(formData);
+      toast.success("CMS created successfully");
     }
 
     setShowForm(false);
@@ -72,16 +75,26 @@ const CMS = () => {
   };
 
   const handleDelete = async () => {
-    await deleteCMS(selected._id);
-    setShowDelete(false);
-    setSelected(null);
+   try {
+     await deleteCMS(selected._id);
+     toast.success("CMS deleted successfully");
+     setShowDelete(false);
+     setSelected(null);
+   } catch (error) {
+    toast.error("Failed to delete CMS");
+   }
   };
 
   const toggleStatus = async (item) => {
-    await updateCMS({
-      id: item._id,
-      status: item.status === "ACTIVE" ? "INACTIVE" : "ACTIVE",
-    });
+   try {
+     await updateCMS({
+       id: item._id,
+       status: item.status === "ACTIVE" ? "INACTIVE" : "ACTIVE",
+     });
+     toast.success("CMS status updated successfully");
+   } catch (error) {
+    toast.error("Failed to update CMS status");
+   }
   };
 
   /* ================= UI ================= */

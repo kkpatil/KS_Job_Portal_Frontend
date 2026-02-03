@@ -7,6 +7,7 @@ import {
 import { useGetEmployerByIdQuery, useGetEmployerDashboardQuery, useUpdateEmployerMutation, useUpdateEmployerStatusMutation } from "../../services/endpoints/employerApi";
 import { useParams } from "react-router-dom";
 import { formatDate } from "../../utils/formateDate";
+import { toast } from "react-toastify";
 
 const EmployerDetails = () => {
   const [editModal, setEditModal] = useState(false);
@@ -26,8 +27,10 @@ const [formData, setFormData] = useState({});
 const handleSave = async () => {
   try {
     await updateEmployer({ id, data: formData }).unwrap();
+    toast.success("Employer updated successfully");
     setEditModal(false);
   } catch (err) {
+    toast.error("Failed to update employer");
     console.error(err);
   }
 };
@@ -35,16 +38,22 @@ const handleSave = async () => {
   const handleApprove = async () => {
     try {
       await employerStatus({ id, data: { status: "ACTIVE" } }).unwrap();
+      toast.success("Employer approved successfully");
     } catch (error) {
+      toast.error("Failed to approve employer");
       console.log("Error approving employer:", error);
+
     }
   }
 
   const handleBlocked = async () => {
     try {
       await employerStatus({ id, data: { status: "BLOCKED" } }).unwrap();
+      toast.success("Employer blocked successfully");
     } catch (error) {
+      toast.error("Failed to block employer");
       console.log("Error blocking employer:", error);
+
     }
   }
  

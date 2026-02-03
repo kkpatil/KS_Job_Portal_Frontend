@@ -14,6 +14,7 @@ import {
   useRejectJobMutation,
 } from "../../services/endpoints/jobApi";
 import Modal from "../../components/common/Modal";
+import { toast } from "react-toastify";
 
 const statusColor = {
   ACTIVE: "bg-green-100 text-green-700",
@@ -47,16 +48,20 @@ const JobsDetails = () => {
     try {
       if (actionType === "approve") {
         await approveJob(job._id).unwrap();
+        toast.success("Job approved successfully");
       }
       if (actionType === "reject") {
         await rejectJob(job._id).unwrap();
+        toast.success("Job rejected successfully");
       }
       if (actionType === "block") {
         await blockJob(job._id).unwrap();
+        toast.success("Job blocked successfully");
       }
 
       closeModal();
     } catch (error) {
+      toast.error("Failed to perform action");
       console.error("Action failed:", error);
       closeModal();
     }

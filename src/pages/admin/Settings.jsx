@@ -3,6 +3,7 @@ import {
   useGetSettingsQuery,
   useUpdateSettingsMutation,
 } from "../../services/endpoints/settingsApi";
+import { toast } from "react-toastify";
 
 
 const Settings = () => {
@@ -37,8 +38,12 @@ const Settings = () => {
   };
 
   const handleSave = async () => {
-    await updateSettings(settings).unwrap();
-    alert("Settings Saved");
+   try {
+     await updateSettings(settings).unwrap();
+     toast.success("Settings Saved");
+   } catch (error) {
+    toast.error("Failed to save settings");
+   }
   };
 
   if (isLoading) return <p>Loading...</p>;

@@ -9,6 +9,7 @@ import {
   useUpdateApplicationStatusMutation,
 } from "../../services/endpoints/applicationsApi";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 const statusColor = {
   NEW: "bg-blue-100 text-blue-700",
@@ -45,8 +46,9 @@ const ApplicationsEmployer = () => {
   const handleStatusChange = async (id, status) => {
     try {
       await updateStatus({ id, status }).unwrap();
+      toast.success("Status updated successfully");
     } catch (err) {
-      alert("Failed to update status");
+      toast.error(err.data.message ||"Failed to update status");
     }
   };
 

@@ -19,7 +19,7 @@ const Dashboard = () => {
   const {data:employerRecentJobs} = useGetRecentEmployersJobsQuery(); 
   
   const {data:recentApplications} = useGetRecentApplicationsQuery();
-  console.log("employerRecentJobs",employerRecentJobs);
+  // console.log("employerRecentJobs",employerRecentJobs);
 
 
   const [showCreateJobModal,setShowCreateJobModal] = useState(false);

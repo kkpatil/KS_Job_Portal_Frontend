@@ -13,6 +13,7 @@ import ApplyJobModal from "../../components/candidate/ApplyJobModal";
 import { useGetJobByIdQuery } from "../../services/endpoints/jobApi";
 import { useApplyJobMutation } from "../../services/endpoints/applicationsApi";
 import { useToggleSaveJobMutation } from "../../services/endpoints/candidate/savedJobApi";
+import { toast } from "react-toastify";
 
 const JobDetailsView = () => {
   const { id } = useParams();
@@ -38,10 +39,12 @@ const JobDetailsView = () => {
         jobId: id,
         companyId: job?.employer?._id,
       }).unwrap();
+      toast.success("Job applied successfully");
 
       setShowApply(false);
     } catch (err) {
-      alert(err?.data?.message || "Failed to apply");
+
+      toast.error(err?.data?.message || "Failed to apply");
     }
   };
 
@@ -49,8 +52,10 @@ const JobDetailsView = () => {
     try {
       const res = await toggleSaveJob(id).unwrap();
       setSaved(res?.saved ?? !saved);
+      toast.success("Job saved successfully");
     } catch (err) {
-      alert(err?.data?.message || "Failed to save job");
+      toast.error(err?.data?.message || "Failed to save job");
+      
     }
   };
 

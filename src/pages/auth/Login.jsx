@@ -3,7 +3,8 @@ import { FaGoogle } from "react-icons/fa";
 import { PiBagSimpleFill } from "react-icons/pi";
 import { Link, useNavigate } from "react-router-dom";
 import { useLoginMutation } from "../../services/endpoints/authApi";
-import { getTokenPayload } from "../../utils/jwt"; // ✅ IMPORT FIX
+import { getTokenPayload } from "../../utils/jwt"; 
+import {toast} from "react-toastify"
 
 const Login = () => {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ const Login = () => {
 
     try {
       const res = await login(formData).unwrap();
+      toast.success("Login successful");
       const token = res.data.token;
 
       localStorage.setItem("token", token);
@@ -56,6 +58,7 @@ const Login = () => {
       }
     } catch (err) {
       console.error("Login error:", err);
+      toast.error("Login failed");
     }
   };
 

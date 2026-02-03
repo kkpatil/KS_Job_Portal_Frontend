@@ -9,6 +9,7 @@ import {
   useCloseJobMutation,
   useGetJobByIdQuery,
 } from "../../services/endpoints/jobApi";
+import { toast } from "react-toastify";
 
 const statusColor = {
   ACTIVE: "bg-green-100 text-green-700",
@@ -139,9 +140,9 @@ const CloseJobModal = ({ id, onClose }) => {
     try {
       await closeJob(id).unwrap();
       onClose();
-      alert("Job closed successfully");
+      toast.success("Job closed successfully");
     } catch (error) {
-      alert("Failed to close job");
+      toast.error("Failed to close job");
       console.error(error);
     }
   };

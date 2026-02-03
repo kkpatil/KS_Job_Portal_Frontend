@@ -10,6 +10,7 @@ import {
   useToggleSaveJobMutation,
 } from "../../services/endpoints/candidate/savedJobApi";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 const Jobs = () => {
   const [jobId, setJobId] = useState(null);
@@ -27,8 +28,9 @@ const Jobs = () => {
     try {
       await toggleSaveJob(jobId).unwrap();
       setShowSavedModel(false);
+      toast.success("Job saved successfully");
     } catch (err) {
-      alert(err?.data?.message || "Failed to save job");
+      toast.error(err?.data?.message || "Failed to save job");
     }
   };
 

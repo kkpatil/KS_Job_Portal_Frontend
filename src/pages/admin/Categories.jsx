@@ -14,6 +14,7 @@ import {
   useDeleteCategoryMutation,
 } from "../../services/endpoints/categoryApi";
 import { iconMap } from "../../utils/iconMap";
+import { toast } from "react-toastify";
 
 const statusColor = {
   ACTIVE: "bg-green-100 text-green-700",
@@ -38,21 +39,36 @@ const Categories = () => {
   );
 
   const handleAdd = async (data) => {
-    await createCategory(data).unwrap();
-    setShowAdd(false);
+    try {
+      await createCategory(data).unwrap();
+      setShowAdd(false);
+      toast.success("Category created successfully"); 
+    } catch (error) {
+      toast.error("Failed to create category");
+    }
   };
 
   const handleUpdate = async (data) => {
-    await updateCategory({
-      id: data._id,
-      data,
-    }).unwrap();
-    setShowEdit(false);
+    try {
+      await updateCategory({
+        id: data._id,
+        data,
+      }).unwrap();
+      toast.success("Category updated successfully");
+      setShowEdit(false);
+    } catch (error) {
+      toast.error("Failed to update category");
+    }
   };
 
   const handleDelete = async () => {
-    await deleteCategory(selected._id).unwrap();
+   try {
+     await deleteCategory(selected._id).unwrap();
+    toast.success("Category deleted successfully");
     setShowDelete(false);
+   } catch (error) {
+  toast.error("Failed to delete category");
+   }
   };
 
   const toggleStatus = async (cat) => {

@@ -25,6 +25,7 @@ import {
   useGetApplicationsReportQuery,
   useGetReportsListQuery,
 } from "../../services/endpoints/reportsApi";
+import { toast } from "react-toastify";
 
 const Reports = () => {
   const { data: summary } = useGetSummaryQuery();
@@ -65,9 +66,10 @@ const Reports = () => {
     a.remove();
 
     window.URL.revokeObjectURL(url);
+    toast.success("Report downloaded successfully");
   } catch (error) {
     console.error("Download error:", error);
-    alert("Failed to download report");
+    toast.error("Failed to download report");
   }
 };
 

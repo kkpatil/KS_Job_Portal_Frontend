@@ -5,6 +5,7 @@ import {
   useUploadResumeMutation,
 } from "../../services/endpoints/candidate/profileApi";
 import { useChangeEmployerPasswordMutation } from "../../services/endpoints/authApi";
+import { toast } from "react-toastify";
 
 const CandidateSettings = () => {
   const { data, isLoading } = useGetCandidateProfileQuery();
@@ -57,22 +58,22 @@ const CandidateSettings = () => {
       name: profile.name,
       phone: profile.phone,
     });
-    alert("Profile updated successfully");
+    toast.success("Profile updated successfully");
   };
 
   const handleResumeUpload = async () => {
-    if (!resume) return alert("Please select a file");
+    if (!resume) return toast.warning("Please select a file");
 
     const formData = new FormData();
     formData.append("resume", resume);
 
     await uploadResume(formData);
-    alert("Resume uploaded successfully");
+    toast.success("Resume uploaded successfully");
   };
 
   const handlePasswordChange = async () => {
     if (password.new !== password.confirm) {
-      return alert("Passwords do not match");
+      return toast.warning("Passwords do not match");
     }
 
     await changePassword({
@@ -80,7 +81,7 @@ const CandidateSettings = () => {
       newPassword: password.new,
     });
 
-    alert("Password updated");
+    toast.success("Password updated");
     setPassword({ current: "", new: "", confirm: "" });
   };
 

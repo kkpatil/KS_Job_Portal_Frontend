@@ -15,6 +15,7 @@ import {
   useUpdateEmployerMutation,
 } from "../../services/endpoints/employerApi";
 import { formatDate } from "../../utils/formateDate";
+import { toast } from "react-toastify";
 
 const statusColor = {
   Active: "bg-green-100 text-green-700",
@@ -57,28 +58,37 @@ const Employers = () => {
   });
 
   const handleDelete = async () => {
-    if (!selectedEmployer?._id) return;
-
-    await deleteEmployer(selectedEmployer._id).unwrap();
-    setDeleteModal(false);
-    setSelectedEmployer(null);
+    try {
+      if (!selectedEmployer?._id) return;
+  
+      await deleteEmployer(selectedEmployer._id).unwrap();
+      toast.success("Employer deleted successfully");
+      setDeleteModal(false);
+      setSelectedEmployer(null);
+    } catch (error) {
+      toast.error("Failed to delete employer");
+    }
   };
 
   const handleSave = async () => {
-    await updateEmployer({
-      id: selectedEmployer._id,
-      data: {
-        companyName: selectedEmployer.companyName,
-        contactEmail: selectedEmployer.contactEmail,
-        industry: selectedEmployer.industry,
-        website: selectedEmployer.website,
-        status: selectedEmployer.status,
-      },
-    }).unwrap();
-
-    setEditForm(false);
-
-    setSelectedEmployer(null);
+    try {
+      await updateEmployer({
+        id: selectedEmployer._id,
+        data: {
+          companyName: selectedEmployer.companyName,
+          contactEmail: selectedEmployer.contactEmail,
+          industry: selectedEmployer.industry,
+          website: selectedEmployer.website,
+          status: selectedEmployer.status,
+        },
+      }).unwrap();
+      toast.success("Employer updated successfully");
+      setEditForm(false);
+  
+      setSelectedEmployer(null);
+    } catch (error) {
+      toast.error("Failed to update employer");
+    }
   };
 
   if (isLoading) {

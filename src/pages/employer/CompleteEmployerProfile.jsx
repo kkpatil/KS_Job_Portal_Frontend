@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCompleteEmployerProfileMutation } from "../../services/endpoints/employerApi";
+import { toast } from "react-toastify";
 
 const CompleteEmployerProfile = () => {
   const navigate = useNavigate();
@@ -26,7 +27,9 @@ const CompleteEmployerProfile = () => {
     e.preventDefault();
 
     const res = await completeProfile(form).unwrap();
-
+    
+    if (res.error) return toast.error(res.error);
+    toast.success("Profile completed successfully");
     localStorage.setItem("token", res.token);
 
     navigate("/employer", { replace: true });

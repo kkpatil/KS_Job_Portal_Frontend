@@ -12,6 +12,7 @@ import {
   useDeleteSkillMutation,
 } from "../../services/endpoints/skillApi";
 import { useGetAllCategoriesQuery } from "../../services/endpoints/categoryApi";
+import { toast } from "react-toastify";
 
 const Skills = () => {
   const { data: skills = [], isLoading } = useGetAdminSkillsQuery();
@@ -29,16 +30,17 @@ const Skills = () => {
     try {
       if(data.category === "")
       {
-        return alert("Please select a category");
+        return toast.error("Please select a category");
       }
       if(data.name === ""){
-        return alert("Please enter a skill name");
+        return toast.error("Please enter a skill name");
       }
       await createSkill({ name: data.name, category:data.category }).unwrap();
+      toast.success("Skill added successfully");
       setShowAdd(false);
       
     } catch (error) {
-      alert(error?.data?.message || "Failed to add skill");
+      toast.error(error?.data?.message || "Failed to add skill");
     }
   };
 

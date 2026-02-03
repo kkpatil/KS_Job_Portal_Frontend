@@ -19,6 +19,7 @@ import {
   useGetCategoriesQuery,
   useGetSkillsByCategoryQuery,
 } from "../../services/endpoints/jobApi";
+import { toast } from "react-toastify";
 
 const statusColor = {
   ACTIVE: "bg-green-100 text-green-700",
@@ -441,11 +442,11 @@ const EditJobModal = ({ job, onClose }) => {
         data: form,
       }).unwrap();
 
-      alert("Job updated successfully");
+      toast.success("Job updated successfully");
       onClose();
     } catch (error) {
       console.error("Update job failed", error);
-      alert("Failed to update job");
+      toast.error("Failed to update job");
     }
   };
 

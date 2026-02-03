@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Modal from "../../components/common/Modal";
 import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
+import { toast } from "react-toastify";
 
 const ApplyJobModal = ({ jobTitle, onClose, onApply }) => {
   const [form, setForm] = useState({
@@ -14,7 +15,7 @@ const ApplyJobModal = ({ jobTitle, onClose, onApply }) => {
 
   const handleSubmit = () => {
     if (!form.resume) {
-      alert("Please upload your resume");
+      toast.warning("Please upload your resume");
       return;
     }
 

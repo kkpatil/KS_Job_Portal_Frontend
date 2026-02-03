@@ -6,6 +6,7 @@ import {
 } from "@heroicons/react/24/outline";
 import Modal from "../../components/common/Modal";
 import { useDeleteApplicationMutation, useGetAllApplicationsQuery } from "../../services/endpoints/applicationsApi";
+import { toast } from "react-toastify";
 
 const statusColor = {
   NEW: "bg-blue-100 text-blue-700",
@@ -46,8 +47,9 @@ const Applications = () => {
     try {
       await deleteApplication(deleteId).unwrap();
       setShowDeleteModal(false);
+      toast.success("Application deleted successfully");
     } catch (error) {
-
+      toast.error("Failed to delete application");
       console.error("Failed to delete application:", error);
     }
   }

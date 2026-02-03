@@ -4,6 +4,7 @@ import {
   useGetSavedJobsQuery,
 } from "../../services/endpoints/candidate/savedJobApi";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 const SavedJobs = () => {
   const { data: savedJobs, isLoading } = useGetSavedJobsQuery();
@@ -18,8 +19,9 @@ const SavedJobs = () => {
       await removeSavedJob(deleteId).unwrap();
       setShowDeleteModal(false);
       setDeleteId(null);
+      toast.success("Saved job removed successfully");
     } catch (error) {
-      alert("Failed to remove saved job");
+      toast.error("Failed to remove saved job");
       console.error(error);
     }
   };

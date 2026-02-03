@@ -12,6 +12,7 @@ import {
   useUploadResumeMutation,
   useUpdateCandidateProfileMutation,
 } from "../../services/endpoints/candidate/profileApi";
+import { toast } from "react-toastify";
 
 const API_URL =
   import.meta.env.VITE_API_URL || "http://localhost:5000";
@@ -58,9 +59,9 @@ const Profile = () => {
       await updateProfile(form).unwrap();
       await refetch();
       setEditMode(false);
-      alert("Profile updated successfully");
+      toast.success("Profile updated successfully");
     } catch {
-      alert("Profile update failed");
+      toast.error( err?.data?.message ||"Profile update failed");
     }
   };
 

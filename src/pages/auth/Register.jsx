@@ -3,6 +3,7 @@ import { FaGoogle } from "react-icons/fa";
 import { PiBagSimpleFill } from "react-icons/pi";
 import { Link, useNavigate } from "react-router-dom";
 import { useRegisterMutation } from "../../services/endpoints/authApi";
+import { toast } from "react-toastify";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -19,9 +20,10 @@ const Register = () => {
   const handleSignup = async () => {
     try {
       await register(form).unwrap();
-      alert("Signup successful");
+      toast.success("Signup successful");
       navigate("/login");
     } catch (err) {
+      toast.error("Signup failed");
       console.error(err);
     }
   };
