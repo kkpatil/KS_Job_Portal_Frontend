@@ -15,12 +15,12 @@ export const jobApi = api.injectEndpoints({
       providesTags: ["Jobs"],
     }),
 
-    getJobById: builder.query({
-      query: (id) => `/jobs/${id}`,
-      transformResponse: (response) => response?.data,
+  getJobById: builder.query({
+  query: (id) => `/jobs/${id}`,
+  transformResponse: (response) => response?.data,
+  providesTags: (result, error, id) => [{ type: "Job", id },"Jobs","Applications"],
+}),
 
-      providesTags: ["  Job", "Application"],
-    }),
 
     getMyJobs: builder.query({
       query: () => "/jobs/employer/my-jobs",

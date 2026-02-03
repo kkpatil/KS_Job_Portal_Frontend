@@ -18,7 +18,7 @@ import { toast } from "react-toastify";
 const JobDetailsView = () => {
   const { id } = useParams();
 
-  const { data, isLoading, error } = useGetJobByIdQuery(id);
+  const { data, isLoading, error, refetch } = useGetJobByIdQuery(id);
   const [applyJob] = useApplyJobMutation();
   const [toggleSaveJob] = useToggleSaveJobMutation();
 
@@ -26,6 +26,13 @@ const JobDetailsView = () => {
 
   const [saved, setSaved] = useState(false);
   const [showApply, setShowApply] = useState(false);
+  const [appliedLocal, setAppliedLocal] = useState(false);
+
+  useEffect(() => {
+    if (job?.isApplied) {
+      setAppliedLocal(true);
+    }
+  }, [job]);
 
   useEffect(() => {
     if (job?.isSaved) {
@@ -35,15 +42,15 @@ const JobDetailsView = () => {
 
   const handleApply = async () => {
     try {
+      setAppliedLocal(true);
       await applyJob({
         jobId: id,
         companyId: job?.employer?._id,
       }).unwrap();
       toast.success("Job applied successfully");
-
+      await refetch();
       setShowApply(false);
     } catch (err) {
-
       toast.error(err?.data?.message || "Failed to apply");
     }
   };
@@ -53,12 +60,11 @@ const JobDetailsView = () => {
       const res = await toggleSaveJob(id).unwrap();
       setSaved(res?.saved ?? !saved);
       toast.success("Job saved successfully");
+      await refetch();
     } catch (err) {
       toast.error(err?.data?.message || "Failed to save job");
-      
     }
   };
-
 
   if (isLoading) {
     return <div className="card text-center">Loading job...</div>;
@@ -104,7 +110,10 @@ const JobDetailsView = () => {
               <CurrencyRupeeIcon className="w-4 h-4" />
               {job.salary}
             </span>
-            <a href={`mailto:${job.employer.contactEmail}`}  className="flex items-center gap-1 hover:underline text-blue-600">
+            <a
+              href={`mailto:${job.employer.contactEmail}`}
+              className="flex items-center gap-1 hover:underline text-blue-600"
+            >
               <PaperAirplaneIcon className="w-4 h-4" />
               {job.employer.contactEmail}
             </a>

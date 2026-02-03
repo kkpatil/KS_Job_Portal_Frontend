@@ -45,16 +45,33 @@ const Skills = () => {
   };
 
   const handleUpdate = async (data) => {
-    await updateSkill({
-      id: selectedSkill._id,
-      data: { name: data.name, status: data.status, category: data.category },
-    }).unwrap();
-    setShowEdit(false);
+   try {
+     if(data.category === "")
+     {
+       return toast.error("Please select a category");
+     }
+     if(data.name === ""){
+       return toast.error("Please enter a skill name");
+     }
+     await updateSkill({
+       id: selectedSkill._id,
+       data: { name: data.name, status: data.status, category: data.category },
+     }).unwrap();
+     setShowEdit(false);
+     toast.success("Skill updated successfully");
+   } catch (error) {
+    toast.warning("Failed to update skill");
+   }
   };
 
   const handleDelete = async () => {
-    await deleteSkill(selectedSkill._id).unwrap();
-    setShowDelete(false);
+    try {
+      await deleteSkill(selectedSkill._id).unwrap();
+      toast.error("Skill deleted successfully");
+      setShowDelete(false);
+    } catch (error) {
+      toast.error("Failed to delete skill");
+    }
   };
 
   return (

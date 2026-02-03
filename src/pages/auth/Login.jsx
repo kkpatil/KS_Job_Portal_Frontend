@@ -35,7 +35,7 @@ const Login = () => {
 
       const { role, profileCompleted } = payload;
 
-      // 🔥 DIRECT REDIRECT (NO /dashboard)
+     
       if (role === "ADMIN") {
         navigate("/admin", { replace: true });
         return;
@@ -57,8 +57,8 @@ const Login = () => {
         return;
       }
     } catch (err) {
-      console.error("Login error:", err);
       toast.error("Login failed");
+      console.error("Login error:", err);
     }
   };
 

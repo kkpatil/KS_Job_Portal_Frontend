@@ -45,14 +45,18 @@ export const applicationsApi = api.injectEndpoints({
       query: () => "/applications/employer",
       providesTags: ["Applications"],
     }),
-    applyJob: builder.mutation({
-      query: (body) => ({
-        url: "/applications",
-        method: "POST",
-        body,
-      }),
-      invalidatesTags: ["Applications", "Jobs"],
-    }),
+   applyJob: builder.mutation({
+  query: (data) => ({
+    url: "/applications",
+    method: "POST",
+    body: data,
+  }),
+  invalidatesTags: (result, error, { jobId }) => [
+    { type: "Job", id: jobId },
+    "Jobs","Applications"
+  ],
+}),
+
     getCandidateApplications: builder.query({
       query: () => "/applications/candidate",
       transformResponse: (response) => Array.isArray(response?.data) ? response.data : [],
