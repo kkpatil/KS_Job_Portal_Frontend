@@ -21,8 +21,19 @@ export const cmsSchemas = {
     fields: ["heading", "description", "faqs"], // 🔥
   },
 
-  "privacy.policy": {
+   "privacy.policy": {
     label: "Privacy Policy",
-    fields: ["html"],
+    fields: [
+      "heading",        // Page heading
+      "intro",          // Intro paragraph
+      "sections",       // Array of sections (title + content)
+      "footerNote",     // Footer note / contact info
+    ],
+  },
+
+  
+  "terms.conditions": {
+    label: "Terms & Conditions",
+    fields: ["intro", "sections", "footerNote"], // 🔥
   },
 };

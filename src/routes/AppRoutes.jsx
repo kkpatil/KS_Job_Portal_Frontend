@@ -16,6 +16,7 @@ import PrivateRoute from "./PrivateRoute";
 import CandidateSettings from "../pages/candidate/CandidateSettings";
 import JobDetailsView from "../pages/candidate/JobsDetailsView";
 import CompleteEmployerProfile from "../pages/employer/CompleteEmployerProfile";
+import CompleteProfile from "../pages/candidate/CompleteProfile";
 import HomePage from "../pages/landingpage/Homepage";
 import AboutPage from "../pages/landingpage/AboutPage";
 import Job from "../pages/landingpage/Job";
@@ -95,7 +96,7 @@ const AppRoutes = () => {
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/job/:id" element={<JobDetail />} />
           <Route path="/privacy&policy" element={<PrivacyPolicy />} />
-          <Route path="/Terms&Condition" element={<TermsAndConditions />} />
+          <Route path="/terms&conditions" element={<TermsAndConditions />} />
           <Route path="/ProfilePage" element={<ProfilePage />} />
           {/* AUTH */}
           <Route path="/login" element={<Login />} />
@@ -312,6 +313,15 @@ const AppRoutes = () => {
           />
 
           {/* CANDIDATE */}
+          <Route
+            path="/candidate/complete-profile"
+            element={
+              <PrivateRoute allowedRoles={["CANDIDATE"]}>
+                <CompleteProfile />
+              </PrivateRoute>
+            }
+          />
+
           <Route
             path="/candidate"
             element={

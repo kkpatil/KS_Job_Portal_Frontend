@@ -48,7 +48,10 @@ const Login = () => {
       }
 
       if (role === "CANDIDATE") {
-        navigate("/candidate", { replace: true });
+        navigate(
+          profileCompleted ? "/candidate" : "/candidate/complete-profile",
+          { replace: true },
+        );
         return;
       }
     } catch (err) {

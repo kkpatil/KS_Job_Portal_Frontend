@@ -85,7 +85,7 @@ const CMSForm = ({ initialData, onSubmit, onCancel, showSlug = true }) => {
       )}
 
       {/* TYPE */}
-      <div>
+      {/* <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Type
         </label>
@@ -98,7 +98,7 @@ const CMSForm = ({ initialData, onSubmit, onCancel, showSlug = true }) => {
           <option value="BLOG">Blog</option>
           <option value="BANNER">Banner</option>
         </select>
-      </div>
+      </div> */}
 
       {/* ================= DYNAMIC FIELDS ================= */}
 
@@ -137,6 +137,111 @@ const CMSForm = ({ initialData, onSubmit, onCancel, showSlug = true }) => {
           />
         </div>
       )}
+
+      {/* INTRO (Privacy Policy) */}
+{schema?.fields.includes("intro") && (
+  <div className="mt-14">
+    <label className="block text-sm font-medium text-gray-700 mb-1">
+      Intro
+    </label>
+    <RichTextEditor
+      value={form.content.intro || ""}
+      onChange={(html) =>
+        setForm({
+          ...form,
+          content: { ...form.content, intro: html },
+        })
+      }
+    />
+  </div>
+)}
+{/* PRIVACY POLICY SECTIONS */}
+{schema?.fields.includes("sections") && (
+  <div className="mt-14 space-y-4">
+    <div className="flex justify-between items-center">
+      <label className="text-sm font-medium text-gray-700">
+        Privacy Sections
+      </label>
+
+    
+    </div>
+
+    {(form.content.sections || []).map((section, index) => (
+      <div
+        key={index}
+        className="border rounded-lg p-4 pb-12 pt-12 space-y-3 relative "
+      >
+        {/* REMOVE */}
+        <button
+          type="button"
+          className="absolute top-2 right-2 text-xs bg-red-400 text-white px-2 py-1 rounded"
+          onClick={() => {
+            const updated = form.content.sections.filter(
+              (_, i) => i !== index
+            );
+
+            setForm({
+              ...form,
+              content: { ...form.content, sections: updated },
+            });
+          }}
+        >
+          Remove
+        </button>
+
+        {/* SECTION TITLE */}
+        <input
+          className="w-full border px-3 py-2 rounded"
+          placeholder="Section Title"
+          value={section.title}
+          onChange={(e) => {
+            const updated = form.content.sections.map((s, i) =>
+              i === index ? { ...s, title: e.target.value } : s
+            );
+
+            setForm({
+              ...form,
+              content: { ...form.content, sections: updated },
+            });
+          }}
+        />
+
+        {/* SECTION CONTENT */}
+        <RichTextEditor
+          value={section.content || ""}
+          onChange={(html) => {
+            const updated = form.content.sections.map((s, i) =>
+              i === index ? { ...s, content: html } : s
+            );
+
+            setForm({
+              ...form,
+              content: { ...form.content, sections: updated },
+            });
+          }}
+        />
+      </div>
+    ))}
+  </div>
+)}
+{/* FOOTER NOTE */}
+{schema?.fields.includes("footerNote") && (
+  <div className="mt-14">
+    <label className="block text-sm font-medium text-gray-700 mb-1">
+      Footer Note
+    </label>
+    <RichTextEditor
+      value={form.content.footerNote || ""}
+      onChange={(html) =>
+        setForm({
+          ...form,
+          content: { ...form.content, footerNote: html },
+        })
+      }
+    />
+  </div>
+)}
+
 
       {/* IMAGE */}
       {schema?.fields.includes("image") && (
@@ -349,6 +454,7 @@ const CMSForm = ({ initialData, onSubmit, onCancel, showSlug = true }) => {
           ))}
         </div>
       )}
+      
 
       {/* HTML (privacy policy etc) */}
       {schema?.fields.includes("html") && (
@@ -362,7 +468,28 @@ const CMSForm = ({ initialData, onSubmit, onCancel, showSlug = true }) => {
           }
         />
       )}
+     
+       <div className="mt-14 space-y-4">
 
+        <button
+        type="button"
+        className="btn-secondary px-4 py-1 rounded-md text-sm"
+        onClick={() =>
+          setForm({
+            ...form,
+            content: {
+              ...form.content,
+              sections: [
+                ...(form.content.sections || []),
+                { title: "", content: "" },
+              ],
+            },
+          })
+        }
+      >
+        + Add Section
+      </button>
+      </div>
       {/* ACTIONS */}
       <div className="flex justify-end gap-3 pt-4 mt-8 border-t">
         <button onClick={onCancel} className="px-4 py-2 border rounded cursor-pointer hover:bg-red-50 transition hover:scale-102 ">
