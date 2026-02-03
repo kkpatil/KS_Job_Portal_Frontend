@@ -54,10 +54,12 @@ const ApplicationsCandidateDetails = () => {
     try {
       if (action === "SHORTLIST") {
         await shortlist(_id).unwrap();
+      
       }
 
       if (action === "REJECT") {
         await reject(_id).unwrap();
+       
       }
     } finally {
       setAction(null);

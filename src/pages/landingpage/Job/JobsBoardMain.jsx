@@ -18,7 +18,7 @@ const timeAgo = (date) => {
 
 const JobBoardMain = () => {
   const { data: jobLocations } = useGetJobLocationsQuery();
-  console.log("job location", jobLocations);
+ 
 
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const [locationInput, setLocationInput] = useState("");
