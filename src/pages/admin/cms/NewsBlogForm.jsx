@@ -24,16 +24,18 @@ const NewsBlogForm = ({ mode = "create", selectedData = null, onClose }) => {
   useEffect(() => {
     if (mode === "edit" && selectedData) {
       setFormData({
-        category: selectedData.category,
-        title: selectedData.title,
-        shortDescription: selectedData.shortDescription,
-        longDescription: selectedData.longDescription,
+        category: selectedData.category || "",
+        title: selectedData.title || "",
+        shortDescription: selectedData.shortDescription || "",
+        longDescription: selectedData.longDescription || "",
         image: selectedData.image || null,
         publishedDate: selectedData.publishedDate
           ? new Date(selectedData.publishedDate).toISOString().split("T")[0]
           : "",
       });
-    } else {
+    }
+
+    if (mode === "create") {
       setFormData({
         category: "",
         title: "",

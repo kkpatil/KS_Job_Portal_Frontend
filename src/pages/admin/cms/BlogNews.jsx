@@ -4,13 +4,18 @@ import NewsBlogForm from "./NewsBlogForm";
 import {
   useGetNewsQuery,
   useDeleteNewsMutation,
-} from "../../../services/endpoints/newsBlogs"; // tumhare api endpoints ka import
+  useGetNewsByIdQuery, // ✅ ye import missing hoga
+} from "../../../services/endpoints/newsBlogs";
 
 const BlogNews = () => {
   const [openModal, setOpenModal] = useState(false);
-  const [selectedData, setSelectedData] = useState(null);
+  const [selectedId, setSelectedId] = useState(null);
 
   // ===== Fetch news/blogs =====
+  const { data: singleNews, isFetching } = useGetNewsByIdQuery(selectedId, {
+    skip: !selectedId,
+  });
+
   const { data: newsBlogs, isLoading, isError } = useGetNewsQuery();
 
   // ===== Delete mutation =====
@@ -18,7 +23,7 @@ const BlogNews = () => {
 
   // ===== Handle Edit =====
   const handleEdit = (item) => {
-    setSelectedData(item);
+    setSelectedId(item._id);
     setOpenModal(true);
   };
 
@@ -38,7 +43,7 @@ const BlogNews = () => {
   // ===== Handle modal close =====
   const handleCloseModal = () => {
     setOpenModal(false);
-    setSelectedData(null);
+    setSelectedId(null); // ✅ correct
   };
 
   return (
@@ -48,7 +53,7 @@ const BlogNews = () => {
         <h2 className="text-2xl font-semibold text-gray-800">News & Blogs</h2>
         <button
           onClick={() => {
-            setSelectedData(null);
+            setSelectedId(null); // ✅ create mode
             setOpenModal(true);
           }}
           className="px-5 py-2 bg-[#309689] text-white rounded-md hover:bg-black transition"
@@ -109,13 +114,14 @@ const BlogNews = () => {
       {/* ===== MODAL ===== */}
       {openModal && (
         <Modal
-          title={selectedData ? "Edit News / Blog" : "Create News / Blog"}
+          title={selectedId ? "Edit News / Blog" : "Create News / Blog"}
           onClose={handleCloseModal}
           maxWidth="max-w-3xl"
         >
           <NewsBlogForm
-            mode={selectedData ? "edit" : "create"}
-            selectedData={selectedData}
+            key={selectedId || "create"}
+            mode={selectedId ? "edit" : "create"}
+            selectedData={singleNews?.data}
             onClose={handleCloseModal}
           />
         </Modal>

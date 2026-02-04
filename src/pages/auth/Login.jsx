@@ -3,10 +3,10 @@ import { FaGoogle } from "react-icons/fa";
 import { PiBagSimpleFill } from "react-icons/pi";
 import { Link, useNavigate } from "react-router-dom";
 import { useLoginMutation } from "../../services/endpoints/authApi";
-import { getTokenPayload } from "../../utils/jwt"; 
-import {toast} from "react-toastify"
-import { FiEye, FiEyeOff } from "react-icons/fi";
-
+import { getTokenPayload } from "../../utils/jwt";
+import { toast } from "react-toastify";
+import { FiEye } from "react-icons/fi";
+import { FiEyeOff } from "react-icons/fi";
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const Login = () => {
@@ -49,7 +49,6 @@ const Login = () => {
 
       const { role, profileCompleted } = payload;
 
-     
       if (role === "ADMIN") {
         navigate("/admin", { replace: true });
         return;
@@ -182,7 +181,9 @@ const Login = () => {
                     type="button"
                     onClick={() => setShowPassword((s) => !s)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-[#309689]"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
                   >
                     {showPassword ? <FiEyeOff /> : <FiEye />}
                   </button>

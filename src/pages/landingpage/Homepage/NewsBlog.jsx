@@ -1,112 +1,74 @@
 import React, { useState } from "react";
+import { useGetNewsQuery } from "../../../services/endpoints/newsBlogs";
 import NewsBlogPopup from "./NewsBlogPopup ";
 
 function NewsBlog() {
-  const [openPopup, setOpenPopup] = useState(false);
+  // ⭐ Final pattern state
+  const [selectedBlog, setSelectedBlog] = useState(null);
+
+  // 🔥 GET ALL NEWS/BLOG API
+  const { data: newsList = [], isLoading } = useGetNewsQuery();
+
+  if (isLoading) {
+    return <div className="text-center py-20">Loading...</div>;
+  }
 
   return (
     <section className="bg-white py-24">
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
         <div className="flex flex-col items-center justify-center text-center mb-14">
-          <div className="animate-[fadeDown_0.8s_ease-out]">
-            <h2 className="text-3xl md:text-4xl font-bold mb-3">
-              News and Blog
-            </h2>
-            <p className="text-gray-500 max-w-xl mx-auto">
-              Metus faucibus sed turpis lectus feugiat tincidunt. Rhoncus sed
-              tristique in dolor.
-            </p>
-          </div>
-          <button className="text-[#309689] font-medium mt-4 md:mt-0 hover:underline">
-            View all
-          </button>
+          <h2 className="text-3xl md:text-4xl font-bold mb-3">News and Blog</h2>
+          <p className="text-gray-500 max-w-xl mx-auto">
+            Metus faucibus sed turpis lectus feugiat tincidunt.
+          </p>
         </div>
 
         {/* Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          {/* Card 1 */}
-          <div className="group animate-[fadeUp_0.9s_ease-out]">
-            <div className="relative rounded-2xl overflow-hidden mb-5">
-              <img
-                src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d"
-                alt="News"
-                className="
-                  w-full
-                  h-70
-                  object-cover
-                  blur-[2px]
-                  transition-all
-                  duration-300
-                  group-hover:scale-105
-                "
-              />
-
-              <span className="absolute top-4 left-4 bg-[#309689] text-white text-xs px-4 py-1 rounded-full">
-                News
-              </span>
-            </div>
-
-            <p className="text-gray-400 text-sm mb-2">30 March 2024</p>
-
-            <h3 className="text-xl font-semibold mb-4 leading-snug">
-              Revitalizing Workplace Morale: Innovative Tactics For Boosting
-              Employee Engagement In 2024
-            </h3>
-
-            <button
-              onClick={() => setOpenPopup(true)} // 🔥 yahi click se popup open hota hai
-              className="text-[#309689] font-medium flex items-center gap-2 hover:gap-3 transition-all"
+          {newsList.map((item) => (
+            <div
+              key={item._id}
+              className="group animate-[fadeUp_0.9s_ease-out]"
             >
-              Read more <span>→</span>
-            </button>
-          </div>
+              <div className="relative rounded-2xl overflow-hidden mb-5">
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="w-full h-70 object-cover blur-[0.5px] transition-all duration-300 group-hover:scale-105"
+                />
+                <span className="absolute top-4 left-4 bg-[#309689] text-white text-xs px-4 py-1 rounded-full">
+                  {item.category}
+                </span>
+              </div>
 
-          {/* Card 2 */}
-          <div className="group animate-[fadeUp_1.1s_ease-out]">
-            <div className="relative rounded-2xl overflow-hidden mb-5">
-              <img
-                src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d"
-                alt="Blog"
-                className="
-                  w-full
-                  h-70
-                  object-cover
-                  blur-[2px]
-                  transition-all
-                  duration-300
-                  group-hover:scale-105
-                  
-                "
-              />
+              <p className="text-gray-400 text-sm mb-2">
+                {new Date(item.createdAt).toDateString()}
+              </p>
 
-              <span className="absolute top-4 left-4 bg-[#309689] text-white text-xs px-4 py-1 rounded-full">
-                Blog
-              </span>
+              <h3 className="text-xl font-semibold mb-4 leading-snug">
+                {item.title}
+              </h3>
+
+              {/* ⭐ SAME onClick for ALL */}
+              <button
+                onClick={() => setSelectedBlog(item)}
+                className="text-[#309689] font-medium flex items-center gap-2 hover:gap-3 transition-all"
+              >
+                Read more <span>→</span>
+              </button>
             </div>
-
-            <p className="text-gray-400 text-sm mb-2">30 March 2024</p>
-
-            <h3 className="text-xl font-semibold mb-4 leading-snug">
-              How To Avoid The Top Six Most Common Job Interview Mistakes
-            </h3>
-
-            <button
-              onClick={() => setOpenPopup(true)} // 🔥 yahi click se popup open hota hai
-              className="text-[#309689] font-medium flex items-center gap-2 hover:gap-3 transition-all"
-            >
-              Read more <span>→</span>
-            </button>
-            {openPopup && (
-              <NewsBlogPopup
-                // 🔥 popup ke andar Close button/backdrop se
-                // setOpenPopup(false) call hoga
-                onClose={() => setOpenPopup(false)}
-              />
-            )}
-          </div>
+          ))}
         </div>
       </div>
+
+      {/* ⭐ SINGLE POPUP */}
+      {selectedBlog && (
+        <NewsBlogPopup
+          blogId={selectedBlog._id}
+          onClose={() => setSelectedBlog(null)}
+        />
+      )}
     </section>
   );
 }
