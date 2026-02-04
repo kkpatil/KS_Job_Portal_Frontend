@@ -1,92 +1,98 @@
 import React from "react";
-import { FiArrowRight } from "react-icons/fi";
 
-const NewsBlogSection = () => {
+function NewsBlogSection() {
   return (
-    <section className="max-w-7xl mx-auto px-6 py-20 -mt-20">
-      {/* Heading */}
-      <div className="text-center mb-14">
-        <h2
-          className="text-3xl md:text-4xl font-semibold text-black mb-3
-                     transition-all duration-300 hover:font-bold"
-        >
-          News and Blog
-        </h2>
-        <p className="text-gray-500 text-sm max-w-xl mx-auto">
-          Metus faucibus sed turpis lectus feugiat tincidunt. Rhoncus sed
-          tristique in dolor.
-        </p>
-      </div>
+    <section className="bg-white py-24">
+      <div className="max-w-7xl mx-auto px-6">
+        {/* Header */}
+        <div className="flex flex-col items-center justify-center text-center mb-14">
+          <div className="animate-[fadeDown_0.8s_ease-out]">
+            <h2 className="text-3xl md:text-4xl font-bold mb-3">
+              News and Blog
+            </h2>
+            <p className="text-gray-500 max-w-xl mx-auto">
+              Metus faucibus sed turpis lectus feugiat tincidunt. Rhoncus sed
+              tristique in dolor.
+            </p>
+          </div>
+          <button className="text-[#309689] font-medium mt-4 md:mt-0 hover:underline">
+            View all
+          </button>
+        </div>
 
-      {/* Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-        {/* Card */}
-        {[
-          {
-            img: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d",
-            tag: "News",
-            title:
-              "Revitalizing Workplace Morale: Innovative Tactics For Boosting Employee Engagement In 2024",
-          },
-          {
-            img: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
-            tag: "Blog",
-            title:
-              "How To Avoid The Top Six Most Common Job Interview Mistakes",
-          },
-        ].map((item, idx) => (
-          <div
-            key={idx}
-            className="group cursor-pointer transition-all duration-300
-                       hover:-translate-y-1"
-          >
-            {/* Image */}
-            <div
-              className="relative rounded-2xl overflow-hidden mb-4 shadow-sm
-                            transition-all duration-300 group-hover:shadow-xl"
-            >
+        {/* Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+          {/* Card 1 */}
+          <div className="group animate-[fadeUp_0.9s_ease-out]">
+            <div className="relative rounded-2xl overflow-hidden mb-5">
               <img
-                src={item.img}
-                alt="news"
-                className="w-full h-[260px] object-cover blur-md scale-110
-                           transition-all duration-700
-                           group-hover:blur-sm group-hover:scale-100"
+                src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d"
+                alt="News"
+                className="
+                  w-full
+                  h-70
+                  object-cover
+                  blur-[2px]
+                  transition-all
+                  duration-300
+                  group-hover:scale-105
+                "
               />
 
-              {/* Badge */}
-              <span
-                className="absolute top-4 left-4 bg-teal-500 text-white
-                           text-xs px-4 py-1 rounded-full
-                           transition-all duration-300
-                           group-hover:scale-105"
-              >
-                {item.tag}
+              <span className="absolute top-4 left-4 bg-[#309689] text-white text-xs px-4 py-1 rounded-full">
+                News
               </span>
             </div>
 
-            <p className="text-gray-500 text-xs mb-2">30 March 2024</p>
+            <p className="text-gray-400 text-sm mb-2">30 March 2024</p>
 
-            <h3
-              className="font-semibold text-black text-lg mb-3 leading-snug
-                         transition-all duration-300
-                         group-hover:font-bold group-hover:text-teal-600"
-            >
-              {item.title}
+            <h3 className="text-xl font-semibold mb-4 leading-snug">
+              Revitalizing Workplace Morale: Innovative Tactics For Boosting
+              Employee Engagement In 2024
             </h3>
 
-            <span
-              className="text-teal-500 text-sm flex items-center gap-1
-                         transition-all duration-300
-                         group-hover:font-semibold"
-            >
-              Read more
-              <FiArrowRight className="transition-all duration-300 group-hover:translate-x-1" />
-            </span>
+            <button className="text-[#309689] font-medium flex items-center gap-2 hover:gap-3 transition-all">
+              Read more <span>→</span>
+            </button>
           </div>
-        ))}
+
+          {/* Card 2 */}
+          <div className="group animate-[fadeUp_1.1s_ease-out]">
+            <div className="relative rounded-2xl overflow-hidden mb-5">
+              <img
+                src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d"
+                alt="Blog"
+                className="
+                  w-full
+                  h-70
+                  object-cover
+                  blur-[2px]
+                  transition-all
+                  duration-300
+                  group-hover:scale-105
+                  
+                "
+              />
+
+              <span className="absolute top-4 left-4 bg-[#309689] text-white text-xs px-4 py-1 rounded-full">
+                Blog
+              </span>
+            </div>
+
+            <p className="text-gray-400 text-sm mb-2">30 March 2024</p>
+
+            <h3 className="text-xl font-semibold mb-4 leading-snug">
+              How To Avoid The Top Six Most Common Job Interview Mistakes
+            </h3>
+
+            <button className="text-[#309689] font-medium flex items-center gap-2 hover:gap-3 transition-all">
+              Read more <span>→</span>
+            </button>
+          </div>
+        </div>
       </div>
     </section>
   );
-};
+}
 
 export default NewsBlogSection;

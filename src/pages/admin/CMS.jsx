@@ -5,6 +5,7 @@ import {
   CheckCircleIcon,
   NoSymbolIcon,
 } from "@heroicons/react/24/outline";
+import Testimonial from "./cms/Testimonial";
 
 import {
   useGetCMSContentsQuery,
@@ -260,6 +261,7 @@ const CMS = () => {
         )}
       </div>
       <BlogNews />
+      <Testimonial />
     </>
   );
 };

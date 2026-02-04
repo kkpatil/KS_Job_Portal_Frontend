@@ -1,32 +1,40 @@
 import { api } from "../api";
 
-// RTK Query testimonial endpoints
 export const testimonialApi = api.injectEndpoints({
   endpoints: (builder) => ({
+    // GET ALL
     getAllTestimonials: builder.query({
       query: () => "/testimonials/all",
+      transformResponse: (response) => response.data || [],
       providesTags: ["Testimonial"],
     }),
+    // GET BY ID
     getTestimonialById: builder.query({
       query: (id) => `/testimonials/${id}`,
       providesTags: ["Testimonial"],
     }),
+
+    // CREATE
     createTestimonial: builder.mutation({
-      query: (data) => ({
+      query: (formData) => ({
         url: "/testimonials/create",
         method: "POST",
-        body: data,
+        body: formData,
       }),
       invalidatesTags: ["Testimonial"],
     }),
+
+    // UPDATE
     updateTestimonial: builder.mutation({
-      query: ({ id, ...data }) => ({
+      query: ({ id, formData }) => ({
         url: `/testimonials/update/${id}`,
         method: "PUT",
-        body: data,
+        body: formData,
       }),
       invalidatesTags: ["Testimonial"],
     }),
+
+    // DELETE
     deleteTestimonial: builder.mutation({
       query: (id) => ({
         url: `/testimonials/delete/${id}`,
@@ -35,10 +43,8 @@ export const testimonialApi = api.injectEndpoints({
       invalidatesTags: ["Testimonial"],
     }),
   }),
-  overrideExisting: false,
 });
 
-// Export hooks for component usage
 export const {
   useGetAllTestimonialsQuery,
   useGetTestimonialByIdQuery,

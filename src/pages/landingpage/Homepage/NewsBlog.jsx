@@ -1,21 +1,23 @@
-import React from "react";
+import React, { useState } from "react";
+import NewsBlogPopup from "./NewsBlogPopup ";
 
 function NewsBlog() {
+  const [openPopup, setOpenPopup] = useState(false);
+
   return (
     <section className="bg-white py-24">
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-14">
+        <div className="flex flex-col items-center justify-center text-center mb-14">
           <div className="animate-[fadeDown_0.8s_ease-out]">
             <h2 className="text-3xl md:text-4xl font-bold mb-3">
               News and Blog
             </h2>
-            <p className="text-gray-500 max-w-xl">
+            <p className="text-gray-500 max-w-xl mx-auto">
               Metus faucibus sed turpis lectus feugiat tincidunt. Rhoncus sed
               tristique in dolor.
             </p>
           </div>
-
           <button className="text-[#309689] font-medium mt-4 md:mt-0 hover:underline">
             View all
           </button>
@@ -52,7 +54,10 @@ function NewsBlog() {
               Employee Engagement In 2024
             </h3>
 
-            <button className="text-[#309689] font-medium flex items-center gap-2 hover:gap-3 transition-all">
+            <button
+              onClick={() => setOpenPopup(true)} // 🔥 yahi click se popup open hota hai
+              className="text-[#309689] font-medium flex items-center gap-2 hover:gap-3 transition-all"
+            >
               Read more <span>→</span>
             </button>
           </div>
@@ -86,9 +91,19 @@ function NewsBlog() {
               How To Avoid The Top Six Most Common Job Interview Mistakes
             </h3>
 
-            <button className="text-[#309689] font-medium flex items-center gap-2 hover:gap-3 transition-all">
+            <button
+              onClick={() => setOpenPopup(true)} // 🔥 yahi click se popup open hota hai
+              className="text-[#309689] font-medium flex items-center gap-2 hover:gap-3 transition-all"
+            >
               Read more <span>→</span>
             </button>
+            {openPopup && (
+              <NewsBlogPopup
+                // 🔥 popup ke andar Close button/backdrop se
+                // setOpenPopup(false) call hoga
+                onClose={() => setOpenPopup(false)}
+              />
+            )}
           </div>
         </div>
       </div>

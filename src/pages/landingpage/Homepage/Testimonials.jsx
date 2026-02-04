@@ -3,10 +3,13 @@ import { FaStar } from "react-icons/fa";
 import { useGetAllTestimonialsQuery } from "../../../services/endpoints/testimonialApi";
 
 function Testimonials() {
-  // RTK Query hook se API call
-  const { data, isLoading, isError } = useGetAllTestimonialsQuery();
-  const testimonialsArray = data?.data || [];
-  console.log("Testimonials fetched:", testimonialsArray); // debug
+  const {
+    data: testimonialsArray = [],
+    isLoading,
+    isError,
+  } = useGetAllTestimonialsQuery();
+
+  console.log("Testimonials fetched:", testimonialsArray);
 
   if (isLoading) return <p className="text-center py-10">Loading...</p>;
   if (isError)
@@ -20,7 +23,7 @@ function Testimonials() {
     <section className="bg-[#eef7f6] py-24">
       <div className="max-w-7xl mx-auto px-6">
         {/* Heading */}
-        <div className="text-center mb-16 animate-[fadeDown_0.8s_ease-out]">
+        <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Testimonials from Our Customers
           </h2>
@@ -32,13 +35,13 @@ function Testimonials() {
 
         {/* Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {testimonialsArray?.map((item) => (
+          {testimonialsArray.map((item) => (
             <div
               key={item._id}
-              className="group bg-white rounded-2xl p-8 shadow transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 animate-[fadeUp_1s_ease-out]"
+              className="bg-white rounded-2xl p-8 shadow hover:shadow-2xl transition-all"
             >
               {/* Stars */}
-              <div className="flex gap-1 mb-4 text-yellow-400">
+              <div className="flex gap-1 mb-4">
                 {[...Array(5)].map((_, i) => (
                   <FaStar
                     key={i}
@@ -49,15 +52,10 @@ function Testimonials() {
                 ))}
               </div>
 
-              {/* Title */}
               <h3 className="text-lg font-semibold mb-3">{item.title}</h3>
 
-              {/* Description */}
-              <p className="text-gray-500 text-sm leading-relaxed mb-8">
-                {item.description}
-              </p>
+              <p className="text-gray-500 text-sm mb-8">{item.description}</p>
 
-              {/* Footer */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <img
@@ -71,8 +69,7 @@ function Testimonials() {
                   </div>
                 </div>
 
-                {/* Quote Icon */}
-                <span className="text-[#309689] text-4xl leading-none">“</span>
+                <span className="text-[#309689] text-4xl">“</span>
               </div>
             </div>
           ))}

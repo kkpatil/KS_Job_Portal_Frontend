@@ -32,6 +32,8 @@ export const api = createApi({
     "SavedJobs",
     "Profile",
     "Testimonial",
+    "NewsBlog",
+    "Contact",
   ],
   endpoints: () => ({}),
 });
