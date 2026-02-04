@@ -4,9 +4,9 @@ import HeroSection from "./Homepage/HeroSection";
 import RecentJobs from "./Homepage/RecentJobs";
 import JobCategory from "./Homepage/JobCategory";
 import CompanySection from "./Homepage/CompanySection";
-import CTASection from "./homePage/CTASection";
-import Testimonials from "./homePage/Testimonials";
-import NewsBlog from "./homePage/NewsBlog";
+import CTASection from "./Homepage/CTASection";
+import Testimonials from "./Homepage/Testimonials";
+import NewsBlog from "./Homepage/NewsBlog";
 import Footer from "../../components/home/layout/Footer";
 
 function HomePage() {
