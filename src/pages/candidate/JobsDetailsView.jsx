@@ -13,12 +13,14 @@ import ApplyJobModal from "../../components/candidate/ApplyJobModal";
 import { useGetJobByIdQuery } from "../../services/endpoints/jobApi";
 import { useApplyJobMutation } from "../../services/endpoints/applicationsApi";
 import { useToggleSaveJobMutation } from "../../services/endpoints/candidate/savedJobApi";
+import { useGetCandidateProfileQuery } from "../../services/endpoints/candidate/profileApi";
 import { toast } from "react-toastify";
 
 const JobDetailsView = () => {
   const { id } = useParams();
 
   const { data, isLoading, error, refetch } = useGetJobByIdQuery(id);
+  const { data: profileData } = useGetCandidateProfileQuery();
   const [applyJob] = useApplyJobMutation();
   const [toggleSaveJob] = useToggleSaveJobMutation();
 
@@ -40,12 +42,18 @@ const JobDetailsView = () => {
     }
   }, [job]);
 
-  const handleApply = async () => {
+  const handleApply = async ({ coverLetter }) => {
+    const resumePath = profileData?.data?.resume;
+    if (!resumePath) {
+      toast.error("Please upload your resume in Profile first");
+      return;
+    }
     try {
       setAppliedLocal(true);
       await applyJob({
         jobId: id,
         companyId: job?.employer?._id,
+        coverLetter,
       }).unwrap();
       toast.success("Job applied successfully");
       await refetch();
@@ -82,6 +90,9 @@ const JobDetailsView = () => {
   }
 
   const applied = job.isApplied; // ⭐ single source of truth
+  const resumeName = profileData?.data?.resume
+    ? profileData.data.resume.split("/").pop()
+    : "";
 
   return (
     <div className="space-y-6">
@@ -181,6 +192,7 @@ const JobDetailsView = () => {
           jobTitle={job.title}
           onClose={() => setShowApply(false)}
           onApply={handleApply}
+          resumeName={resumeName}
         />
       )}
     </div>

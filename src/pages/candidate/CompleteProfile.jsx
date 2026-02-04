@@ -1,25 +1,56 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useComplateCandidateProfileMutation } from "../../services/endpoints/candidate/profileApi";
+import { toast } from "react-toastify";
 
 const CompleteProfile = () => {
   const navigate = useNavigate();
+  const [profileComplate, { isLoading }] =
+    useComplateCandidateProfileMutation();
 
   const [form, setForm] = useState({
     firstName: "",
-    email: "",
+    lastName: "",
     phone: "",
+
+    country: "",
+    state: "",
+    zipCode: "",
+    address: "",
+
+    currentRole: "",
+    experience: "",
+    expectedSalary: "",
+    preferredLocation: "",
+
+    skills: "",
+    about: "",
+
+    linkedin: "",
+    portfolio: "",
+
+    noticePeriod: "",
+    employmentType: "",
+    availability: "",
+    relocate: "",
+    preferredShift: "",
+    workAuthorization: "",
   });
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // future me API yaha aayegi
-
-    navigate("/candidate", { replace: true });
+    try {
+      await profileComplate(form).unwrap();
+      toast.success("Profile completed successfully");
+      navigate("/candidate", { replace: true });
+    } catch (error) {
+      toast.error(error?.data?.message || "Failed to complete profile");
+    }
   };
 
   return (
@@ -27,135 +58,179 @@ const CompleteProfile = () => {
       <div className="w-full max-w-6xl">
         <form
           onSubmit={handleSubmit}
-          className="bg-white rounded-2xl shadow-md p-10 space-y-16 hover:shadow-2xl transition-all duration-300"
+          className="bg-white rounded-2xl shadow-md p-10 space-y-16"
         >
-          {/* ===== PROFILE TOP ===== */}
-          <div className="flex items-center justify-between border-b pb-4">
-            <div>
-              <h3 className="font-semibold text-2xl text-black">
-                Complete Your Profile Details
-              </h3>
-              <p className="text-sm text-gray-500 mt-1">
-                This information helps Employer understand your profile
-              </p>
-            </div>
-
-            <button
-              type="button"
-              className="px-6 py-2 rounded-md text-sm font-medium bg-[#309689] text-white hover:bg-black transition"
-            >
-              ✎ Edit Profile
-            </button>
+          {/* HEADER */}
+          <div className="border-b pb-4">
+            <h3 className="font-semibold text-2xl">
+              Complete Your Profile Details
+            </h3>
+            <p className="text-sm text-gray-500">
+              This information helps employer understand your profile
+            </p>
           </div>
 
-          {/* ===== PERSONAL INFO + ADDRESS ===== */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-14">
+          {/* PERSONAL INFO */}
+          <div className="grid md:grid-cols-2 gap-10">
             <Section title="Personal Information">
               <Input
                 label="First Name"
                 name="firstName"
-                placeholder="Enter your first name"
+                value={form.firstName}
                 onChange={handleChange}
                 required
               />
-              <Input label="Last Name" placeholder="Enter your last name" />
               <Input
-                label="Email Address"
-                name="email"
-                placeholder="example@email.com"
+                label="Last Name"
+                name="lastName"
+                value={form.lastName}
                 onChange={handleChange}
-                required
               />
               <Input
                 label="Phone Number"
                 name="phone"
-                placeholder="+91 9XXXXXXXXX"
+                value={form.phone}
                 onChange={handleChange}
                 required
               />
             </Section>
 
             <Section title="Address">
-              <Input label="Country" placeholder="India" />
-              <Input label="State" placeholder="Madhya Pradesh" />
-              <Input label="Zip Code" placeholder="452001" />
+              <Input
+                label="Country"
+                name="country"
+                value={form.country}
+                onChange={handleChange}
+              />
+              <Input
+                label="State"
+                name="state"
+                value={form.state}
+                onChange={handleChange}
+              />
+              <Input
+                label="Zip Code"
+                name="zipCode"
+                value={form.zipCode}
+                onChange={handleChange}
+              />
               <Input
                 label="Apartment / Street"
-                placeholder="Flat no, Street name"
+                name="address"
+                value={form.address}
+                onChange={handleChange}
               />
             </Section>
           </div>
 
-          {/* ===== PROFESSIONAL DETAILS ===== */}
+          {/* PROFESSIONAL */}
           <div>
             <SectionTitle title="Professional Details" />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Input label="Current Role" placeholder="Frontend Developer" />
-              <Input label="Experience (Years)" placeholder="2 Years" />
+            <div className="grid md:grid-cols-2 gap-6">
+              <Input
+                label="Current Role"
+                name="currentRole"
+                value={form.currentRole}
+                onChange={handleChange}
+              />
+              <Input
+                label="Experience"
+                name="experience"
+                value={form.experience}
+                onChange={handleChange}
+              />
               <Input
                 label="Expected Salary"
-                placeholder="₹6,00,000 per annum"
+                name="expectedSalary"
+                value={form.expectedSalary}
+                onChange={handleChange}
               />
               <Input
                 label="Preferred Job Location"
-                placeholder="Remote / Indore"
+                name="preferredLocation"
+                value={form.preferredLocation}
+                onChange={handleChange}
               />
               <Input
-                label="Skills (React, Node, MongoDB)"
-                placeholder="React, Node, MongoDB"
-                full
-              />
-              <Input
-                label="Resume URL"
-                placeholder="https://drive.google.com/..."
+                label="Skills (comma separated)"
+                name="skills"
+                value={form.skills}
+                onChange={handleChange}
                 full
               />
               <Input
                 label="LinkedIn URL"
-                placeholder="https://linkedin.com/in/username"
+                name="linkedin"
+                value={form.linkedin}
+                onChange={handleChange}
                 full
               />
               <Input
                 label="Portfolio / GitHub URL"
-                placeholder="https://github.com/username"
+                name="portfolio"
+                value={form.portfolio}
+                onChange={handleChange}
                 full
               />
               <Textarea
                 label="About Yourself"
-                placeholder="Write a short professional summary about yourself..."
+                name="about"
+                value={form.about}
+                onChange={handleChange}
               />
             </div>
           </div>
 
-          {/* ===== ADDITIONAL INFO ===== */}
+          {/* ADDITIONAL */}
           <div>
             <SectionTitle title="Additional Information" />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Input label="Notice Period" placeholder="15 Days / Immediate" />
+            <div className="grid md:grid-cols-2 gap-6">
+              <Input
+                label="Notice Period"
+                name="noticePeriod"
+                value={form.noticePeriod}
+                onChange={handleChange}
+              />
               <Input
                 label="Employment Type"
-                placeholder="Full-time / Remote / Hybrid"
+                name="employmentType"
+                value={form.employmentType}
+                onChange={handleChange}
               />
               <Input
-                label="Availability to Join"
-                placeholder="Immediately / Within 30 Days"
+                label="Availability"
+                name="availability"
+                value={form.availability}
+                onChange={handleChange}
               />
-              <Input label="Willing to Relocate" placeholder="Yes / No" />
+              <Input
+                label="Willing to Relocate"
+                name="relocate"
+                value={form.relocate}
+                onChange={handleChange}
+              />
               <Input
                 label="Preferred Shift"
-                placeholder="Day / Night / Flexible"
+                name="preferredShift"
+                value={form.preferredShift}
+                onChange={handleChange}
               />
-              <Input label="Work Authorization" placeholder="India / Other" />
+              <Input
+                label="Work Authorization"
+                name="workAuthorization"
+                value={form.workAuthorization}
+                onChange={handleChange}
+              />
             </div>
           </div>
 
-          {/* ===== SAVE BUTTON ===== */}
-          <div className="flex justify-end pt-6">
+          {/* SAVE */}
+          <div className="flex justify-end">
             <button
-              type="submit"
-              className="px-10 py-3 rounded-md bg-[#309689] text-white hover:bg-black hover:scale-105 transition-all duration-300 shadow-md"
+              disabled={isLoading}
+              className="px-10 py-3 bg-[#309689] text-white rounded-md"
             >
-              Save & Changes
+              {isLoading ? "Saving..." : "Save Changes"}
             </button>
           </div>
         </form>
@@ -175,31 +250,33 @@ const Section = ({ title, children }) => (
 
 const SectionTitle = ({ title }) => (
   <>
-    <h4 className="font-semibold text-2xl text-black mb-2">{title}</h4>
-    <div className="w-12 h-1 bg-[#309689] rounded mb-6"></div>
+    <h4 className="font-semibold text-xl mb-2">{title}</h4>
+    <div className="w-12 h-1 bg-[#309689] mb-6"></div>
   </>
 );
 
-const Input = ({ label, placeholder, full, name, onChange, required }) => (
+const Input = ({ label, name, value, onChange, required, full }) => (
   <div className={full ? "md:col-span-2" : ""}>
-    <label className="block text-sm mb-1 text-gray-600">{label}</label>
+    <label className="block text-sm mb-1">{label}</label>
     <input
       name={name}
-      required={required}
+      value={value}
       onChange={onChange}
-      placeholder={placeholder}
-      className="w-full px-4 py-3 rounded-lg border border-gray-300 text-black focus:ring-1 focus:ring-[#309689]"
+      required={required}
+      className="w-full px-4 py-3 border rounded-lg"
     />
   </div>
 );
 
-const Textarea = ({ label, placeholder }) => (
+const Textarea = ({ label, name, value, onChange }) => (
   <div className="md:col-span-2">
-    <label className="block text-sm mb-1 text-gray-600">{label}</label>
+    <label className="block text-sm mb-1">{label}</label>
     <textarea
+      name={name}
+      value={value}
+      onChange={onChange}
       rows="4"
-      placeholder={placeholder}
-      className="w-full px-4 py-3 rounded-lg border border-gray-300 text-black focus:ring-1 focus:ring-[#309689] resize-none"
+      className="w-full px-4 py-3 border rounded-lg resize-none"
     />
   </div>
 );

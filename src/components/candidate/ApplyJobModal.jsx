@@ -3,29 +3,23 @@ import Modal from "../../components/common/Modal";
 import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
 import { toast } from "react-toastify";
 
-const ApplyJobModal = ({ jobTitle, onClose, onApply }) => {
-  const [form, setForm] = useState({
-    coverLetter: "",
-    resume: null,
-  });
-
-  const handleFileChange = (e) => {
-    setForm({ ...form, resume: e.target.files[0] });
-  };
+const ApplyJobModal = ({
+  jobTitle,
+  onClose,
+  onApply,
+  resumeName,
+}) => {
+  const [coverLetter, setCoverLetter] = useState("");
 
   const handleSubmit = () => {
-    if (!form.resume) {
-      toast.warning("Please upload your resume");
+    if (!resumeName) {
+      toast.warning(
+        "Please upload your resume in Profile first",
+      );
       return;
     }
 
-    // dummy submit
-    onApply({
-      coverLetter: form.coverLetter,
-      resume: form.resume.name,
-      appliedOn: new Date().toLocaleDateString(),
-    });
-
+    onApply({ coverLetter });
     onClose();
   };
 
@@ -38,20 +32,17 @@ const ApplyJobModal = ({ jobTitle, onClose, onApply }) => {
         Submit your resume and cover letter
       </p>
 
-      {/* Resume Upload */}
-      <div className="mb-4">
-        <label className="block text-sm mb-1 text-gray-600">
-          Upload Resume (PDF / DOC) *
-        </label>
-        <input
-          type="file"
-          accept=".pdf,.doc,.docx"
-          onChange={handleFileChange}
-          className="w-full border rounded-lg px-3 py-2 text-sm"
-        />
-        {form.resume && (
-          <p className="text-xs text-green-600 mt-1">
-            Selected: {form.resume.name}
+      {/* Resume (from Profile) */}
+      <div className="mb-4 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+        <p className="text-xs uppercase tracking-wide text-gray-500">
+          Resume (from Profile)
+        </p>
+        <p className="text-sm text-gray-800">
+          {resumeName || "No resume uploaded yet"}
+        </p>
+        {!resumeName && (
+          <p className="mt-1 text-xs text-red-600">
+            Please upload your resume in Profile to apply.
           </p>
         )}
       </div>
@@ -64,10 +55,8 @@ const ApplyJobModal = ({ jobTitle, onClose, onApply }) => {
         <textarea
           rows="4"
           placeholder="Write a short cover letter..."
-          value={form.coverLetter}
-          onChange={(e) =>
-            setForm({ ...form, coverLetter: e.target.value })
-          }
+          value={coverLetter}
+          onChange={(e) => setCoverLetter(e.target.value)}
           className="w-full border rounded-lg px-3 py-2 text-sm"
         />
       </div>

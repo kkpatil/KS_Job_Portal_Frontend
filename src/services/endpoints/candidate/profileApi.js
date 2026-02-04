@@ -21,7 +21,14 @@ export const profileApi = api.injectEndpoints({
       }),
       invalidatesTags: ["Profile"],
     }),
+    complateCandidateProfile:builder.mutation({
+      query: (data) => ({
+        url: `/candidate/profile-complete`,
+        method: "PUT",
+        body: data,
+      }),
+    })
     }),
 })
 
-export const {useGetCandidateProfileQuery, useUpdateCandidateProfileMutation, useUploadResumeMutation} = profileApi;
+export const {useGetCandidateProfileQuery, useUpdateCandidateProfileMutation, useUploadResumeMutation, useComplateCandidateProfileMutation} = profileApi;

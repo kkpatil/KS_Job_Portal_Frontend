@@ -18,8 +18,18 @@ import { useGetAdminDashboardQuery, useGetRecentActivitiesQuery, useGetSystemAle
 //   { name: "Week 3", users: 1100, jobs: 680 },
 //   { name: "Week 4", users: 1500, jobs: 980 },
 // ];
- const buildChartData = (chart) => {
-  if (!chart || (!chart.users?.length && !chart.jobs?.length)) {
+const buildChartData = (chart) => {
+  if (!chart) return [];
+
+  if (Array.isArray(chart)) {
+    return chart.map((item, index) => ({
+      name: item?.name || `Week ${index + 1}`,
+      users: item?.users ?? 0,
+      jobs: item?.jobs ?? 0,
+    }));
+  }
+
+  if (!chart.users?.length && !chart.jobs?.length) {
     return [];
   }
 
@@ -28,7 +38,7 @@ import { useGetAdminDashboardQuery, useGetRecentActivitiesQuery, useGetSystemAle
   chart.users?.forEach((u) => {
     weekMap[u._id] = {
       name: `Week ${u._id}`,
-      users: u.users,
+      users: u.users ?? u.count ?? 0,
       jobs: 0,
     };
   });
@@ -38,10 +48,10 @@ import { useGetAdminDashboardQuery, useGetRecentActivitiesQuery, useGetSystemAle
       weekMap[j._id] = {
         name: `Week ${j._id}`,
         users: 0,
-        jobs: j.jobs,
+        jobs: j.jobs ?? j.count ?? 0,
       };
     } else {
-      weekMap[j._id].jobs = j.jobs;
+      weekMap[j._id].jobs = j.jobs ?? j.count ?? 0;
     }
   });
 
