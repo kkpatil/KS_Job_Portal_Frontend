@@ -137,11 +137,11 @@ const CMS = () => {
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-gray-50 border-b">
-                <th className="px-4 py-3">Title</th>
-                <th className="px-4 py-3">Type</th>
-                <th className="px-4 py-3">Slug</th>
+                <th className="px-4 py-3 text-start">Title</th>
+                <th className="px-4 py-3 text-start">Type</th>
+                <th className="px-4 py-3 text-start">Slug</th>
                 <th className="px-4 py-3 text-center">Status</th>
-                <th className="px-4 py-3">Updated</th>
+                <th className="px-4 py-3 text-start">Updated</th>
                 <th className="px-4 py-3 text-center">Actions</th>
               </tr>
             </thead>
@@ -238,8 +238,7 @@ const CMS = () => {
 
         {/* DELETE MODAL */}
         {showDelete && (
-          <Modal onClose={() => setShowDelete(false)}>
-            <h3 className="text-lg font-semibold mb-4">Delete Content</h3>
+          <Modal title={selected?.title} maxWidth="max-w-sm" onClose={() => setShowDelete(false)}>
 
             <p className="mb-6 text-sm">
               Are you sure you want to delete <b>{selected?.title}</b>?
