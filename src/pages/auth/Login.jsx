@@ -5,9 +5,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { useLoginMutation } from "../../services/endpoints/authApi";
 import { getTokenPayload } from "../../utils/jwt"; 
 import {toast} from "react-toastify"
+import { FiEye, FiEyeOff } from "react-icons/fi";
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const Login = () => {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -18,6 +22,16 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!formData.email || !formData.password) {
+      toast.error("Email and password are required");
+      return;
+    }
+
+    if (!emailRegex.test(formData.email)) {
+      toast.error("Enter a valid email");
+      return;
+    }
 
     try {
       const res = await login(formData).unwrap();
@@ -150,19 +164,37 @@ const Login = () => {
                 <label className="text-sm text-gray-300 mb-1 block">
                   Password
                 </label>
-                <input
-                  type="password"
-                  required
-                  value={formData.password}
-                  onChange={(e) =>
-                    setFormData({ ...formData, password: e.target.value })
-                  }
-                  placeholder="********"
-                  className="w-full px-4 py-2 rounded-full
-                  bg-white/20 text-white text-sm
-                  placeholder-gray-300
-                  focus:outline-none focus:ring-2 focus:ring-[#309689]"
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    required
+                    value={formData.password}
+                    onChange={(e) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
+                    placeholder="Your password"
+                    className="w-full px-4 py-2 rounded-full
+                    bg-white/20 text-white text-sm
+                    placeholder-gray-300
+                    focus:outline-none focus:ring-2 focus:ring-[#309689] pr-12"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((s) => !s)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-[#309689]"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <FiEyeOff /> : <FiEye />}
+                  </button>
+                </div>
+                <div className="mt-2 text-right">
+                  <Link
+                    to="/forgot-password"
+                    className="text-xs text-gray-300 hover:text-[#309689] hover:underline"
+                  >
+                    Forgot Password?
+                  </Link>
+                </div>
               </div>
 
               <button

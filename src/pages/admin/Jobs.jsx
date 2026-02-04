@@ -51,6 +51,8 @@ const Jobs = () => {
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [page, setPage] = useState(1);
+  const pageSize = 9;
 
   const filteredJobs = jobs.filter((job) => {
     const matchSearch =
@@ -61,6 +63,13 @@ const Jobs = () => {
 
     return matchSearch && matchStatus;
   });
+
+  const totalPages = Math.max(1, Math.ceil(filteredJobs.length / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const paginatedJobs = filteredJobs.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  );
 
   const openActionModal = (type, jobId) => {
     setActionModal({
@@ -140,7 +149,7 @@ const Jobs = () => {
         {filteredJobs.length === 0 && (
           <p className="text-center py-6 ">No jobs found</p>
         )}
-        {filteredJobs.map((job) => (
+        {paginatedJobs.map((job) => (
           <div
             key={job._id}
             className="rounded-xl p-5 tabl shadow-sm hover:shadow-md transition"
@@ -315,6 +324,28 @@ const Jobs = () => {
           }}
         />
       )}
+
+      <div className="flex items-center justify-between mt-6">
+        <p className="text-sm text-gray-500">
+          Page {currentPage} of {totalPages}
+        </p>
+        <div className="flex gap-2">
+          <button
+            className="px-3 py-1 border rounded text-sm disabled:opacity-50"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage <= 1}
+          >
+            Prev
+          </button>
+          <button
+            className="px-3 py-1 border rounded text-sm disabled:opacity-50"
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage >= totalPages}
+          >
+            Next
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

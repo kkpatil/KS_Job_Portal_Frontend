@@ -4,9 +4,13 @@ import { PiBagSimpleFill } from "react-icons/pi";
 import { Link, useNavigate } from "react-router-dom";
 import { useRegisterMutation } from "../../services/endpoints/authApi";
 import { toast } from "react-toastify";
+import { FiEye, FiEyeOff } from "react-icons/fi";
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const Register = () => {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -18,6 +22,21 @@ const Register = () => {
   const [register, { isLoading, error }] = useRegisterMutation();
 
   const handleSignup = async () => {
+    if (!form.name || !form.email || !form.password || !form.role) {
+      toast.error("All fields are required");
+      return;
+    }
+
+    if (!emailRegex.test(form.email)) {
+      toast.error("Enter a valid email");
+      return;
+    }
+
+    if (form.password.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    }
+
     try {
       await register(form).unwrap();
       toast.success("Signup successful");
@@ -116,18 +135,28 @@ const Register = () => {
                 <label className="text-sm text-gray-300 mb-1 block">
                   Password
                 </label>
-                <input
-                  onChange={(e) =>
-                    setForm({ ...form, password: e.target.value })
-                  }
-                  value={form.password}
-                  type="password"
-                  placeholder="********"
-                  className="w-full px-4 py-2 rounded-full
-                             bg-white/20 text-white text-sm
-                             placeholder-gray-300
-                             focus:outline-none focus:ring-2 focus:ring-[#309689]"
-                />
+                <div className="relative">
+                  <input
+                    onChange={(e) =>
+                      setForm({ ...form, password: e.target.value })
+                    }
+                    value={form.password}
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Create a strong password"
+                    className="w-full px-4 py-2 rounded-full
+                               bg-white/20 text-white text-sm
+                               placeholder-gray-300
+                               focus:outline-none focus:ring-2 focus:ring-[#309689] pr-12"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((s) => !s)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-[#309689]"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <FiEyeOff /> : <FiEye />}
+                  </button>
+                </div>
               </div>
 
               {/* Role */}

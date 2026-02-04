@@ -9,14 +9,18 @@ import {
   useGetJobApplicationsQuery,
   useRejectApplicationMutation,
   useShortlistApplicationMutation,
-  useUpdateApplicationStatusMutation,
+  useHireApplicationMutation,
 } from "../../services/endpoints/applicationsApi";
 import { toast } from "react-toastify";
 
 const statusColor = {
+  NEW: "bg-yellow-100 text-yellow-700",
   APPLIED: "bg-blue-100 text-blue-700",
   SHORTLISTED: "bg-green-100 text-green-700",
   REJECTED: "bg-red-100 text-red-700",
+  ACCEPTED: "bg-emerald-100 text-emerald-700",
+  HIRED: "bg-emerald-100 text-emerald-700",
+  WITHDRAWN: "bg-gray-100 text-gray-600",
 };
 
 const JobApplicationsEmployer = () => {
@@ -25,17 +29,22 @@ const JobApplicationsEmployer = () => {
   const { data, isLoading } = useGetJobApplicationsQuery({jobId});
   const [handleShortlisted] = useShortlistApplicationMutation();
   const [handleRejected] = useRejectApplicationMutation();
+  const [handleHired] = useHireApplicationMutation();
 
   const applications = data?.data || [];
 
   const handleStatusChange = async (applicationId, status) => {
     try {
-      if (status === "shortlisted") {
+      const next = String(status).toUpperCase();
+      if (next === "SHORTLISTED") {
         await handleShortlisted(applicationId);
         toast.success("Application shortlisted successfully");
-      } else {
+      } else if (next === "REJECTED") {
         await handleRejected(applicationId);
         toast.success("Application rejected successfully");
+      } else if (next === "HIRED") {
+        await handleHired(applicationId);
+        toast.success("Candidate hired successfully");
       }
     } catch (error) {
       toast.error("Failed to update application status");
@@ -96,7 +105,7 @@ const JobApplicationsEmployer = () => {
                   </td>
 
                   <td className="px-4 py-3">
-                    {app?.experience || "-"}
+                    {app?.candidate?.experience || "-"}
                   </td>
 
                   <td className="px-4 py-3">
@@ -105,7 +114,9 @@ const JobApplicationsEmployer = () => {
 
                   <td className="px-4 py-3 text-center">
                     <span
-                      className={`px-3 py-1 rounded-full text-xs ${statusColor[app.status]}`}
+                      className={`px-3 py-1 rounded-full text-xs ${
+                        statusColor[app.status] || "bg-gray-100 text-gray-700"
+                      }`}
                     >
                       {app.status}
                     </span>
@@ -135,6 +146,15 @@ const JobApplicationsEmployer = () => {
                             <XCircleIcon className="w-5 h-5 text-red-600" />
                           </button>
                         </>
+                      )}
+
+                      {app.status === "SHORTLISTED" && (
+                        <button
+                          onClick={() => handleStatusChange(app._id, "HIRED")}
+                          title="Hire"
+                        >
+                          <CheckCircleIcon className="w-5 h-5 text-emerald-600" />
+                        </button>
                       )}
                     </div>
                   </td>

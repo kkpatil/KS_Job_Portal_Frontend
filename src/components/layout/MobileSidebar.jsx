@@ -6,10 +6,12 @@ import { MdOutlineAdminPanelSettings } from "react-icons/md";
 import { HiOutlineLightBulb } from "react-icons/hi2";
 import { MdOutlineDashboardCustomize } from "react-icons/md";
 import {  NavLink, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const adminMenu = [
   { label: "Dashboard", to: "/admin", icon: <HomeIcon className="w-5 h-5" /> },
   { label: "Employers", to: "/admin/employers", icon: <MdOutlineAdminPanelSettings size={22} /> },
+  { label: "Candidates", to: "/admin/candidates", icon: <MdOutlineAdminPanelSettings size={22} /> },
   { label: "Applications", to: "/admin/applications", icon: <FaBriefcase size={20} /> },
   { label: "Jobs", to: "/admin/jobs", icon: <MdWorkHistory size={22} /> },
   { label: "Categories", to: "/admin/categories", icon: <FaChalkboardTeacher size={20} /> },
@@ -47,6 +49,7 @@ const MobileSidebar = () => {
     localStorage.removeItem("role");
     
     navigate("/login",{ replace: true });
+    toast.success("Logout successful");
   }
 
   return (

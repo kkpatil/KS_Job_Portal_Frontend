@@ -27,6 +27,17 @@ import {
 } from "../../services/endpoints/reportsApi";
 import { toast } from "react-toastify";
 
+const statusColor = {
+  ACTIVE: "bg-green-100 text-green-700",
+  PENDING: "bg-yellow-100 text-yellow-700",
+  BLOCKED: "bg-red-100 text-red-700",
+  REJECTED: "bg-gray-200 text-gray-600",
+  NEW: "bg-blue-100 text-blue-700",
+  APPLIED: "bg-yellow-100 text-yellow-700",
+  SHORTLISTED: "bg-green-100 text-green-700",
+  HIRED: "bg-emerald-100 text-emerald-700",
+};
+
 const Reports = () => {
   const { data: summary } = useGetSummaryQuery();
   const { data: applicationData = [] } = useGetApplicationTrendQuery();
@@ -119,6 +130,7 @@ const Reports = () => {
           j.status,
           new Date(j.createdAt).toLocaleDateString(),
         ])}
+        statusIndex={2}
       />
 
       {/* ================= APPLICATIONS REPORT ================= */}
@@ -131,6 +143,7 @@ const Reports = () => {
           a.status,
           new Date(a.createdAt).toLocaleDateString(),
         ])}
+        statusIndex={2}
       />
 
       {/* ================= REPORTS LIST ================= */}
@@ -203,7 +216,7 @@ const ChartCard = ({ title, children }) => (
   </div>
 );
 
-const ReportTable = ({ title, headers, rows }) => (
+const ReportTable = ({ title, headers, rows, statusIndex }) => (
   <div className="card">
     <h3 className="text-lg font-semibold mb-4">{title}</h3>
     <table className="w-full text-sm">
@@ -218,7 +231,19 @@ const ReportTable = ({ title, headers, rows }) => (
         {rows.map((row, i) => (
           <tr key={i} className="border-b">
             {row.map((cell, j) => (
-              <td key={j} className="px-4 py-2">{cell}</td>
+              <td key={j} className="px-4 py-2">
+                {statusIndex === j ? (
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs ${
+                      statusColor[cell] || "bg-gray-100 text-gray-700"
+                    }`}
+                  >
+                    {cell}
+                  </span>
+                ) : (
+                  cell
+                )}
+              </td>
             ))}
           </tr>
         ))}

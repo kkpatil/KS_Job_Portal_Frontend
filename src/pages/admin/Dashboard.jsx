@@ -7,8 +7,14 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { useState } from "react";
 
-import { useGetAdminDashboardQuery, useGetRecentActivitiesQuery, useGetSystemAlertsQuery } from "../../services/endpoints/adminApi";
+import {
+  useGetAdminDashboardQuery,
+  useGetCandidatesQuery,
+  useGetRecentActivitiesQuery,
+  useGetSystemAlertsQuery,
+} from "../../services/endpoints/adminApi";
 
 
 
@@ -62,11 +68,21 @@ const Dashboard = () => {
   const { data, isLoading, error } = useGetAdminDashboardQuery();
   const { data: recentActivities, isLoading: recentActivitiesLoading, error: recentActivitiesError } = useGetRecentActivitiesQuery();
   const { data: systemAlerts, isLoading: systemAlertsLoading, error: systemAlertsError } = useGetSystemAlertsQuery();
+  const [candidateSearch, setCandidateSearch] = useState("");
+  const [candidatePage, setCandidatePage] = useState(1);
+  const { data: candidateData, isLoading: candidatesLoading } =
+    useGetCandidatesQuery({
+      page: candidatePage,
+      limit: 8,
+      search: candidateSearch,
+    });
     if (isLoading) return <p>Loading dashboard...</p>;
   if (error) return <p>Failed to load dashboard</p>;
 
  
 const chartData = buildChartData(data?.chart);
+const candidates = candidateData?.data || [];
+const candidatePages = candidateData?.pages || 1;
 
 
   return (
@@ -178,6 +194,8 @@ const chartData = buildChartData(data?.chart);
           </ul>
         </div>
       </div>
+
+     
     </div>
   );
 };

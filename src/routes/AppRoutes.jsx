@@ -32,10 +32,14 @@ import ScrollToTop from "../components/common/ScrollToTop";
 const Login = lazy(() => import("../pages/auth/Login"));
 const Register = lazy(() => import("../pages/auth/Register"));
 const ForgotPassword = lazy(() => import("../pages/auth/ForgotPassword"));
+const VerifyOtp = lazy(() => import("../pages/auth/VerifyOtp"));
+const ResetPassword = lazy(() => import("../pages/auth/ResetPassword"));
 
 // ================= ADMIN =================
 const AdminDashboard = lazy(() => import("../pages/admin/Dashboard"));
 const Employers = lazy(() => import("../pages/admin/Employers"));
+const Candidates = lazy(() => import("../pages/admin/Candidates"));
+const CandidateDetails = lazy(() => import("../pages/admin/CandidateDetails"));
 const EmployerDetails = lazy(() => import("../pages/admin/EmployerDetails"));
 const Applications = lazy(() => import("../pages/admin/Applications"));
 const Categories = lazy(() => import("../pages/admin/Categories"));
@@ -110,6 +114,22 @@ const AppRoutes = () => {
             element={
               <AuthLayout>
                 <ForgotPassword />
+               </AuthLayout>
+            }
+          />
+          <Route
+            path="/verify-otp"
+            element={
+              <AuthLayout>
+                <VerifyOtp />
+              </AuthLayout>
+            }
+          />
+          <Route
+            path="/reset-password"
+            element={
+              <AuthLayout>
+                <ResetPassword />
               </AuthLayout>
             }
           />
@@ -131,6 +151,26 @@ const AppRoutes = () => {
               <PrivateRoute allowedRoles={["ADMIN"]}>
                 <AdminLayout>
                   <Employers />
+                </AdminLayout>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/admin/candidates"
+            element={
+              <PrivateRoute allowedRoles={["ADMIN"]}>
+                <AdminLayout>
+                  <Candidates />
+                </AdminLayout>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/admin/candidates/:id"
+            element={
+              <PrivateRoute allowedRoles={["ADMIN"]}>
+                <AdminLayout>
+                  <CandidateDetails />
                 </AdminLayout>
               </PrivateRoute>
             }

@@ -6,6 +6,7 @@ import {
 } from "../../services/endpoints/employerApi";
 import { useChangeEmployerPasswordMutation } from "../../services/endpoints/authApi";
 import { toast } from "react-toastify";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 
 const Settings = () => {
   const { data: profile, isLoading, error } = useGetProfileQuery();
@@ -24,6 +25,11 @@ const Settings = () => {
     current: "",
     new: "",
     confirm: "",
+  });
+  const [showPassword, setShowPassword] = useState({
+    current: false,
+    new: false,
+    confirm: false,
   });
 
   // const [notifications, setNotifications] = useState({
@@ -106,11 +112,41 @@ const Settings = () => {
         <h2 className="text-lg font-semibold mb-4">Company Profile</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input label="Company Name" name="name" value={company.name} onChange={handleCompanyChange} />
-          <Input label="Email" name="email" value={company.email} onChange={handleCompanyChange} />
-          <Input label="Phone" name="phone" value={company.phone} onChange={handleCompanyChange} />
-          <Input label="Website" name="website" value={company.website} onChange={handleCompanyChange} />
-          <Input label="Location" name="location" value={company.location} onChange={handleCompanyChange} />
+          <Input
+            label="Company Name"
+            name="name"
+            value={company.name}
+            onChange={handleCompanyChange}
+            placeholder="e.g. Acme Technologies"
+          />
+          <Input
+            label="Email"
+            name="email"
+            value={company.email}
+            onChange={handleCompanyChange}
+            placeholder="e.g. hr@company.com"
+          />
+          <Input
+            label="Phone"
+            name="phone"
+            value={company.phone}
+            onChange={handleCompanyChange}
+            placeholder="e.g. 9876543210"
+          />
+          <Input
+            label="Website"
+            name="website"
+            value={company.website}
+            onChange={handleCompanyChange}
+            placeholder="e.g. https://company.com"
+          />
+          <Input
+            label="Location"
+            name="location"
+            value={company.location}
+            onChange={handleCompanyChange}
+            placeholder="e.g. Pune, India"
+          />
         </div>
 
         <div className="mt-4 flex justify-end">
@@ -124,9 +160,45 @@ const Settings = () => {
         <h2 className="text-lg font-semibold mb-4">Change Password</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input type="password" label="Current Password" name="current" value={password.current} onChange={handlePasswordChange} />
-          <Input type="password" label="New Password" name="new" value={password.new} onChange={handlePasswordChange} />
-          <Input type="password" label="Confirm Password" name="confirm" value={password.confirm} onChange={handlePasswordChange} />
+          <Input
+            type="password"
+            label="Current Password"
+            name="current"
+            value={password.current}
+            onChange={handlePasswordChange}
+            placeholder="Current password"
+            showToggle
+            show={showPassword.current}
+            onToggle={() =>
+              setShowPassword((s) => ({ ...s, current: !s.current }))
+            }
+          />
+          <Input
+            type="password"
+            label="New Password"
+            name="new"
+            value={password.new}
+            onChange={handlePasswordChange}
+            placeholder="New password (min 8 chars)"
+            showToggle
+            show={showPassword.new}
+            onToggle={() =>
+              setShowPassword((s) => ({ ...s, new: !s.new }))
+            }
+          />
+          <Input
+            type="password"
+            label="Confirm Password"
+            name="confirm"
+            value={password.confirm}
+            onChange={handlePasswordChange}
+            placeholder="Re-enter new password"
+            showToggle
+            show={showPassword.confirm}
+            onToggle={() =>
+              setShowPassword((s) => ({ ...s, confirm: !s.confirm }))
+            }
+          />
         </div>
 
         <div className="mt-4 flex justify-end">
@@ -150,16 +222,39 @@ const Settings = () => {
 };
 
 
-const Input = ({ label, name, value, onChange, type = "text" }) => (
-  <div>
+const Input = ({
+  label,
+  name,
+  value,
+  onChange,
+  type = "text",
+  showToggle = false,
+  show = false,
+  onToggle,
+  placeholder,
+}) => (
+  <div className="relative">
     <label className="block text-sm text-gray-600 mb-1">{label}</label>
     <input
-      type={type}
+      type={showToggle ? (show ? "text" : "password") : type}
       name={name}
       value={value}
       onChange={onChange}
-      className="w-full border px-4 py-2 rounded-lg text-sm"
+      placeholder={placeholder || label}
+      className={`w-full border px-4 py-2 rounded-lg text-sm ${
+        showToggle ? "pr-10" : ""
+      }`}
     />
+    {showToggle && (
+      <button
+        type="button"
+        onClick={onToggle}
+        className="absolute right-3 top-[34px] text-gray-500 hover:text-gray-700"
+        aria-label={show ? "Hide password" : "Show password"}
+      >
+        {show ? <FiEyeOff /> : <FiEye />}
+      </button>
+    )}
   </div>
 );
 

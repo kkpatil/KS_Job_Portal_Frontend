@@ -30,6 +30,48 @@ const Applications = () => {
   const applications = Array.isArray(applicationsData)
     ? applicationsData
     : [];
+
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [jobFilter, setJobFilter] = useState("All");
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+
+  const jobTitles = [
+    "All",
+    ...new Set(
+      applications
+        .map((a) => a.job?.title)
+        .filter((t) => t && typeof t === "string"),
+    ),
+  ];
+
+  const filteredApplications = applications.filter((app) => {
+    const term = search.trim().toLowerCase();
+    const matchSearch =
+      !term ||
+      app.candidate?.name?.toLowerCase().includes(term) ||
+      app.candidate?.email?.toLowerCase().includes(term) ||
+      app.job?.title?.toLowerCase().includes(term) ||
+      app.job?.employer?.companyName?.toLowerCase().includes(term);
+
+    const matchStatus =
+      statusFilter === "All" || app.status === statusFilter;
+
+    const matchJob = jobFilter === "All" || app.job?.title === jobFilter;
+
+    return matchSearch && matchStatus && matchJob;
+  });
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredApplications.length / pageSize),
+  );
+  const currentPage = Math.min(page, totalPages);
+  const paginatedApplications = filteredApplications.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  );
  
 
 
@@ -58,8 +100,40 @@ const Applications = () => {
     <>
       <div className="card">
         
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
           <h2 className="text-xl font-semibold">Job Applications</h2>
+          <div className="flex flex-col gap-3 md:flex-row md:items-center">
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search candidate, job, company"
+              className="border px-4 py-2 rounded-lg text-sm w-full md:w-72"
+            />
+            <select
+              className="border px-4 py-2 rounded-lg text-sm"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <option value="All">All Status</option>
+              <option value="NEW">NEW</option>
+              <option value="APPLIED">APPLIED</option>
+              <option value="SHORTLISTED">SHORTLISTED</option>
+              <option value="REJECTED">REJECTED</option>
+              <option value="HIRED">HIRED</option>
+            </select>
+            <select
+              className="border px-4 py-2 rounded-lg text-sm"
+              value={jobFilter}
+              onChange={(e) => setJobFilter(e.target.value)}
+            >
+              {jobTitles.map((job) => (
+                <option key={job} value={job}>
+                  {job}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
        
@@ -93,7 +167,7 @@ const Applications = () => {
                 </tr>
               )}
 
-              {applications.map((app) => (
+              {paginatedApplications.map((app) => (
                 <tr key={app._id} className="hover:bg-gray-50">
                   <td className="px-4 py-3">
                     <div className="font-medium">
@@ -154,7 +228,7 @@ const Applications = () => {
                 </tr>
               ))}
 
-              {!isLoading && applications.length === 0 && (
+              {!isLoading && filteredApplications.length === 0 && (
                 <tr>
                   <td
                     colSpan="6"
@@ -170,7 +244,7 @@ const Applications = () => {
 
 
         <div className="md:hidden space-y-4">
-          {applications.map((app) => (
+          {paginatedApplications.map((app) => (
             <div
               key={app._id}
               className="bg-white border rounded-lg p-4 shadow-sm space-y-3"
@@ -232,11 +306,33 @@ const Applications = () => {
             </div>
           ))}
 
-          {!isLoading && applications.length === 0 && (
+          {!isLoading && filteredApplications.length === 0 && (
             <p className="text-center py-6 text-gray-500">
               No applications found
             </p>
           )}
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between mt-4">
+        <p className="text-sm text-gray-500">
+          Page {currentPage} of {totalPages}
+        </p>
+        <div className="flex gap-2">
+          <button
+            className="px-3 py-1 border rounded text-sm disabled:opacity-50"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage <= 1}
+          >
+            Prev
+          </button>
+          <button
+            className="px-3 py-1 border rounded text-sm disabled:opacity-50"
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage >= totalPages}
+          >
+            Next
+          </button>
         </div>
       </div>
 

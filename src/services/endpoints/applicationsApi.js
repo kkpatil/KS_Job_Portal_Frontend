@@ -82,6 +82,13 @@ export const applicationsApi = api.injectEndpoints({
       }),
       invalidatesTags: ["Applications", "Application"],
     }),
+    hireApplication: builder.mutation({
+      query: (applicationId) => ({
+        url: `/applications/${applicationId}/hire`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["Applications", "Application"],
+    }),
   }),
 });
 
@@ -97,4 +104,5 @@ export const {
   useGetApplicationByIdQuery,
   useShortlistApplicationMutation,
   useRejectApplicationMutation,
+  useHireApplicationMutation,
 } = applicationsApi;

@@ -25,6 +25,25 @@ const Skills = () => {
   const [showEdit, setShowEdit] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [selectedSkill, setSelectedSkill] = useState(null);
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+
+  const filteredSkills = skills.filter((skill) => {
+    const term = search.trim().toLowerCase();
+    if (!term) return true;
+    return (
+      skill.name?.toLowerCase().includes(term) ||
+      skill.category?.name?.toLowerCase().includes(term)
+    );
+  });
+
+  const totalPages = Math.max(1, Math.ceil(filteredSkills.length / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const paginatedSkills = filteredSkills.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
 
   const handleAdd = async (data) => {
     try {
@@ -88,6 +107,19 @@ const Skills = () => {
         </button>
       </div>
 
+      <div className="flex flex-col md:flex-row gap-3 mb-4">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(1);
+          }}
+          placeholder="Search skill or category"
+          className="border px-4 py-2 rounded-lg text-sm w-full md:w-72"
+        />
+      </div>
+
       {isLoading && <p className="text-center py-6">Loading skills...</p>}
 
       {/* TABLE */}
@@ -106,7 +138,7 @@ const Skills = () => {
           </thead>
 
           <tbody>
-            {skills.map((skill) => (
+            {paginatedSkills.map((skill) => (
               <tr key={skill._id} className="hover:bg-[#e7e8e5]">
                 <td className="px-4 py-3 font-medium">{skill.name}</td>
                 <td className="px-4 py-3">{skill.category?.name || "-"}</td>
@@ -149,7 +181,7 @@ const Skills = () => {
               </tr>
             ))}
 
-            {skills.length === 0 && (
+            {filteredSkills.length === 0 && (
               <tr>
                 <td colSpan="4" className="text-center py-6 text-gray-500">
                   No skills found
@@ -158,6 +190,28 @@ const Skills = () => {
             )}
           </tbody>
         </table>
+      </div>
+
+      <div className="flex items-center justify-between mt-4">
+        <p className="text-sm text-gray-500">
+          Page {currentPage} of {totalPages}
+        </p>
+        <div className="flex gap-2">
+          <button
+            className="px-3 py-1 border rounded text-sm disabled:opacity-50"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage <= 1}
+          >
+            Prev
+          </button>
+          <button
+            className="px-3 py-1 border rounded text-sm disabled:opacity-50"
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage >= totalPages}
+          >
+            Next
+          </button>
+        </div>
       </div>
 
       {/* ADD */}

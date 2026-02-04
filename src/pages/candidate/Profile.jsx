@@ -152,10 +152,11 @@ const Profile = () => {
     }
   };
 
-  const resumeUrl =
-    user?.resume && API_URL
-      ? `${API_URL.replace(/\/$/, "")}/${user.resume}`
-      : null;
+  const resumeUrl = user?.resume
+    ? /^https?:\/\//i.test(user.resume)
+      ? user.resume
+      : `${API_URL.replace(/\/$/, "")}/${user.resume}`
+    : null;
 
   return (
     <div className="space-y-6 py-2">
@@ -699,9 +700,11 @@ const Profile = () => {
           <div>
             <p className="font-medium">Resume</p>
             <p className="text-sm text-gray-500">
-              {user?.resume
-                ? user.resume.split("/").pop()
-                : "Not uploaded"}
+              {user?.resumeName
+                ? user.resumeName
+                : user?.resume
+                  ? user.resume.split("/").pop()
+                  : "Not uploaded"}
             </p>
           </div>
         </div>

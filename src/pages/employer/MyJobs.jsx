@@ -20,6 +20,7 @@ const statusMap = {
   PENDING: "Pending",
   CLOSED: "Closed",
   REJECTED: "Rejected",
+  BLOCKED: "Blocked",
 };
 
 const statusColor = {
@@ -27,6 +28,7 @@ const statusColor = {
   PENDING: "bg-yellow-100 text-yellow-700",
   CLOSED: "bg-red-100 text-red-700",
   REJECTED: "bg-red-100 text-red-700",
+  BLOCKED: "bg-gray-200 text-gray-700",
 };
 
 const MyJobs = () => {
@@ -104,6 +106,7 @@ const MyJobs = () => {
           <option value="Active">Active</option>
           <option value="Pending">Pending</option>
           <option value="Closed">Closed</option>
+          <option value="Blocked">Blocked</option>
         </select>
       </div>
 
@@ -119,9 +122,11 @@ const MyJobs = () => {
               </div>
              
               <span
-                className={`px-3 py-1 rounded-full text-xs ${statusColor[job.status]}`}
+                className={`px-3 py-1 rounded-full text-xs ${
+                  statusColor[job.status] || "bg-gray-100 text-gray-700"
+                }`}
               >
-                {statusMap[job.status]}
+                {statusMap[job.status] || job.status}
               </span>
             </div>
 

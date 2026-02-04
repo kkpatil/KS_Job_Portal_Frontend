@@ -54,15 +54,15 @@ const CompleteProfile = () => {
   };
 
   return (
-    <div className="min-h-screen py-14 px-4 flex justify-center bg-gradient-to-br from-[#eae4e4] via-[#e6f0ef] to-[#ece3e3]">
+    <div className="min-h-screen py-12 px-4 flex justify-center bg-gradient-to-br from-black via-[#0f1f1c] to-black">
       <div className="w-full max-w-6xl">
         <form
           onSubmit={handleSubmit}
-          className="bg-white rounded-2xl shadow-md p-10 space-y-16"
+          className="bg-white rounded-3xl shadow-[0_20px_60px_rgba(48,150,137,0.25)] p-8 md:p-10 space-y-12"
         >
           {/* HEADER */}
           <div className="border-b pb-4">
-            <h3 className="font-semibold text-2xl">
+            <h3 className="font-semibold text-2xl text-gray-900">
               Complete Your Profile Details
             </h3>
             <p className="text-sm text-gray-500">
@@ -78,6 +78,7 @@ const CompleteProfile = () => {
                 name="firstName"
                 value={form.firstName}
                 onChange={handleChange}
+                placeholder="e.g. Aakash"
                 required
               />
               <Input
@@ -85,12 +86,14 @@ const CompleteProfile = () => {
                 name="lastName"
                 value={form.lastName}
                 onChange={handleChange}
+                placeholder="e.g. Sharma"
               />
               <Input
                 label="Phone Number"
                 name="phone"
                 value={form.phone}
                 onChange={handleChange}
+                placeholder="e.g. 9876543210"
                 required
               />
             </Section>
@@ -101,24 +104,28 @@ const CompleteProfile = () => {
                 name="country"
                 value={form.country}
                 onChange={handleChange}
+                placeholder="e.g. India"
               />
               <Input
                 label="State"
                 name="state"
                 value={form.state}
                 onChange={handleChange}
+                placeholder="e.g. Maharashtra"
               />
               <Input
                 label="Zip Code"
                 name="zipCode"
                 value={form.zipCode}
                 onChange={handleChange}
+                placeholder="e.g. 411001"
               />
               <Input
                 label="Apartment / Street"
                 name="address"
                 value={form.address}
                 onChange={handleChange}
+                placeholder="e.g. 21, MG Road"
               />
             </Section>
           </div>
@@ -132,30 +139,35 @@ const CompleteProfile = () => {
                 name="currentRole"
                 value={form.currentRole}
                 onChange={handleChange}
+                placeholder="e.g. Frontend Developer"
               />
               <Input
                 label="Experience"
                 name="experience"
                 value={form.experience}
                 onChange={handleChange}
+                placeholder="e.g. 3 years"
               />
               <Input
                 label="Expected Salary"
                 name="expectedSalary"
                 value={form.expectedSalary}
                 onChange={handleChange}
+                placeholder="e.g. 800000"
               />
               <Input
                 label="Preferred Job Location"
                 name="preferredLocation"
                 value={form.preferredLocation}
                 onChange={handleChange}
+                placeholder="e.g. Remote, Pune"
               />
               <Input
                 label="Skills (comma separated)"
                 name="skills"
                 value={form.skills}
                 onChange={handleChange}
+                placeholder="e.g. React, Node, MongoDB"
                 full
               />
               <Input
@@ -163,6 +175,7 @@ const CompleteProfile = () => {
                 name="linkedin"
                 value={form.linkedin}
                 onChange={handleChange}
+                placeholder="e.g. https://linkedin.com/in/yourname"
                 full
               />
               <Input
@@ -170,6 +183,7 @@ const CompleteProfile = () => {
                 name="portfolio"
                 value={form.portfolio}
                 onChange={handleChange}
+                placeholder="e.g. https://github.com/yourname"
                 full
               />
               <Textarea
@@ -177,6 +191,7 @@ const CompleteProfile = () => {
                 name="about"
                 value={form.about}
                 onChange={handleChange}
+                placeholder="Brief summary about your experience and goals"
               />
             </div>
           </div>
@@ -190,36 +205,42 @@ const CompleteProfile = () => {
                 name="noticePeriod"
                 value={form.noticePeriod}
                 onChange={handleChange}
+                placeholder="e.g. 15 days"
               />
               <Input
                 label="Employment Type"
                 name="employmentType"
                 value={form.employmentType}
                 onChange={handleChange}
+                placeholder="e.g. Full-time"
               />
               <Input
                 label="Availability"
                 name="availability"
                 value={form.availability}
                 onChange={handleChange}
+                placeholder="e.g. Immediate"
               />
               <Input
                 label="Willing to Relocate"
                 name="relocate"
                 value={form.relocate}
                 onChange={handleChange}
+                placeholder="e.g. Yes / No"
               />
               <Input
                 label="Preferred Shift"
                 name="preferredShift"
                 value={form.preferredShift}
                 onChange={handleChange}
+                placeholder="e.g. Day shift"
               />
               <Input
                 label="Work Authorization"
                 name="workAuthorization"
                 value={form.workAuthorization}
                 onChange={handleChange}
+                placeholder="e.g. India"
               />
             </div>
           </div>
@@ -255,7 +276,15 @@ const SectionTitle = ({ title }) => (
   </>
 );
 
-const Input = ({ label, name, value, onChange, required, full }) => (
+const Input = ({
+  label,
+  name,
+  value,
+  onChange,
+  required,
+  full,
+  placeholder,
+}) => (
   <div className={full ? "md:col-span-2" : ""}>
     <label className="block text-sm mb-1">{label}</label>
     <input
@@ -263,18 +292,20 @@ const Input = ({ label, name, value, onChange, required, full }) => (
       value={value}
       onChange={onChange}
       required={required}
+      placeholder={placeholder || label}
       className="w-full px-4 py-3 border rounded-lg"
     />
   </div>
 );
 
-const Textarea = ({ label, name, value, onChange }) => (
+const Textarea = ({ label, name, value, onChange, placeholder }) => (
   <div className="md:col-span-2">
     <label className="block text-sm mb-1">{label}</label>
     <textarea
       name={name}
       value={value}
       onChange={onChange}
+      placeholder={placeholder || label}
       rows="4"
       className="w-full px-4 py-3 border rounded-lg resize-none"
     />

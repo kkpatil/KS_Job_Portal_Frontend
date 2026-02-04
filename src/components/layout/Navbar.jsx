@@ -78,7 +78,7 @@ const Navbar = ({ toggleSidebar, setToggleSidebar }) => {
         {/* RIGHT */}
         <div className="flex items-center gap-6 relative">
           {/* MESSAGES (future use) */}
-          <IconWithBadge icon={<ChatBubbleLeftIcon />} count={0} />
+          {/* <IconWithBadge icon={<ChatBubbleLeftIcon />} count={0} /> */}
 
           {/* NOTIFICATIONS */}
           <div
@@ -88,13 +88,7 @@ const Navbar = ({ toggleSidebar, setToggleSidebar }) => {
               )
             }
           >
-            {role === "ADMIN" && (
-              <IconWithBadge icon={<BellIcon />} count={unreadCount} />
-            )}
-
-            {role === "EMPLOYER" && (
-              <IconWithBadge icon={<ChatBubbleLeftIcon />} count={0} />
-            )}
+            <IconWithBadge icon={<BellIcon />} count={unreadCount} />
           </div>
 
           {/* PROFILE */}

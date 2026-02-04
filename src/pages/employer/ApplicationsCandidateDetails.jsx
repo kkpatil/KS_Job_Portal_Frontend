@@ -11,6 +11,7 @@ import {
   useGetApplicationByIdQuery,
   useShortlistApplicationMutation,
   useRejectApplicationMutation,
+  useHireApplicationMutation,
 } from "../../services/endpoints/applicationsApi";
 import { toast } from "react-toastify";
 
@@ -18,6 +19,7 @@ const statusColor = {
   NEW: "bg-blue-100 text-blue-700",
   SHORTLISTED: "bg-green-100 text-green-700",
   REJECTED: "bg-red-100 text-red-700",
+  HIRED: "bg-emerald-100 text-emerald-700",
 };
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
@@ -32,6 +34,7 @@ const ApplicationsCandidateDetails = () => {
     useShortlistApplicationMutation();
   const [reject, { isLoading: rejecting }] =
     useRejectApplicationMutation();
+  const [hire, { isLoading: hiring }] = useHireApplicationMutation();
 
   if (isLoading) {
     return <div className="card text-center">Loading...</div>;
@@ -50,6 +53,13 @@ const ApplicationsCandidateDetails = () => {
 
   const application = data.data;
   const { candidate, job, status, createdAt, _id } = application;
+  const fullName =
+    candidate?.firstName || candidate?.lastName
+      ? `${candidate?.firstName || ""} ${candidate?.lastName || ""}`.trim()
+      : candidate?.name || "Candidate";
+  const resumeName =
+    candidate?.resumeName ||
+    (candidate?.resume ? candidate.resume.split("/").pop() : "Resume");
 
   const handleConfirm = async () => {
     try {
@@ -63,6 +73,10 @@ const ApplicationsCandidateDetails = () => {
         await reject(_id).unwrap();
        
         toast.success("Candidate rejected successfully");
+      }
+      if (action === "HIRE") {
+        await hire(_id).unwrap();
+        toast.success("Candidate hired successfully");
       }
     }catch(error) {
       toast.error(error.data.message || "Failed to perform action");
@@ -86,14 +100,16 @@ const ApplicationsCandidateDetails = () => {
       {/* HEADER */}
       <div className="card flex justify-between items-start">
         <div>
-          <h1 className="text-2xl font-bold">{candidate.name}</h1>
+          <h1 className="text-2xl font-bold">{fullName}</h1>
           <p className="text-gray-500">
             Applied for <b>{job.title}</b>
           </p>
         </div>
 
         <span
-          className={`px-4 py-1 rounded-full text-sm ${statusColor[status]}`}
+          className={`px-4 py-1 rounded-full text-sm ${
+            statusColor[status] || "bg-gray-100 text-gray-700"
+          }`}
         >
           {status}
         </span>
@@ -102,8 +118,20 @@ const ApplicationsCandidateDetails = () => {
       {/* DETAILS */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="card space-y-3">
+          <Detail label="First Name" value={candidate.firstName || "—"} />
+          <Detail label="Last Name" value={candidate.lastName || "—"} />
           <Detail label="Email" value={candidate.email} />
+          <Detail label="Phone" value={candidate.phone || "—"} />
+          <Detail label="Current Role" value={candidate.currentRole || "—"} />
           <Detail label="Experience" value={candidate.experience || "—"} />
+          <Detail
+            label="Expected Salary"
+            value={candidate.expectedSalary || "—"}
+          />
+          <Detail
+            label="Preferred Location"
+            value={candidate.preferredLocation || "—"}
+          />
           <Detail
             label="Applied On"
             value={new Date(createdAt).toDateString()}
@@ -113,30 +141,74 @@ const ApplicationsCandidateDetails = () => {
         <div className="card">
           <h3 className="font-semibold mb-2">Skills</h3>
           <div className="flex flex-wrap gap-2">
-            {candidate.skills?.map((skill, i) => (
-              <span
-                key={i}
-                className="px-3 py-1 rounded-full text-xs bg-indigo-100 text-indigo-700"
-              >
-                {skill}
-              </span>
-            ))}
+            {candidate.skills?.length ? (
+              candidate.skills.map((skill, i) => (
+                <span
+                  key={i}
+                  className="px-3 py-1 rounded-full text-xs bg-indigo-100 text-indigo-700"
+                >
+                  {skill}
+                </span>
+              ))
+            ) : (
+              <span className="text-sm text-gray-500">No skills</span>
+            )}
           </div>
         </div>
       </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="card space-y-3">
+          <Detail label="Country" value={candidate.country || "—"} />
+          <Detail label="State" value={candidate.state || "—"} />
+          <Detail label="Zip Code" value={candidate.zipCode || "—"} />
+          <Detail label="Address" value={candidate.address || "—"} />
+        </div>
+
+        <div className="card space-y-3">
+          <Detail label="Notice Period" value={candidate.noticePeriod || "—"} />
+          <Detail
+            label="Employment Type"
+            value={candidate.employmentType || "—"}
+          />
+          <Detail label="Availability" value={candidate.availability || "—"} />
+          <Detail label="Relocate" value={candidate.relocate || "—"} />
+          <Detail label="Preferred Shift" value={candidate.preferredShift || "—"} />
+          <Detail
+            label="Work Authorization"
+            value={candidate.workAuthorization || "—"}
+          />
+        </div>
+      </div>
+
+      {(candidate.linkedin || candidate.github || candidate.portfolio) && (
+        <div className="card space-y-3">
+          <h3 className="font-semibold mb-2">Links</h3>
+          <Detail label="LinkedIn" value={candidate.linkedin || "—"} />
+          <Detail label="GitHub" value={candidate.github || "—"} />
+          <Detail label="Portfolio" value={candidate.portfolio || "—"} />
+        </div>
+      )}
+
+      {candidate.about && (
+        <div className="card">
+          <h3 className="font-semibold mb-2">About</h3>
+          <p className="text-sm text-gray-600">{candidate.about}</p>
+        </div>
+      )}
 
       {/* RESUME */}
       <div className="card flex justify-between items-center">
         <div>
           <p className="font-medium">Resume</p>
           <p className="text-sm text-gray-500">
-            {candidate.resume?.split("/").pop()}
+            {resumeName}
           </p>
         </div>
 
         <div className="flex gap-4">
           <a
-            href={`${API_URL}/${candidate?.resume}`}
+            href={candidate?.resume || "#"}
             target="_blank"
             rel="noreferrer"
             className="btn-secondary flex items-center gap-1"
@@ -146,7 +218,7 @@ const ApplicationsCandidateDetails = () => {
           </a>
 
           <a
-            href={`${API_URL}/applications/${_id}/download`}
+            href={`${API_URL}/api/applications/${_id}/resume`}
             className="btn-secondary flex items-center gap-1"
           >
             <DocumentArrowDownIcon className="w-4 h-4" />
@@ -155,26 +227,41 @@ const ApplicationsCandidateDetails = () => {
         </div>
       </div>
 
-      {/* ACTIONS – ONLY WHEN NEW */}
-      {status === "NEW" && (
+      {/* ACTIONS – ONLY WHEN NEW/SHORTLISTED */}
+      {(status === "NEW" || status === "SHORTLISTED") && (
         <div className="flex justify-end gap-3">
-          <button
-            onClick={() => setAction("SHORTLIST")}
-            disabled={shortlisting || rejecting}
-            className="btn-primary flex items-center gap-1"
-          >
-            <CheckCircleIcon className="w-4 h-4" />
-            Shortlist
-          </button>
+          {status !== "SHORTLISTED" && (
+            <button
+              onClick={() => setAction("SHORTLIST")}
+              disabled={shortlisting || rejecting || hiring}
+              className="btn-primary flex items-center gap-1"
+            >
+              <CheckCircleIcon className="w-4 h-4" />
+              Shortlist
+            </button>
+          )}
 
-          <button
-            onClick={() => setAction("REJECT")}
-            disabled={shortlisting || rejecting}
-            className="btn-danger flex items-center gap-1"
-          >
-            <XCircleIcon className="w-4 h-4" />
-            Reject
-          </button>
+          {status !== "REJECTED" && (
+            <button
+              onClick={() => setAction("REJECT")}
+              disabled={shortlisting || rejecting || hiring}
+              className="btn-danger flex items-center gap-1"
+            >
+              <XCircleIcon className="w-4 h-4" />
+              Reject
+            </button>
+          )}
+
+          {status === "SHORTLISTED" && (
+            <button
+              onClick={() => setAction("HIRE")}
+              disabled={shortlisting || rejecting || hiring}
+              className="btn-secondary flex items-center gap-1"
+            >
+              <CheckCircleIcon className="w-4 h-4" />
+              Hire
+            </button>
+          )}
         </div>
       )}
 
@@ -185,12 +272,19 @@ const ApplicationsCandidateDetails = () => {
             <h3 className="text-lg font-semibold">
               {action === "REJECT"
                 ? "Reject Candidate?"
-                : "Shortlist Candidate?"}
+                : action === "HIRE"
+                  ? "Hire Candidate?"
+                  : "Shortlist Candidate?"}
             </h3>
 
             <p className="text-sm text-gray-500">
               Are you sure you want to{" "}
-              {action === "REJECT" ? "reject" : "shortlist"} this candidate?
+              {action === "REJECT"
+                ? "reject"
+                : action === "HIRE"
+                  ? "hire"
+                  : "shortlist"}{" "}
+              this candidate?
             </p>
 
             <div className="flex justify-end gap-3">
@@ -204,7 +298,11 @@ const ApplicationsCandidateDetails = () => {
               <button
                 onClick={handleConfirm}
                 className={
-                  action === "REJECT" ? "btn-danger" : "btn-primary"
+                  action === "REJECT"
+                    ? "btn-danger"
+                    : action === "HIRE"
+                      ? "btn-secondary"
+                      : "btn-primary"
                 }
               >
                 Confirm

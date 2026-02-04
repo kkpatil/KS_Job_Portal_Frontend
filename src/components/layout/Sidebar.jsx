@@ -16,6 +16,11 @@ const adminMenu = [
     icon: <MdOutlineAdminPanelSettings size={22} />,
   },
   {
+    label: "Candidates",
+    to: "/admin/candidates",
+    icon: <MdOutlineAdminPanelSettings size={22} />,
+  },
+  {
     label: "Applications",
     to: "/admin/applications",
     icon: <FaBriefcase size={20} />,

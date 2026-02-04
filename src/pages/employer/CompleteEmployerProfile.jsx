@@ -36,8 +36,8 @@ const CompleteEmployerProfile = () => {
   };
 
   return (
-    <div className="min-h-screen py-14 px-4 flex justify-center bg-gradient-to-br from-[#eae4e4] via-[#e6f0ef] to-[#ece3e3]">
-      <div className="w-full max-w-6xl bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden">
+    <div className="min-h-screen py-12 px-4 flex justify-center bg-gradient-to-br from-black via-[#0f1f1c] to-black">
+      <div className="w-full max-w-6xl bg-white rounded-3xl shadow-[0_20px_60px_rgba(48,150,137,0.25)] overflow-hidden">
         {/* Header */}
         <div className="px-8 py-6 border-b">
           <h2 className="text-2xl font-semibold text-black">
@@ -49,7 +49,7 @@ const CompleteEmployerProfile = () => {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-10 space-y-14">
+        <form onSubmit={handleSubmit} className="p-8 md:p-10 space-y-12">
           {/* Company Info */}
           <div>
             <h3 className="text-2xl font-semibold text-black mb-2">
@@ -61,15 +61,27 @@ const CompleteEmployerProfile = () => {
                 name="companyName"
                 label="Company Name"
                 onChange={handleChange}
+                placeholder="e.g. Acme Technologies"
                 required
               />
-              <Input name="industry" label="Industry" onChange={handleChange} />
+              <Input
+                name="industry"
+                label="Industry"
+                onChange={handleChange}
+                placeholder="e.g. IT Services"
+              />
               <Input
                 name="companySize"
                 label="Company Size"
                 onChange={handleChange}
+                placeholder="e.g. 51-200"
               />
-              <Input name="website" label="Website" onChange={handleChange} />
+              <Input
+                name="website"
+                label="Website"
+                onChange={handleChange}
+                placeholder="e.g. https://company.com"
+              />
             </div>
 
             <div className="mt-4">
@@ -107,23 +119,27 @@ const CompleteEmployerProfile = () => {
                 name="contactName"
                 label="Contact Person Name"
                 onChange={handleChange}
+                placeholder="e.g. Neha Verma"
                 required
               />
               <Input
                 name="contactRole"
                 label="Role / Designation"
                 onChange={handleChange}
+                placeholder="e.g. HR Manager"
               />
               <Input
                 name="contactEmail"
                 label="Contact Email"
                 onChange={handleChange}
+                placeholder="e.g. hr@company.com"
                 required
               />
               <Input
                 name="contactPhone"
                 label="Contact Phone"
                 onChange={handleChange}
+                placeholder="e.g. 9876543210"
                 required
               />
             </div>
@@ -158,13 +174,14 @@ const Label = ({ text }) => (
   <label className="block text-sm font-medium text-gray-700 mb-1">{text}</label>
 );
 
-const Input = ({ label, name, onChange, required }) => (
+const Input = ({ label, name, onChange, required, placeholder }) => (
   <div>
     <Label text={label} />
     <input
       name={name}
       required={required}
       onChange={onChange}
+      placeholder={placeholder || label}
       className="
     w-full px-4 py-3 rounded-lg
     border border-gray-300
@@ -175,7 +192,6 @@ const Input = ({ label, name, onChange, required }) => (
     focus:ring-1 focus:ring-[#309689]
     shadow-sm
   "
-      placeholder={label}
     />
   </div>
 );

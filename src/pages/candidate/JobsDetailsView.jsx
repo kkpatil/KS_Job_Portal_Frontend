@@ -90,9 +90,11 @@ const JobDetailsView = () => {
   }
 
   const applied = job.isApplied; // ⭐ single source of truth
-  const resumeName = profileData?.data?.resume
-    ? profileData.data.resume.split("/").pop()
-    : "";
+  const resumeName = profileData?.data?.resumeName
+    ? profileData.data.resumeName
+    : profileData?.data?.resume
+      ? profileData.data.resume.split("/").pop()
+      : "";
 
   return (
     <div className="space-y-6">
