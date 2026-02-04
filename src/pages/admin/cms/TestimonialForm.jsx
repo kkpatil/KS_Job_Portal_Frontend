@@ -3,6 +3,7 @@ import {
   useCreateTestimonialMutation,
   useUpdateTestimonialMutation,
 } from "../../../services/endpoints/testimonialApi";
+import { toast } from "react-toastify";
 
 const TestimonialForm = ({ mode = "create", selectedData = null, onClose }) => {
   const isEdit = mode === "edit";
@@ -79,7 +80,7 @@ const TestimonialForm = ({ mode = "create", selectedData = null, onClose }) => {
       if (formData.avatar instanceof File) {
         payload.append("avatar", formData.avatar);
       } else if (!isEdit) {
-        alert("Avatar is required");
+        toast.warning("Avatar is required");
         return;
       }
 
@@ -88,17 +89,17 @@ const TestimonialForm = ({ mode = "create", selectedData = null, onClose }) => {
           id: selectedData._id,
           formData: payload,
         }).unwrap();
-        alert("Testimonial updated successfully");
+        toast.success("Testimonial updated successfully");
       } else {
         console.log("create payload", payload);
         await createTestimonial(payload).unwrap();
-        alert("Testimonial created successfully");
+        toast.success("Testimonial created successfully");
       }
 
       onClose?.();
     } catch (err) {
       console.error(err);
-      alert("Something went wrong");
+      toast.error("Something went wrong");
     }
   };
 
@@ -184,7 +185,7 @@ const TestimonialForm = ({ mode = "create", selectedData = null, onClose }) => {
         <button
           type="submit"
           disabled={creating || updating}
-          className="px-6 py-2 bg-teal-600 text-white rounded"
+          className="px-6 py-2 btn-primary  rounded"
         >
           {creating || updating
             ? "Saving..."

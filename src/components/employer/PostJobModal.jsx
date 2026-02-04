@@ -5,6 +5,7 @@ import {
   useGetCategoriesQuery,
   useGetSkillsByCategoryQuery,
 } from "../../services/endpoints/jobApi";
+import { toast } from "react-toastify";
 
 const PostJobModal = ({ onClose }) => {
   const [createJob, { isLoading }] = useCreateNewJobMutation();
@@ -68,17 +69,17 @@ const PostJobModal = ({ onClose }) => {
 
   const handleSubmit = async () => {
     if (!job.title || !job.location || !job.category || !job.description) {
-      alert("Please fill all required fields");
+      toast.error("Please fill all required fields");
       return;
     }
 
     try {
       await createJob(job).unwrap();
-      alert("Job posted successfully");
+      toast.success("Job posted successfully");
       onClose();
     } catch (err) {
       console.error(err);
-      alert(err?.data?.message || "Failed to post job");
+      toast.error(err?.data?.message || "Failed to post job");
     }
   };
 

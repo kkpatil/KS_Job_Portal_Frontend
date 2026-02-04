@@ -6,6 +6,7 @@ import {
   FaMapMarkerAlt,
 } from "react-icons/fa";
 import { useSendContactMessageMutation } from "../../../services/endpoints/contactApi";
+import { toast } from "react-toastify";
 
 const ContactSection = () => {
   const [formData, setFormData] = useState({
@@ -34,7 +35,7 @@ const ContactSection = () => {
         message: formData.message,
       }).unwrap();
 
-      alert("Message sent successfully ✅");
+      toast.success("Message sent successfully");
 
       setFormData({
         name: "",
@@ -44,7 +45,7 @@ const ContactSection = () => {
       });
     } catch (error) {
       console.error(error);
-      alert("Failed to send message ❌");
+      toast.error("Failed to send message ");
     }
   };
 

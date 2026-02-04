@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Modal from "../../components/common/Modal";
+import { toast } from "react-toastify";
 
 const EditJobModal = ({ job, onClose, onUpdate }) => {
   const [form, setForm] = useState({
@@ -18,7 +19,7 @@ const EditJobModal = ({ job, onClose, onUpdate }) => {
 
   const handleSubmit = () => {
     if (!form.title || !form.location || !form.description) {
-      alert("Please fill all required fields");
+      toast.error("Please fill all required fields");
       return;
     }
 

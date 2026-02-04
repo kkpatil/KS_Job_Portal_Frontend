@@ -1,4 +1,5 @@
 import { useParams, Link } from "react-router-dom";
+import { useState } from "react";
 import {
   ArrowLeftIcon,
   EyeIcon,
@@ -32,6 +33,30 @@ const JobApplicationsEmployer = () => {
   const [handleHired] = useHireApplicationMutation();
 
   const applications = data?.data || [];
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+
+  const filteredApplications = applications.filter((app) => {
+    const term = search.trim().toLowerCase();
+    const matchSearch =
+      !term ||
+      app.candidate?.name?.toLowerCase().includes(term) ||
+      app.candidate?.email?.toLowerCase().includes(term);
+
+    const matchStatus =
+      statusFilter === "All" || app.status === statusFilter;
+
+    return matchSearch && matchStatus;
+  });
+
+  const totalPages = Math.max(1, Math.ceil(filteredApplications.length / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const paginatedApplications = filteredApplications.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
 
   const handleStatusChange = async (applicationId, status) => {
     try {
@@ -75,6 +100,36 @@ const JobApplicationsEmployer = () => {
         </p>
       </div>
 
+      {/* FILTERS */}
+      <div className="card flex flex-col sm:flex-row gap-4">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(1);
+          }}
+          placeholder="Search candidate name or email"
+          className="border px-4 py-2 rounded-lg text-sm"
+        />
+        <select
+          className="border px-4 py-2 rounded-lg text-sm"
+          value={statusFilter}
+          onChange={(e) => {
+            setStatusFilter(e.target.value);
+            setPage(1);
+          }}
+        >
+          <option value="All">All Status</option>
+          <option value="NEW">New</option>
+          <option value="APPLIED">Applied</option>
+          <option value="SHORTLISTED">Shortlisted</option>
+          <option value="REJECTED">Rejected</option>
+          <option value="HIRED">Hired</option>
+          <option value="WITHDRAWN">Withdrawn</option>
+        </select>
+      </div>
+
       {/* TABLE */}
       <div className="card">
         <div className="overflow-x-auto">
@@ -90,7 +145,7 @@ const JobApplicationsEmployer = () => {
             </thead>
 
             <tbody>
-              {applications.map((app) => (
+              {paginatedApplications.map((app) => (
                 <tr
                   key={app._id}
                   className="border-b hover:bg-gray-50"
@@ -127,8 +182,9 @@ const JobApplicationsEmployer = () => {
                       <Link
                         to={`/employer/candidates/${app?._id}`}
                         title="View Profile"
+                        className="flex border rounded-md px-1 py-1 items-center "
                       >
-                        <EyeIcon className="w-5 h-5 text-blue-600" />
+                        <EyeIcon className="w-5 h-5 text-blue-600" />View
                       </Link>
 
                       {app.status === "NEW" && (
@@ -136,14 +192,16 @@ const JobApplicationsEmployer = () => {
                           <button
                             onClick={() => handleStatusChange(app._id, "SHORTLISTED")}
                             title="Shortlist"
+                            className="flex items-center border rounded-md  p-1"
                           >
-                            <CheckCircleIcon className="w-5 h-5 text-green-600" />
+                            <CheckCircleIcon className="w-5 h-5 text-green-600" />Sortlist
                           </button>
                           <button
                             onClick={() => handleStatusChange(app._id, "REJECTED")}
                             title="Reject"
+                            className="flex items-center rounded-md border p-1"
                           >
-                            <XCircleIcon className="w-5 h-5 text-red-600" />
+                            <XCircleIcon className="w-5 h-5 text-red-600" />Reject
                           </button>
                         </>
                       )}
@@ -161,7 +219,7 @@ const JobApplicationsEmployer = () => {
                 </tr>
               ))}
 
-              {applications.length === 0 && (
+              {filteredApplications.length === 0 && (
                 <tr>
                   <td
                     colSpan="5"
@@ -173,6 +231,28 @@ const JobApplicationsEmployer = () => {
               )}
             </tbody>
           </table>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-gray-500">
+          Page {currentPage} of {totalPages}
+        </p>
+        <div className="flex gap-2">
+          <button
+            className="px-3 py-1 border rounded text-sm disabled:opacity-50"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage <= 1}
+          >
+            Prev
+          </button>
+          <button
+            className="px-3 py-1 border rounded text-sm disabled:opacity-50"
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage >= totalPages}
+          >
+            Next
+          </button>
         </div>
       </div>
     </div>

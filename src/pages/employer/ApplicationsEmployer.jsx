@@ -30,22 +30,39 @@ const ApplicationsEmployer = () => {
 
   const [jobFilter, setJobFilter] = useState("All");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
 
   /* ================= FILTER ================= */
   const filteredApplications = applications.filter((app) => {
+    const term = search.trim().toLowerCase();
+    const matchSearch =
+      !term ||
+      app.candidate?.name?.toLowerCase().includes(term) ||
+      app.candidate?.email?.toLowerCase().includes(term) ||
+      app.job?.title?.toLowerCase().includes(term);
+
     const matchJob =
       jobFilter === "All" || app.job?.title === jobFilter;
 
     const matchStatus =
       statusFilter === "All" || app.status === statusFilter;
 
-    return matchJob && matchStatus;
+    return matchSearch && matchJob && matchStatus;
   });
 
   const jobTitles = [
     "All",
     ...new Set(applications.map((a) => a.job?.title)),
   ];
+
+  const totalPages = Math.max(1, Math.ceil(filteredApplications.length / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const paginatedApplications = filteredApplications.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
 
   /* ================= STATUS UPDATE ================= */
   const handleStatusChange = async (id, status) => {
@@ -80,6 +97,16 @@ const ApplicationsEmployer = () => {
 
       {/* FILTERS */}
       <div className="card flex flex-col sm:flex-row gap-4">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(1);
+          }}
+          placeholder="Search candidate or job"
+          className="border px-4 py-2 rounded-lg text-sm"
+        />
         <select
           className="border px-4 py-2 rounded-lg text-sm"
           value={jobFilter}
@@ -119,7 +146,7 @@ const ApplicationsEmployer = () => {
           </thead>
 
           <tbody>
-            {filteredApplications.map((app) => (
+            {paginatedApplications.map((app) => (
               <tr key={app._id} className="border-b">
                 <td className="px-4 py-3">
                   <div className="font-medium">
@@ -152,27 +179,30 @@ const ApplicationsEmployer = () => {
                   <div className="flex justify-center gap-3">
                     <Link
                       to={`/employer/candidates/${app?._id}`}
+                      className="flex items-center p-1 rounded-md border"
                     >
-                      <EyeIcon className="w-5 h-5 text-blue-600" />
+                      <EyeIcon className="w-5 h-5 text-blue-600" />View
                     </Link>
 
                     {app.status !== "SHORTLISTED" && app.status !== "HIRED" && (
                       <button
+                        className="flex items-center p-1 rounded-md border "
                         onClick={() =>
                           handleStatusChange(app._id, "SHORTLISTED")
                         }
                       >
-                        <CheckCircleIcon className="w-5 h-5 text-green-600" />
+                        <CheckCircleIcon className="w-5 h-5 text-green-600" />Sortlist
                       </button>
                     )}
 
                     {app.status !== "REJECTED" && app.status !== "HIRED" && (
                       <button
+                        className="flex items-center p-1 rounded-md border"
                         onClick={() =>
                           handleStatusChange(app._id, "REJECTED")
                         }
                       >
-                        <XCircleIcon className="w-5 h-5 text-red-600" />
+                        <XCircleIcon className="w-5 h-5 text-red-600" />Reject
                       </button>
                     )}
 
@@ -198,6 +228,28 @@ const ApplicationsEmployer = () => {
             )}
           </tbody>
         </table>
+      </div>
+
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-gray-500">
+          Page {currentPage} of {totalPages}
+        </p>
+        <div className="flex gap-2">
+          <button
+            className="px-3 py-1 border rounded text-sm disabled:opacity-50"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage <= 1}
+          >
+            Prev
+          </button>
+          <button
+            className="px-3 py-1 border rounded text-sm disabled:opacity-50"
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage >= totalPages}
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -23,6 +23,14 @@ const Dashboard = () => {
 
 
   const [showCreateJobModal,setShowCreateJobModal] = useState(false);
+  const statusColor = {
+    NEW: "bg-blue-100 text-blue-700",
+    APPLIED: "bg-blue-100 text-blue-700",
+    SHORTLISTED: "bg-green-100 text-green-700",
+    REJECTED: "bg-red-100 text-red-700",
+    HIRED: "bg-emerald-100 text-emerald-700",
+  };
+
   return (
     <div className="space-y-6 py-2 md:px-0">
       <div>
@@ -210,9 +218,7 @@ const Dashboard = () => {
 
               <span
                 className={`px-3 py-1 rounded-full text-xs ${
-                  app.status === "Shortlisted"
-                    ? "bg-green-100 text-green-700"
-                    : "bg-blue-100 text-blue-700"
+                  statusColor[app.status] || "bg-gray-100 text-gray-700"
                 }`}
               >
                 {app.status}

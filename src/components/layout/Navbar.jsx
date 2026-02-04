@@ -5,6 +5,7 @@ import {
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
 import { MdMenuOpen, MdNotificationImportant } from "react-icons/md";
+import NotificationPopup from "../common/NotificationPopup";
 
 import {
   useGetMyNotificationsQuery,
@@ -16,6 +17,7 @@ import { useGetMyProfileQuery } from "../../services/endpoints/profileApi";
 
 const Navbar = ({ toggleSidebar, setToggleSidebar }) => {
   const [openDropdown, setOpenDropdown] = useState(null);
+  const [showAllNotifications, setShowAllNotifications] = useState(false);
 
   /* ================= API ================= */
   const { data } = useGetMyNotificationsQuery();
@@ -29,6 +31,10 @@ const Navbar = ({ toggleSidebar, setToggleSidebar }) => {
 
   const notifications = data?.data || [];
   const unreadCount = notifications.filter((n) => !n.isRead).length;
+  const recentNotifications = notifications
+    .filter((n) => !n.isRead)
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 5);
 
   const toggleSidebarHandle = () => {
     setToggleSidebar((prev) => !prev);
@@ -48,10 +54,12 @@ const Navbar = ({ toggleSidebar, setToggleSidebar }) => {
     CANDIDATE: "Candidate",
   };
 
-  const roleAvatar = {
-    ADMIN: "https://i.pravatar.cc/40?img=1",
-    EMPLOYER: "https://i.pravatar.cc/40?img=5",
-    CANDIDATE: "https://i.pravatar.cc/40?img=8",
+  const getInitials = (name) => {
+    if (!name) return "U";
+    const parts = name.trim().split(/\s+/);
+    const first = parts[0]?.[0] || "";
+    const last = parts.length > 1 ? parts[parts.length - 1][0] : "";
+    return (first + last).toUpperCase() || "U";
   };
 
   return (
@@ -93,15 +101,9 @@ const Navbar = ({ toggleSidebar, setToggleSidebar }) => {
 
           {/* PROFILE */}
           <div className="flex items-center gap-3 cursor-pointer">
-            <img
-              src={
-                user?.avatar
-                  ? `${import.meta.env.VITE_API_URL}/${user.avatar}`
-                  : roleAvatar[role]
-              }
-              alt="profile"
-              className="w-10 h-10 rounded-full object-cover"
-            />
+            <div className="w-10 h-10 rounded-full bg-[#309689] text-white flex items-center justify-center font-semibold">
+              {getInitials(user?.name)}
+            </div>
 
             <div className="text-sm">
               <p className="font-semibold">{user?.name || "User"}</p>
@@ -111,12 +113,19 @@ const Navbar = ({ toggleSidebar, setToggleSidebar }) => {
 
           {/* NOTIFICATION DROPDOWN */}
           {openDropdown === "notifications" && (
-            <Dropdown title="Notifications" onClear={handleMarkAllRead}>
-              {notifications.length === 0 && (
-                <p className="text-sm text-gray-400">No notifications</p>
+            <Dropdown
+              title="Notifications"
+              onClear={handleMarkAllRead}
+              onViewAll={() => {
+                setOpenDropdown(null);
+                setShowAllNotifications(true);
+              }}
+            >
+              {recentNotifications.length === 0 && (
+                <p className="text-sm text-gray-400">No new notifications</p>
               )}
 
-              {notifications.map((note) => (
+              {recentNotifications.map((note) => (
                 <div
                   key={note._id}
                   onClick={() => handleNotificationClick(note._id)}
@@ -143,6 +152,10 @@ const Navbar = ({ toggleSidebar, setToggleSidebar }) => {
           onClick={() => setOpenDropdown(null)}
         />
       )}
+
+      {showAllNotifications && (
+        <NotificationPopup onClose={() => setShowAllNotifications(false)} />
+      )}
     </>
   );
 };
@@ -160,15 +173,22 @@ const IconWithBadge = ({ icon, count }) => (
   </div>
 );
 
-const Dropdown = ({ title, children, onClear }) => (
+const Dropdown = ({ title, children, onClear, onViewAll }) => (
   <div className="absolute top-14 right-0 w-80 bg-white rounded-lg shadow-lg p-4 z-50">
     <div className="flex justify-between items-center mb-3">
       <h4 className="font-semibold">{title}</h4>
-      {onClear && (
-        <button onClick={onClear} className="text-xs text-indigo-600">
-          Mark all read
-        </button>
-      )}
+      <div className="flex items-center gap-3">
+        {onViewAll && (
+          <button onClick={onViewAll} className="text-xs text-indigo-600">
+            View all
+          </button>
+        )}
+        {onClear && (
+          <button onClick={onClear} className="text-xs text-indigo-600">
+            Mark all read
+          </button>
+        )}
+      </div>
     </div>
     <div className="space-y-2 max-h-80 overflow-y-auto">{children}</div>
   </div>

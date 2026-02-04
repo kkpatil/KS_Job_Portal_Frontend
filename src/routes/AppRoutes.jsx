@@ -27,7 +27,6 @@ import JobDetail from "../pages/landingpage/JobDetail";
 import PrivacyPolicy from "../pages/landingpage/privacyPolicy/PrivacyPolicy";
 import TermsAndConditions from "../pages/landingpage/TermsandCondition/TermsandCondition";
 import ScrollToTop from "../components/common/ScrollToTop";
-import NotificationPopup from "../pages/admin/NotificationPopup";
 // ================= AUTH =================
 const Login = lazy(() => import("../pages/auth/Login"));
 const Register = lazy(() => import("../pages/auth/Register"));
@@ -106,7 +105,6 @@ const AppRoutes = () => {
           <Route path="/privacy&policy" element={<PrivacyPolicy />} />
           <Route path="/terms&conditions" element={<TermsAndConditions />} />
           <Route path="/ProfilePage" element={<ProfilePage />} />
-          <Route path="/NotificationPopup" element={<NotificationPopup />} />
           {/* AUTH */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />

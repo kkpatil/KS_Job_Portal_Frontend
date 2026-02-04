@@ -1,6 +1,7 @@
 import { useState } from "react";
 import RichTextEditor from "./RichTextEditor";
 import { cmsSchemas } from "../../utils/cmsSchemas";
+import { toast } from "react-toastify";
 
 const CMSForm = ({ initialData, onSubmit, onCancel, showSlug = true }) => {
   const isEditMode = Boolean(initialData && initialData._id);
@@ -31,7 +32,7 @@ const CMSForm = ({ initialData, onSubmit, onCancel, showSlug = true }) => {
 
   const handleSave = () => {
     if (!form.slug) {
-      alert("Slug is required");
+      toast.error("Slug is required");
       return;
     }
 

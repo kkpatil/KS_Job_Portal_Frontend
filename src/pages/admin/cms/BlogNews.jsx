@@ -6,6 +6,7 @@ import {
   useDeleteNewsMutation,
   useGetNewsByIdQuery, // ✅ ye import missing hoga
 } from "../../../services/endpoints/newsBlogs";
+import { toast } from "react-toastify";
 
 const BlogNews = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -32,10 +33,10 @@ const BlogNews = () => {
     if (window.confirm("Are you sure you want to delete this news/blog?")) {
       try {
         await deleteNews(id).unwrap();
-        alert("Deleted successfully!");
+        toast.success("Deleted successfully!");
       } catch (err) {
+        toast.error("Delete failed!");
         console.error(err);
-        alert("Delete failed!");
       }
     }
   };
@@ -56,7 +57,7 @@ const BlogNews = () => {
             setSelectedId(null); // ✅ create mode
             setOpenModal(true);
           }}
-          className="px-5 py-2 bg-[#309689] text-white rounded-md hover:bg-black transition"
+          className="px-5 py-2 btn-primary text-white rounded-md  transition"
         >
           + Add News / Blog
         </button>

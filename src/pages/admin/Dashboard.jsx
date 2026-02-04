@@ -15,6 +15,7 @@ import {
   useGetRecentActivitiesQuery,
   useGetSystemAlertsQuery,
 } from "../../services/endpoints/adminApi";
+import { useGetMyProfileQuery } from "../../services/endpoints/profileApi";
 
 
 
@@ -68,6 +69,7 @@ const Dashboard = () => {
   const { data, isLoading, error } = useGetAdminDashboardQuery();
   const { data: recentActivities, isLoading: recentActivitiesLoading, error: recentActivitiesError } = useGetRecentActivitiesQuery();
   const { data: systemAlerts, isLoading: systemAlertsLoading, error: systemAlertsError } = useGetSystemAlertsQuery();
+  const { data: profileData } = useGetMyProfileQuery();
   const [candidateSearch, setCandidateSearch] = useState("");
   const [candidatePage, setCandidatePage] = useState(1);
   const { data: candidateData, isLoading: candidatesLoading } =
@@ -119,12 +121,12 @@ const candidatePages = candidateData?.pages || 1;
         {/* Admin Info */}
         <div className="bg-white rounded-2xl p-6 shadow-md">
           <div className="flex flex-col items-center text-center">
-            <img
-              src="https://i.pravatar.cc/150?img=12"
-              alt="admin"
-              className="w-24 h-24 rounded-full border-4 border-indigo-500"
-            />
-            <h3 className="mt-4 font-semibold text-lg">Super Admin</h3>
+            <div className="w-24 h-24 rounded-full border-4 border-indigo-500 bg-[#309689] text-white flex items-center justify-center text-3xl font-bold">
+              {getInitials(profileData?.data?.name)}
+            </div>
+            <h3 className="mt-4 font-semibold text-lg">
+              {profileData?.data?.name || "Admin"}
+            </h3>
             <p className="text-sm text-gray-500">Platform Administrator</p>
           </div>
 
@@ -230,6 +232,14 @@ const Alert = ({ text, type }) => {
     error: "bg-red-100 text-red-700",
   };
   return <li className={`px-4 py-2 rounded-lg ${colors[type]}`}>{text}</li>;
+};
+
+const getInitials = (name) => {
+  if (!name) return "A";
+  const parts = name.trim().split(/\s+/);
+  const first = parts[0]?.[0] || "";
+  const last = parts.length > 1 ? parts[parts.length - 1][0] : "";
+  return (first + last).toUpperCase() || "A";
 };
 
 export default Dashboard;

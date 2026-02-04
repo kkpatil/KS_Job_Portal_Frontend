@@ -3,6 +3,7 @@ import {
   useCreateNewsMutation,
   useUpdateNewsMutation,
 } from "../../../services/endpoints/newsBlogs"; // Your endpoints
+import { toast } from "react-toastify";
 
 const NewsBlogForm = ({ mode = "create", selectedData = null, onClose }) => {
   const [formData, setFormData] = useState({
@@ -65,7 +66,7 @@ const NewsBlogForm = ({ mode = "create", selectedData = null, onClose }) => {
       !formData.shortDescription ||
       !formData.longDescription
     ) {
-      alert("Please fill all required fields!");
+      toast.error("Please fill all required fields!");
       return;
     }
 
@@ -83,16 +84,16 @@ const NewsBlogForm = ({ mode = "create", selectedData = null, onClose }) => {
 
       if (mode === "edit" && selectedData) {
         await updateNews({ id: selectedData._id, formData: data }).unwrap();
-        alert("News updated successfully!");
+        toast.success("News updated successfully!");
       } else {
         await createNews(data).unwrap();
-        alert("News created successfully!");
+        toast.success("News created successfully!");
       }
 
       onClose(); // Close modal after success
     } catch (err) {
       console.error(err);
-      alert("Something went wrong!");
+      toast.error("Something went wrong!");
     } finally {
       setLoading(false);
     }
@@ -203,7 +204,7 @@ const NewsBlogForm = ({ mode = "create", selectedData = null, onClose }) => {
         <button
           type="submit"
           disabled={loading}
-          className="px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:opacity-50"
+          className="px-6 py-2 btn-primary text-white rounded-lg  disabled:opacity-50"
         >
           {loading ? "Saving..." : mode === "edit" ? "Update" : "Create"}
         </button>
