@@ -105,89 +105,171 @@ const Candidates = () => {
         />
       </div>
 
-      <div className="card overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead className="bg-[#c1ceb1] border-b text-left">
-            <tr>
-              <th className="px-4 py-3">Name</th>
-              <th className="px-4 py-3">Email</th>
-              <th className="px-4 py-3">Phone</th>
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3">Joined</th>
-              <th className="px-4 py-3">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading && (
+      <div className="card">
+        <div className="hidden md:block overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-[#c1ceb1] border-b text-left">
               <tr>
-                <td colSpan="5" className="px-4 py-6 text-center text-gray-500">
+                <th className="px-4 py-3">Name</th>
+                <th className="px-4 py-3">Email</th>
+                <th className="px-4 py-3">Phone</th>
+                <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3">Joined</th>
+                <th className="px-4 py-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {isLoading && (
+                <tr>
+                <td colSpan="6" className="px-4 py-6 text-center text-gray-500">
                   Loading candidates...
                 </td>
-              </tr>
-            )}
+                </tr>
+              )}
 
-            {!isLoading && candidates.length === 0 && (
-              <tr>
-                <td colSpan="5" className="px-4 py-6 text-center text-gray-500">
+              {!isLoading && candidates.length === 0 && (
+                <tr>
+                <td colSpan="6" className="px-4 py-6 text-center text-gray-500">
                   No candidates found
                 </td>
-              </tr>
-            )}
+                </tr>
+              )}
 
-            {candidates.map((user) => {
-              const name =
-                user?.firstName || user?.lastName
-                  ? `${user?.firstName || ""} ${user?.lastName || ""}`.trim()
-                  : user?.name || "Candidate";
-              return (
-                <tr key={user._id} className="border-b">
-                  <td className="px-4 py-3 font-medium">{name}</td>
-                  <td className="px-4 py-3">{user.email || "—"}</td>
-                  <td className="px-4 py-3">{user.phone || "—"}</td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs ${
-                        user.status === "BLOCKED"
-                          ? "bg-red-100 text-red-700"
-                          : "bg-green-100 text-green-700"
-                      }`}
-                    >
-                      {user.status || "ACTIVE"}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
+              {candidates.map((user) => {
+                const name =
+                  user?.firstName || user?.lastName
+                    ? `${user?.firstName || ""} ${user?.lastName || ""}`.trim()
+                    : user?.name || "Candidate";
+                return (
+                  <tr key={user._id} className="border-b">
+                    <td className="px-4 py-3 font-medium">{name}</td>
+                    <td className="px-4 py-3">{user.email || "—"}</td>
+                    <td className="px-4 py-3">{user.phone || "—"}</td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs ${
+                          user.status === "BLOCKED"
+                            ? "bg-red-100 text-red-700"
+                            : "bg-green-100 text-green-700"
+                        }`}
+                      >
+                        {user.status || "ACTIVE"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      {user.createdAt
+                        ? new Date(user.createdAt).toLocaleDateString()
+                        : "—"}
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex gap-3">
+                        <Link
+                          to={`/admin/candidates/${user._id}`}
+                          className="text-indigo-600 hover:underline"
+                        >
+                          View
+                        </Link>
+                        <button
+                          onClick={() => openEdit(user)}
+                          className="text-emerald-600 hover:underline"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => openDelete(user)}
+                          disabled={deleting}
+                          className="text-red-600 hover:underline"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="md:hidden space-y-4">
+          {isLoading && (
+            <div className="py-6 text-center text-gray-500">
+              Loading candidates...
+            </div>
+          )}
+
+          {!isLoading && candidates.length === 0 && (
+            <div className="py-6 text-center text-gray-500">
+              No candidates found
+            </div>
+          )}
+
+          {candidates.map((user) => {
+            const name =
+              user?.firstName || user?.lastName
+                ? `${user?.firstName || ""} ${user?.lastName || ""}`.trim()
+                : user?.name || "Candidate";
+            return (
+              <div
+                key={user._id}
+                className="border rounded-lg p-4 shadow-sm bg-white space-y-3"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="text-base font-semibold break-words">{name}</div>
+                    <div className="text-sm text-gray-600 break-all">
+                      {user.email || "—"}
+                    </div>
+                  </div>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs ${
+                      user.status === "BLOCKED"
+                        ? "bg-red-100 text-red-700"
+                        : "bg-green-100 text-green-700"
+                    }`}
+                  >
+                    {user.status || "ACTIVE"}
+                  </span>
+                </div>
+
+                <div className="text-sm text-gray-600 space-y-1">
+                  <div>
+                    <span className="text-gray-500">Phone:</span>{" "}
+                    {user.phone || "—"}
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Joined:</span>{" "}
                     {user.createdAt
                       ? new Date(user.createdAt).toLocaleDateString()
                       : "—"}
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex gap-3">
-                      <Link
-                        to={`/admin/candidates/${user._id}`}
-                        className="text-indigo-600 hover:underline"
-                      >
-                        View
-                      </Link>
-                      <button
-                        onClick={() => openEdit(user)}
-                        className="text-emerald-600 hover:underline"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => openDelete(user)}
-                        disabled={deleting}
-                        className="text-red-600 hover:underline"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-4 pt-2">
+                  <Link
+                    to={`/admin/candidates/${user._id}`}
+                    className="text-indigo-600"
+                  >
+                    View
+                  </Link>
+                  <button
+                    onClick={() => openEdit(user)}
+                    className="text-emerald-600"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => openDelete(user)}
+                    disabled={deleting}
+                    className="text-red-600"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       <div className="flex items-center justify-between">

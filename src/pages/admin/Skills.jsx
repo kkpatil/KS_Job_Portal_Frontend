@@ -96,11 +96,11 @@ const Skills = () => {
   return (
     <div className="card">
       {/* HEADER */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <h2 className="text-xl font-semibold">Skills</h2>
         <button
           onClick={() => setShowAdd(true)}
-          className="btn-primary flex items-center gap-1"
+          className="btn-primary flex items-center justify-center gap-1 w-full sm:w-auto"
         >
           <PlusIcon className="w-4 h-4" />
           Add Skill
@@ -123,7 +123,7 @@ const Skills = () => {
       {isLoading && <p className="text-center py-6">Loading skills...</p>}
 
       {/* TABLE */}
-      <div className="overflow-x-auto">
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-sm tabl">
           <thead className="bg-[#c1ceb1]">
             <tr>
@@ -183,13 +183,69 @@ const Skills = () => {
 
             {filteredSkills.length === 0 && (
               <tr>
-                <td colSpan="4" className="text-center py-6 text-gray-500">
+                <td colSpan="5" className="text-center py-6 text-gray-500">
                   No skills found
                 </td>
               </tr>
             )}
           </tbody>
         </table>
+      </div>
+
+      <div className="md:hidden space-y-4">
+        {paginatedSkills.map((skill) => (
+          <div
+            key={skill._id}
+            className="border rounded-lg p-4 shadow-sm bg-white space-y-3"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <div className="text-base font-semibold">{skill.name}</div>
+                <div className="text-sm text-gray-600">
+                  {skill.category?.name || "-"}
+                </div>
+              </div>
+              <span
+                className={`px-3 py-1 rounded-full text-xs ${
+                  skill.status === "ACTIVE"
+                    ? "bg-green-100 text-green-700"
+                    : "bg-red-100 text-red-700"
+                }`}
+              >
+                {skill.status}
+              </span>
+            </div>
+
+            <div className="text-sm text-gray-600">
+              <span className="text-gray-500">Jobs:</span> {skill.jobsCount}
+            </div>
+
+            <div className="flex justify-end gap-4 pt-2">
+              <button
+                onClick={() => {
+                  setSelectedSkill(skill);
+                  setShowEdit(true);
+                }}
+              >
+                <PencilSquareIcon className="w-5 h-5 text-blue-600" />
+              </button>
+              <button
+                onClick={() => {
+                  setSelectedSkill(skill);
+                  setShowDelete(true);
+                }}
+              >
+                <TrashIcon className="w-5 h-5 text-red-600" />
+              </button>
+            </div>
+          </div>
+        ))}
+
+        {filteredSkills.length === 0 && (
+          <div className="text-center py-6 text-gray-500">
+            No skills found
+          </div>
+        )}
       </div>
 
       <div className="flex items-center justify-between mt-4">

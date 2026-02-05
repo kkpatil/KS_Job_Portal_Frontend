@@ -105,10 +105,10 @@ const ApplicationsEmployer = () => {
             setPage(1);
           }}
           placeholder="Search candidate or job"
-          className="border px-4 py-2 rounded-lg text-sm"
+          className="border px-4 py-2 rounded-lg text-sm w-full sm:w-72"
         />
         <select
-          className="border px-4 py-2 rounded-lg text-sm"
+          className="border px-4 py-2 rounded-lg text-sm w-full sm:w-56"
           value={jobFilter}
           onChange={(e) => setJobFilter(e.target.value)}
         >
@@ -120,7 +120,7 @@ const ApplicationsEmployer = () => {
         </select>
 
         <select
-          className="border px-4 py-2 rounded-lg text-sm"
+          className="border px-4 py-2 rounded-lg text-sm w-full sm:w-48"
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
         >
@@ -133,7 +133,7 @@ const ApplicationsEmployer = () => {
       </div>
 
       {/* TABLE */}
-      <div className="card overflow-x-auto">
+      <div className="card hidden md:block overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 border-b">
             <tr>
@@ -152,7 +152,7 @@ const ApplicationsEmployer = () => {
                   <div className="font-medium">
                     {app.candidate?.name}
                   </div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-gray-500 break-all">
                     {app.candidate?.email}
                   </div>
                 </td>
@@ -228,6 +228,88 @@ const ApplicationsEmployer = () => {
             )}
           </tbody>
         </table>
+      </div>
+
+      <div className="md:hidden space-y-4">
+        {paginatedApplications.map((app) => (
+          <div
+            key={app._id}
+            className="card space-y-3"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="font-semibold text-sm">{app.candidate?.name}</div>
+                <div className="text-xs text-gray-500 break-all">
+                  {app.candidate?.email}
+                </div>
+              </div>
+              <span
+                className={`px-3 py-1 rounded-full text-xs ${
+                  statusColor[app.status] || "bg-gray-100 text-gray-700"
+                }`}
+              >
+                {app.status}
+              </span>
+            </div>
+
+            <div className="text-sm text-gray-600 space-y-1">
+              <div>
+                <span className="text-gray-500">Job:</span> {app.job?.title}
+              </div>
+              <div>
+                <span className="text-gray-500">Applied:</span>{" "}
+                {new Date(app.createdAt).toLocaleDateString()}
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2 pt-2">
+              <Link
+                to={`/employer/candidates/${app?._id}`}
+                className="flex items-center gap-1 px-3 py-2 rounded-md border text-sm"
+              >
+                <EyeIcon className="w-4 h-4 text-blue-600" /> View
+              </Link>
+
+              {app.status !== "SHORTLISTED" && app.status !== "HIRED" && (
+                <button
+                  className="flex items-center gap-1 px-3 py-2 rounded-md border text-sm"
+                  onClick={() =>
+                    handleStatusChange(app._id, "SHORTLISTED")
+                  }
+                >
+                  <CheckCircleIcon className="w-4 h-4 text-green-600" /> Shortlist
+                </button>
+              )}
+
+              {app.status !== "REJECTED" && app.status !== "HIRED" && (
+                <button
+                  className="flex items-center gap-1 px-3 py-2 rounded-md border text-sm"
+                  onClick={() =>
+                    handleStatusChange(app._id, "REJECTED")
+                  }
+                >
+                  <XCircleIcon className="w-4 h-4 text-red-600" /> Reject
+                </button>
+              )}
+
+              {app.status === "SHORTLISTED" && (
+                <button
+                  onClick={() => handleStatusChange(app._id, "HIRED")}
+                  className="flex items-center gap-1 px-3 py-2 rounded-md border text-sm"
+                  title="Hire"
+                >
+                  <CheckCircleIcon className="w-4 h-4 text-emerald-600" /> Hire
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
+
+        {filteredApplications.length === 0 && (
+          <div className="text-center py-6 text-gray-500">
+            No applications found
+          </div>
+        )}
       </div>
 
       <div className="flex items-center justify-between">

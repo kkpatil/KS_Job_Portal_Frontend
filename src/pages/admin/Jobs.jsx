@@ -116,17 +116,17 @@ const Jobs = () => {
       <div className="flex md:flex-row flex-col gap-3 justify-between mb-6">
         <h2 className="text-xl font-semibold">Jobs</h2>
 
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <input
             type="text"
             placeholder="Search job or employer"
-            className="border px-4 py-2 rounded-lg text-sm"
+            className="border px-4 py-2 rounded-lg text-sm w-full sm:w-64"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
 
           <select
-            className="border px-4 py-2 rounded-lg text-sm"
+            className="border px-4 py-2 rounded-lg text-sm w-full sm:w-48"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >

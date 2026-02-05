@@ -18,9 +18,9 @@ import { formatDate } from "../../utils/formateDate";
 import { toast } from "react-toastify";
 
 const statusColor = {
-  Active: "bg-green-100 text-green-700",
-  Pending: "bg-yellow-100 text-yellow-700",
-  Blocked: "bg-red-100 text-red-700",
+  ACTIVE: "bg-green-100 text-green-700",
+  PENDING: "bg-yellow-100 text-yellow-700",
+  BLOCKED: "bg-red-100 text-red-700",
 };
 
 const Employers = () => {
@@ -105,13 +105,13 @@ const Employers = () => {
           <input
             type="text"
             placeholder="Search company or email"
-            className="border px-4 py-2 rounded-lg text-sm"
+            className="border px-4 py-2 rounded-lg text-sm w-full sm:w-64"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
 
           <select
-            className="border px-4 py-2 rounded-lg text-sm"
+            className="border px-4 py-2 rounded-lg text-sm w-full sm:w-48"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
@@ -194,6 +194,75 @@ const Employers = () => {
             )}
           </tbody>
         </table>
+      </div>
+
+      <div className="md:hidden space-y-4">
+        {filteredData.map((emp) => (
+          <div
+            key={emp._id}
+            className="border rounded-lg p-4 shadow-sm bg-white"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="text-base font-semibold break-words">
+                  {emp.companyName}
+                </div>
+                <div className="text-sm text-gray-600 break-all">
+                  {emp.email}
+                </div>
+              </div>
+              <span
+                className={`px-3 py-1 rounded-full text-xs font-medium ${statusColor[emp.status]}`}
+              >
+                {emp.status}
+              </span>
+            </div>
+
+            <div className="mt-3 space-y-1 text-sm">
+              <div>
+                <span className="text-gray-500">Contact:</span>{" "}
+                {emp.contactEmail}
+              </div>
+              <div>
+                <span className="text-gray-500">Industry:</span> {emp.industry}
+              </div>
+              <div>
+                <span className="text-gray-500">Joined:</span>{" "}
+                {formatDate(emp.createdAt)}
+              </div>
+            </div>
+
+            <div className="mt-4 flex justify-end gap-3">
+              <button
+                onClick={() => navigate(`/admin/employers/${emp._id}`)}
+              >
+                <EyeIcon className="w-5 h-5 text-blue-600" />
+              </button>
+              <button
+                onClick={() => {
+                  setSelectedEmployer(emp);
+                  setEditForm(true);
+                }}
+              >
+                <PencilSquareIcon className="w-5 h-5 text-green-600" />
+              </button>
+              <button
+                onClick={() => {
+                  setSelectedEmployer(emp);
+                  setDeleteModal(true);
+                }}
+              >
+                <TrashIcon className="w-5 h-5 text-red-600" />
+              </button>
+            </div>
+          </div>
+        ))}
+
+        {filteredData.length === 0 && (
+          <div className="text-center py-6 text-gray-500">
+            No employers found
+          </div>
+        )}
       </div>
 
       <div className="flex justify-between items-center mt-6 text-sm">

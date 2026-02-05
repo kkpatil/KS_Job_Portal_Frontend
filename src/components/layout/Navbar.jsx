@@ -174,7 +174,7 @@ const IconWithBadge = ({ icon, count }) => (
 );
 
 const Dropdown = ({ title, children, onClear, onViewAll }) => (
-  <div className="absolute top-14 right-0 w-80 bg-white rounded-lg shadow-lg p-4 z-50">
+  <div className="absolute top-14 right-2 w-80 max-w-[90vw] bg-white rounded-lg shadow-lg p-4 z-50">
     <div className="flex justify-between items-center mb-3">
       <h4 className="font-semibold">{title}</h4>
       <div className="flex items-center gap-3">

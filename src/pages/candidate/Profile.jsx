@@ -177,21 +177,21 @@ const Profile = () => {
         <div className="flex flex-wrap gap-3">
           <Link
             to={-1}
-            className="btn-secondary flex items-center gap-2"
+            className="btn-secondary flex items-center gap-2 w-full sm:w-auto justify-center"
           >
             <FiArrowLeft className="h-4 w-4" /> Back
           </Link>
 
           {!editMode ? (
             <button
-              className="btn-primary flex items-center gap-2"
+              className="btn-primary flex items-center gap-2 w-full sm:w-auto justify-center"
               onClick={() => setEditMode(true)}
             >
               <FiEdit2 className="h-4 w-4" /> Edit Profile
             </button>
           ) : (
             <button
-              className=" bg-gray-400 rounded-md p-2 text-white hover:scale-102 cursor-pointer flex items-center gap-2"
+              className=" bg-gray-400 rounded-md p-2 text-white hover:scale-102 cursor-pointer flex items-center gap-2 w-full sm:w-auto justify-center"
               onClick={() => setEditMode(false)}
             >
               <FiX className="h-4 w-4" /> Cancel
@@ -206,24 +206,26 @@ const Profile = () => {
         {!editMode ? (
           <div className="relative">
             <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 min-w-0">
                 <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-600 text-white">
                   <FiUser className="h-6 w-6" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <h2 className="text-xl font-semibold text-gray-900">
                     {user?.firstName} {user?.lastName}
                   </h2>
-                  <p className="text-gray-700">{user?.email}</p>
-                  <div className="mt-2 flex flex-wrap items-center gap-4 text-sm text-gray-700">
+                  <p className="text-gray-700 break-all">{user?.email}</p>
+                  <div className="mt-2 flex flex-wrap items-start gap-4 text-sm text-gray-700">
                     <span className="flex items-center gap-2">
                       <FiPhone /> {user?.phone || "Add phone"}
                     </span>
                     <span className="flex items-center gap-2">
                       <FiMapPin />
-                      {user?.address
+                      <span className="break-words">
+                        {user?.address
                         ? `${user?.address}, ${user?.state}, ${user?.country} - ${user?.zipCode}`
                         : "Add address"}
+                      </span>
                     </span>
                   </div>
                 </div>
@@ -234,7 +236,7 @@ const Profile = () => {
                   <p className="text-xs uppercase tracking-wide text-gray-500">
                     Current Role
                   </p>
-                  <p className="mt-1 font-medium text-gray-800">
+                  <p className="mt-1 font-medium text-gray-800 break-words">
                     {user?.currentRole || "Add role"}
                   </p>
                 </div>
@@ -242,7 +244,7 @@ const Profile = () => {
                   <p className="text-xs uppercase tracking-wide text-gray-500">
                     Experience
                   </p>
-                  <p className="mt-1 font-medium text-gray-800">
+                  <p className="mt-1 font-medium text-gray-800 break-words">
                     {user?.experience || "Add experience"}
                   </p>
                 </div>
@@ -254,7 +256,7 @@ const Profile = () => {
                 <p className="text-xs uppercase tracking-wide text-gray-500">
                   Preferred Location
                 </p>
-                <p className="mt-2 flex items-center gap-2 text-sm font-semibold text-gray-900">
+                <p className="mt-2 flex items-center gap-2 text-sm font-semibold text-gray-900 break-words">
                   <FiMapPin />{" "}
                   {user?.preferredLocation || "Not set"}
                 </p>
@@ -263,7 +265,7 @@ const Profile = () => {
                 <p className="text-xs uppercase tracking-wide text-gray-500">
                   Expected Salary
                 </p>
-                <p className="mt-2 flex items-center gap-2 text-sm font-semibold text-gray-900">
+                <p className="mt-2 flex items-center gap-2 text-sm font-semibold text-gray-900 break-words">
                   <FiDollarSign /> ₹{user?.expectedSalary || "—"} / year
                 </p>
               </div>
@@ -271,7 +273,7 @@ const Profile = () => {
                 <p className="text-xs uppercase tracking-wide text-gray-500">
                   Availability
                 </p>
-                <p className="mt-2 flex items-center gap-2 text-sm font-semibold text-gray-900">
+                <p className="mt-2 flex items-center gap-2 text-sm font-semibold text-gray-900 break-words">
                   <FiClock /> {user?.availability || "Not set"}
                 </p>
               </div>
@@ -311,25 +313,25 @@ const Profile = () => {
             <div className="mt-5 grid gap-3 text-sm md:grid-cols-2">
               <div className="flex items-center gap-2 rounded-xl border border-gray-100 bg-white/90 px-3 py-2 text-gray-800 shadow-sm">
                 <FiClock />
-                <span>
+                <span className="break-words">
                   Notice Period: {user?.noticePeriod || "Not set"}
                 </span>
               </div>
               <div className="flex items-center gap-2 rounded-xl border border-gray-100 bg-white/90 px-3 py-2 text-gray-800 shadow-sm">
                 <FiBriefcase />
-                <span>
+                <span className="break-words">
                   Employment: {user?.employmentType || "Not set"}
                 </span>
               </div>
               <div className="flex items-center gap-2 rounded-xl border border-gray-100 bg-white/90 px-3 py-2 text-gray-800 shadow-sm">
                 <FiClock />
-                <span>
+                <span className="break-words">
                   Shift: {user?.preferredShift || "Not set"}
                 </span>
               </div>
               <div className="flex items-center gap-2 rounded-xl border border-gray-100 bg-white/90 px-3 py-2 text-gray-800 shadow-sm">
                 <FiGlobe />
-                <span>
+                <span className="break-words">
                   Work Auth: {user?.workAuthorization || "India"}
                 </span>
               </div>
@@ -340,7 +342,7 @@ const Profile = () => {
                 <div className="flex items-center gap-2 text-gray-800">
                   <FiLink />
                   <span>LinkedIn:</span>
-                  <span className="text-indigo-700 font-medium">
+                  <span className="text-indigo-700 font-medium break-all">
                     {user.linkedin}
                   </span>
                 </div>
@@ -349,7 +351,7 @@ const Profile = () => {
                 <div className="flex items-center gap-2 text-gray-800">
                   <FiExternalLink />
                   <span>Portfolio:</span>
-                  <span className="text-indigo-700 font-medium">
+                  <span className="text-indigo-700 font-medium break-all">
                     {user.portfolio}
                   </span>
                 </div>
@@ -653,34 +655,34 @@ const Profile = () => {
                 ))}
               </div>
 
-              <div className="mt-3 flex flex-wrap gap-2">
+              <div className="mt-3 flex flex-col sm:flex-row gap-2">
                 <input
                   value={skillInput}
                   onChange={(e) =>
                     setSkillInput(e.target.value)
                   }
                   placeholder="Add skill"
-                  className="border px-3 py-2 rounded-lg text-sm text-gray-900 placeholder:text-gray-400"
+                  className="border px-3 py-2 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 w-full sm:w-auto"
                 />
                 <button
                   onClick={handleAddSkill}
-                  className="btn-secondary"
+                  className="btn-secondary w-full sm:w-auto flex items-center justify-center"
                 >
                   <FiPlus className="h-4 w-4" />
                 </button>
               </div>
             </Section>
 
-            <div className="flex flex-wrap items-center gap-3 pt-2">
+            <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
               <button
-                className="btn-primary"
+                className="btn-primary w-full sm:w-auto"
                 onClick={handleSaveProfile}
                 disabled={saving}
               >
                 {saving ? "Saving..." : "Save Changes"}
               </button>
               <button
-                className="btn-secondary"
+                className="btn-secondary w-full sm:w-auto"
                 onClick={() => setEditMode(false)}
                 disabled={saving}
               >
@@ -693,13 +695,13 @@ const Profile = () => {
 
       {/* RESUME */}
       <div className="card flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 min-w-0">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
             <FiBriefcase className="h-5 w-5" />
           </div>
           <div>
             <p className="font-medium">Resume</p>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 break-all">
               {user?.resumeName
                 ? user.resumeName
                 : user?.resume
@@ -709,20 +711,20 @@ const Profile = () => {
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-col sm:flex-row flex-wrap gap-3 w-full md:w-auto">
           {resumeUrl && (
             <a
               href={resumeUrl}
               target="_blank"
               rel="noreferrer"
-              className="btn-primary flex items-center gap-2"
+              className="btn-primary flex items-center gap-2 justify-center w-full sm:w-auto"
             >
               <FiDownload className="h-4 w-4" />
               Download
             </a>
           )}
 
-          <label className="btn-secondary cursor-pointer">
+          <label className="btn-secondary cursor-pointer w-full sm:w-auto text-center">
             {uploading ? "Uploading..." : "Upload"}
             <input
               type="file"

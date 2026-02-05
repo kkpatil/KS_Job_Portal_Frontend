@@ -69,12 +69,12 @@ const MyApplications = () => {
       <div className="font-semibold">{app.jobTitle}</div>
       <div className="text-sm text-gray-500">{app.company}</div>
       <div className="text-xs text-gray-400">
-        Applied on {app.createdAt}
+        Applied on {new Date(app.createdAt).toLocaleDateString()}
       </div>
 
       <div className="flex items-center justify-between pt-2">
         <StatusBadge status={app.status} />
-        <Link to={`/candidate/jobs/${app.jobId}`}>
+        <Link to={`/candidate/jobs/${app?.job?._id}`}>
           <EyeIcon className="w-5 h-5 text-indigo-600" />
         </Link>
       </div>

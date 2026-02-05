@@ -148,45 +148,69 @@ const Reports = () => {
 
       {/* ================= REPORTS LIST ================= */}
     <div className="card">
-  <h3 className="text-lg font-semibold mb-4">Available Reports</h3>
+      <h3 className="text-lg font-semibold mb-4">Available Reports</h3>
 
-  <table className="w-full text-sm">
-    <thead className="bg-[#ebf5c6]">
-      <tr>
-        <th className="px-4 py-2 text-left">Report</th>
-        <th className="px-4 py-2 text-center">Action</th>
-      </tr>
-    </thead>
+      <div className="hidden md:block overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead className="bg-[#ebf5c6]">
+            <tr>
+              <th className="px-4 py-2 text-left">Report</th>
+              <th className="px-4 py-2 text-center">Action</th>
+            </tr>
+          </thead>
 
-    <tbody>
-      {reportsList.map((report) => (
-        <tr key={report.key} className="border-b">
-          <td className="px-4 py-2 font-medium">
-            {report.title}
-          </td>
+          <tbody>
+            {reportsList.map((report) => (
+              <tr key={report.key} className="border-b">
+                <td className="px-4 py-2 font-medium">{report.title}</td>
 
-          <td className="px-4 py-2 text-center">
+                <td className="px-4 py-2 text-center">
+                  <button
+                    onClick={() => downloadReport(report.key)}
+                    className="text-indigo-600 flex items-center gap-1 justify-center"
+                  >
+                    <ArrowDownTrayIcon className="w-4 h-4" />
+                    Download
+                  </button>
+                </td>
+              </tr>
+            ))}
+
+            {reportsList.length === 0 && (
+              <tr>
+                <td colSpan="2" className="text-center py-6 text-gray-500">
+                  No reports available
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="md:hidden space-y-3">
+        {reportsList.map((report) => (
+          <div
+            key={report.key}
+            className="border rounded-lg p-4 shadow-sm bg-white flex items-center justify-between gap-3"
+          >
+            <div className="font-medium text-sm">{report.title}</div>
             <button
               onClick={() => downloadReport(report.key)}
-              className="text-indigo-600 flex items-center gap-1 justify-center"
+              className="text-indigo-600 flex items-center gap-1"
             >
               <ArrowDownTrayIcon className="w-4 h-4" />
               Download
             </button>
-          </td>
-        </tr>
-      ))}
+          </div>
+        ))}
 
-      {reportsList.length === 0 && (
-        <tr>
-          <td colSpan="2" className="text-center py-6 text-gray-500">
+        {reportsList.length === 0 && (
+          <div className="text-center py-6 text-gray-500">
             No reports available
-          </td>
-        </tr>
-      )}
-    </tbody>
-  </table>
-</div>
+          </div>
+        )}
+      </div>
+    </div>
 
 
     </div>
@@ -216,40 +240,78 @@ const ChartCard = ({ title, children }) => (
   </div>
 );
 
-const ReportTable = ({ title, headers, rows, statusIndex }) => (
-  <div className="card">
-    <h3 className="text-lg font-semibold mb-4">{title}</h3>
-    <table className="w-full text-sm">
-      <thead className="bg-[#ebf5c6]">
-        <tr>
-          {headers.map((h, i) => (
-            <th key={i} className="px-4 py-2 text-left">{h}</th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map((row, i) => (
-          <tr key={i} className="border-b">
-            {row.map((cell, j) => (
-              <td key={j} className="px-4 py-2">
-                {statusIndex === j ? (
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs ${
-                      statusColor[cell] || "bg-gray-100 text-gray-700"
-                    }`}
-                  >
-                    {cell}
-                  </span>
-                ) : (
-                  cell
-                )}
-              </td>
+const ReportTable = ({ title, headers, rows, statusIndex }) => {
+  const renderCell = (cell, isStatus) =>
+    isStatus ? (
+      <span
+        className={`px-2 py-1 rounded-full text-xs ${
+          statusColor[cell] || "bg-gray-100 text-gray-700"
+        }`}
+      >
+        {cell}
+      </span>
+    ) : (
+      cell
+    );
+
+  return (
+    <div className="card">
+      <h3 className="text-lg font-semibold mb-4">{title}</h3>
+
+      <div className="hidden md:block overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead className="bg-[#ebf5c6]">
+            <tr>
+              {headers.map((h, i) => (
+                <th key={i} className="px-4 py-2 text-left">
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row, i) => (
+              <tr key={i} className="border-b">
+                {row.map((cell, j) => (
+                  <td key={j} className="px-4 py-2">
+                    {renderCell(cell, statusIndex === j)}
+                  </td>
+                ))}
+              </tr>
             ))}
-          </tr>
+
+            {rows.length === 0 && (
+              <tr>
+                <td colSpan={headers.length} className="text-center py-6 text-gray-500">
+                  No data available
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="md:hidden space-y-4">
+        {rows.map((row, i) => (
+          <div
+            key={i}
+            className="border rounded-lg p-4 shadow-sm bg-white space-y-2"
+          >
+            {row.map((cell, j) => (
+              <div key={j} className="flex items-start justify-between gap-3 text-sm">
+                <span className="text-gray-500">{headers[j]}</span>
+                <span className="text-right">{renderCell(cell, statusIndex === j)}</span>
+              </div>
+            ))}
+          </div>
         ))}
-      </tbody>
-    </table>
-  </div>
-);
+
+        {rows.length === 0 && (
+          <div className="text-center py-6 text-gray-500">No data available</div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export default Reports;

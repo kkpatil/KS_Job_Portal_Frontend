@@ -88,18 +88,18 @@ const Categories = () => {
       <div className="flex md:flex-row flex-col justify-between gap-4 mb-6">
         <h2 className="text-xl font-semibold">Categories</h2>
 
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <input
             type="text"
             placeholder="Search category"
-            className="border px-4 py-2 rounded-lg text-sm"
+            className="border px-4 py-2 rounded-lg text-sm w-full sm:w-64"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
 
           <button
             onClick={() => setShowAdd(true)}
-            className="btn-primary flex items-center gap-1 text-sm"
+            className="btn-primary flex items-center justify-center gap-1 text-sm w-full sm:w-auto"
           >
             <PlusIcon className="w-4 h-4" />
             Add Category

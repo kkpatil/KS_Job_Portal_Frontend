@@ -71,7 +71,7 @@ const MyJobs = () => {
   return (
     <div className="space-y-6">
       {/* HEADER */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold">My Jobs</h1>
           <p className="text-gray-500">
@@ -81,24 +81,24 @@ const MyJobs = () => {
 
         <button
           onClick={() => setShowPostJob(true)}
-          className="btn-primary"
+          className="btn-primary w-full sm:w-auto"
         >
           + Post New Job
         </button>
       </div>
 
       {/* FILTERS */}
-      <div className="card flex gap-4">
+      <div className="card flex flex-col sm:flex-row gap-4">
         <input
           type="text"
           placeholder="Search job"
-          className="border px-4 py-2 rounded-lg text-sm"
+          className="border px-4 py-2 rounded-lg text-sm w-full sm:w-72"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
 
         <select
-          className="border px-4 py-2 rounded-lg text-sm"
+          className="border px-4 py-2 rounded-lg text-sm w-full sm:w-48"
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
         >
@@ -115,10 +115,10 @@ const MyJobs = () => {
         {filteredJobs.map((job) => (
           <div key={job._id} className="card">
             <div className="flex justify-between mb-3">
-              <div>
+              <div className="min-w-0">
 
-              <h3 className="font-semibold text-lg">{job.title}</h3>
-               <span>{job?.employer?.companyName}</span>
+              <h3 className="font-semibold text-lg break-words">{job.title}</h3>
+               <span className="text-sm text-gray-600 break-words">{job?.employer?.companyName}</span>
               </div>
              
               <span

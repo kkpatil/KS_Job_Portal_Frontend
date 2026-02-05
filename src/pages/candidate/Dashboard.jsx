@@ -142,9 +142,9 @@ const Dashboard = () => {
             </tbody>
           </table>
         </div>
-        <div className="md:hidden space-y-4">
+        <div className="md:hidden space-y-4 ">
           {recentApplications?.map((app) => (
-            <div key={app._id} className="border rounded-lg p-4 space-y-2">
+            <div key={app._id} className="border rounded-lg p-4 space-y-2 ">
               <div className="font-semibold">{app?.job}</div>
               <div className="text-sm text-gray-500">{app?.company}</div>
               <div className="text-xs text-gray-400">
@@ -172,7 +172,7 @@ const Dashboard = () => {
           {recommendedJobs?.map((job) => (
             <div
               key={job.id}
-              className="border rounded-lg p-4 flex justify-between items-center"
+              className="border rounded-lg p-4 flex justify-between items-center gap-1"
             >
               <div>
                 <p className="font-medium">{job.title}</p>

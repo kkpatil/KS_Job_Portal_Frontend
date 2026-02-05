@@ -105,12 +105,12 @@ const JobDetailsView = () => {
       </Link>
 
       {/* HEADER */}
-      <div className="card flex flex-col md:flex-row justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">{job.title}</h1>
-          <p className="text-gray-500">{job?.employer.companyName}</p>
+      <div className="card flex flex-col md:flex-row justify-between gap-6">
+        <div className="min-w-0">
+          <h1 className="text-2xl sm:text-3xl font-bold break-words">{job.title}</h1>
+          <p className="text-gray-500 break-words">{job?.employer.companyName}</p>
 
-          <div className="flex gap-4 text-sm text-gray-600 mt-3">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 text-sm text-gray-600 mt-3">
             <span className="flex items-center gap-1">
               <MapPinIcon className="w-4 h-4" />
               {job.location}
@@ -125,7 +125,7 @@ const JobDetailsView = () => {
             </span>
             <a
               href={`mailto:${job.employer.contactEmail}`}
-              className="flex items-center gap-1 hover:underline text-blue-600"
+              className="flex items-center gap-1 hover:underline text-blue-600 break-all"
             >
               <PaperAirplaneIcon className="w-4 h-4" />
               {job.employer.contactEmail}
@@ -134,10 +134,10 @@ const JobDetailsView = () => {
         </div>
 
         {/* ACTIONS */}
-        <div className="flex gap-3 h-12 mt-6">
+        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
           <button
             onClick={handleSave}
-            className={`px-4 py-2 rounded-lg border flex items-center gap-1 ${
+            className={`px-4 py-2 rounded-lg border flex items-center justify-center gap-1 w-full sm:w-auto ${
               saved ? "text-indigo-600 border-indigo-600" : ""
             }`}
           >
@@ -148,7 +148,7 @@ const JobDetailsView = () => {
           <button
             onClick={() => setShowApply(true)}
             disabled={applied}
-            className={`btn-primary flex items-center gap-1 ${
+            className={`btn-primary flex items-center justify-center gap-1 w-full sm:w-auto  ${
               applied ? "opacity-60 cursor-not-allowed" : ""
             }`}
           >
@@ -159,11 +159,11 @@ const JobDetailsView = () => {
       </div>
 
       {/* DETAILS */}
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2 space-y-6">
           <div className="card">
             <h2 className="font-semibold mb-2">Job Description</h2>
-            <p className="text-sm text-gray-600">{job.description}</p>
+            <p className="text-sm text-gray-600 break-words">{job.description}</p>
           </div>
 
           <div className="card">

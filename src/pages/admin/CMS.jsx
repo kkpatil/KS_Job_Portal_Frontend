@@ -104,7 +104,7 @@ const CMS = () => {
     <>
       <div className="card">
         {/* HEADER */}
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
           <h2 className="text-xl font-semibold">CMS Management</h2>
 
           {/* <button
@@ -121,7 +121,7 @@ const CMS = () => {
         {/* FILTER */}
         <div className="mb-6">
           <select
-            className="border px-4 py-2 rounded-lg text-sm"
+            className="border px-4 py-2 rounded-lg text-sm w-full sm:w-48"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
           >
@@ -133,7 +133,7 @@ const CMS = () => {
         </div>
 
         {/* TABLE */}
-        <div className="overflow-x-auto">
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-gray-50 border-b">
@@ -218,6 +218,79 @@ const CMS = () => {
               )}
             </tbody>
           </table>
+        </div>
+
+        <div className="md:hidden space-y-4">
+          {isLoading && (
+            <div className="text-center py-6 text-gray-500">Loading...</div>
+          )}
+
+          {!isLoading && contents.length === 0 && (
+            <div className="text-center py-6 text-gray-500">
+              No content found
+            </div>
+          )}
+
+          {contents.map((item) => (
+            <div
+              key={item._id}
+              className="border rounded-lg p-4 shadow-sm bg-white space-y-3"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <div className="text-base font-semibold">{item.title}</div>
+                  <div className="text-sm text-gray-600">
+                    {typeMap[item.type]}
+                  </div>
+                </div>
+                <span
+                  className={`px-3 py-1 rounded-full text-xs ${statusColor[item.status]}`}
+                >
+                  {statusMap[item.status]}
+                </span>
+              </div>
+
+              <div className="text-sm text-gray-600 space-y-1">
+                <div>
+                  <span className="text-gray-500">Slug:</span> {item.slug}
+                </div>
+                <div>
+                  <span className="text-gray-500">Updated:</span>{" "}
+                  {new Date(item.updatedAt).toLocaleDateString()}
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-4 pt-2">
+                <PencilSquareIcon
+                  className="w-5 h-5 text-blue-600 cursor-pointer"
+                  onClick={() => {
+                    setSelected(item);
+                    setShowForm(true);
+                  }}
+                />
+
+                {item.status === "ACTIVE" ? (
+                  <NoSymbolIcon
+                    className="w-5 h-5 text-yellow-600 cursor-pointer"
+                    onClick={() => toggleStatus(item)}
+                  />
+                ) : (
+                  <CheckCircleIcon
+                    className="w-5 h-5 text-green-600 cursor-pointer"
+                    onClick={() => toggleStatus(item)}
+                  />
+                )}
+
+                <TrashIcon
+                  className="w-5 h-5 text-red-600 cursor-pointer"
+                  onClick={() => {
+                    setSelected(item);
+                    setShowDelete(true);
+                  }}
+                />
+              </div>
+            </div>
+          ))}
         </div>
 
         {/* CREATE / EDIT MODAL */}

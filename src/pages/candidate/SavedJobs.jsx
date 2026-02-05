@@ -5,6 +5,7 @@ import {
 } from "../../services/endpoints/candidate/savedJobApi";
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
 
 const SavedJobs = () => {
   const { data: savedJobs, isLoading } = useGetSavedJobsQuery();
@@ -65,10 +66,10 @@ const SavedJobs = () => {
         <p><b>Salary:</b> {item.job.salary || "-"}</p>
       </div>
 
-      <button className="btn-primary flex items-center gap-1">
+      <Link to={`/candidate/jobs/${item.job._id}`} className="btn-primary flex items-center gap-1 w-fit">
         <PaperAirplaneIcon className="w-4 h-4" />
         Apply Now
-      </button>
+      </Link>
     </div>
 ))}
 
