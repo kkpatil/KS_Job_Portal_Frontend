@@ -7,6 +7,8 @@ import { HiOutlineLightBulb } from "react-icons/hi2";
 import { MdOutlineDashboardCustomize } from "react-icons/md";
 import { useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { api } from "../../services/api";
 import { getTokenPayload } from "../../utils/jwt";
 import { toast } from "react-toastify";
 const adminMenu = [
@@ -16,6 +18,7 @@ const adminMenu = [
     to: "/admin/employers",
     icon: <MdOutlineAdminPanelSettings size={22} />,
   },
+  
   {
     label: "Candidates",
     to: "/admin/candidates",
@@ -47,7 +50,6 @@ const adminMenu = [
     to: "/admin/cms",
     icon: <MdOutlineDashboardCustomize size={22} />,
   },
-  { label: "Settings", to: "/admin/settings", icon: <IoSettings size={22} /> },
 ];
 
 const employerMenu = [
@@ -56,17 +58,24 @@ const employerMenu = [
     to: "/employer",
     icon: <HomeIcon className="w-5 h-5" />,
   },
+ 
   { label: "My Jobs", to: "/employer/jobs", icon: <MdWorkHistory size={22} /> },
   {
     label: "Applications",
     to: "/employer/applications",
     icon: <ChartBarIcon className="w-5 h-5" />,
   },
+   {
+    label: "Profile",
+    to: "/employer/profile",
+    icon: <IoSettings size={22} />,
+  },
   {
     label: "Settings",
     to: "/employer/settings",
     icon: <IoSettings size={22} />,
   },
+  
 ];
 
 const candidateMenu = [
@@ -104,6 +113,7 @@ const candidateMenu = [
 
 const Sidebar = ({ toggleSidebar, setToggleSidebar }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   useEffect(() => {
     if (toggleSidebar) {
       const original = document.body.style.overflow;
@@ -130,6 +140,7 @@ const Sidebar = ({ toggleSidebar, setToggleSidebar }) => {
 
   const logoutHandle = () => {
     localStorage.removeItem("token");
+    dispatch(api.util.resetApiState());
     toast.success("Logout Successfully");
     navigate("/", { replace: true });
   };

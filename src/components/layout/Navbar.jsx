@@ -6,6 +6,9 @@ import {
 } from "@heroicons/react/24/outline";
 import { MdMenuOpen, MdNotificationImportant } from "react-icons/md";
 import NotificationPopup from "../common/NotificationPopup";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { api } from "../../services/api";
 
 import {
   useGetMyNotificationsQuery,
@@ -18,6 +21,8 @@ import { useGetMyProfileQuery } from "../../services/endpoints/profileApi";
 const Navbar = ({ toggleSidebar, setToggleSidebar }) => {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [showAllNotifications, setShowAllNotifications] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   /* ================= API ================= */
   const { data } = useGetMyNotificationsQuery();
@@ -28,6 +33,7 @@ const Navbar = ({ toggleSidebar, setToggleSidebar }) => {
 
   const user = profileData?.data;
   const role = user?.role;
+  const roleKey = String(role || "").toUpperCase();
 
   const notifications = data?.data || [];
   const unreadCount = notifications.filter((n) => !n.isRead).length;
@@ -52,6 +58,18 @@ const Navbar = ({ toggleSidebar, setToggleSidebar }) => {
     ADMIN: "Administrator",
     EMPLOYER: "Employer",
     CANDIDATE: "Candidate",
+  };
+
+  const profilePath = {
+    ADMIN: "/admin/settings",
+    EMPLOYER: "/employer/profile",
+    CANDIDATE: "/candidate/profile",
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    dispatch(api.util.resetApiState());
+    navigate("/login", { replace: true });
   };
 
   const getInitials = (name) => {
@@ -100,14 +118,22 @@ const Navbar = ({ toggleSidebar, setToggleSidebar }) => {
           </div>
 
           {/* PROFILE */}
-          <div className="flex items-center gap-3 cursor-pointer">
+          <div
+            className="flex items-center gap-3 cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation();
+              setOpenDropdown(
+                openDropdown === "profile" ? null : "profile",
+              );
+            }}
+          >
             <div className="w-10 h-10 rounded-full bg-[#309689] text-white flex items-center justify-center font-semibold">
               {getInitials(user?.name)}
             </div>
 
             <div className="text-sm">
               <p className="font-semibold">{user?.name || "User"}</p>
-              <p className="text-gray-400 text-xs">{roleLabel[role]}</p>
+              <p className="text-gray-400 text-xs">{roleLabel[roleKey]}</p>
             </div>
           </div>
 
@@ -140,6 +166,27 @@ const Navbar = ({ toggleSidebar, setToggleSidebar }) => {
                   </div>
                 </div>
               ))}
+            </Dropdown>
+          )}
+
+          {/* PROFILE DROPDOWN */}
+          {openDropdown === "profile" && (
+            <Dropdown title="Account">
+              <button
+                onClick={() => {
+                  setOpenDropdown(null);
+                  navigate(profilePath[roleKey] || "/");
+                }}
+                className="w-full text-left text-sm px-3 py-2 rounded hover:bg-gray-50"
+              >
+                Profile
+              </button>
+              <button
+                onClick={handleLogout}
+                className="w-full text-left text-sm px-3 py-2 rounded text-red-600 hover:bg-red-50"
+              >
+                Logout
+              </button>
             </Dropdown>
           )}
         </div>

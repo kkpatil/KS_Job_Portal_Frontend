@@ -16,6 +16,11 @@ const adminMenu = [
     icon: <MdOutlineAdminPanelSettings size={22} />,
   },
   {
+    label: "Profile",
+    to: "/admin/settings",
+    icon: <IoSettings size={22} />,
+  },
+  {
     label: "Candidates",
     to: "/admin/candidates",
     icon: <MdOutlineAdminPanelSettings size={22} />,
@@ -46,7 +51,6 @@ const adminMenu = [
     to: "/admin/cms",
     icon: <MdOutlineDashboardCustomize size={22} />,
   },
-  { label: "Settings", to: "/admin/settings", icon: <IoSettings size={22} /> },
 ];
 
 const employerMenu = [
@@ -54,6 +58,11 @@ const employerMenu = [
     label: "Dashboard",
     to: "/employer",
     icon: <HomeIcon className="w-5 h-5" />,
+  },
+  {
+    label: "Profile",
+    to: "/employer/profile",
+    icon: <IoSettings size={22} />,
   },
   { label: "My Jobs", to: "/employer/jobs", icon: <MdWorkHistory size={22} /> },
   {
