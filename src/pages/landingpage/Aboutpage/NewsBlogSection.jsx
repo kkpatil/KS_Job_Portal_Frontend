@@ -50,7 +50,7 @@ function NewsBlogSection() {
                 {item.title}
               </h3>
 
-              {/* ⭐ SAME onClick for ALL */}
+              {/*  SAME onClick for ALL */}
               <button
                 onClick={() => setSelectedBlog(item)}
                 className="text-[#309689] font-medium flex items-center gap-2 hover:gap-3 transition-all"
@@ -62,7 +62,7 @@ function NewsBlogSection() {
         </div>
       </div>
 
-      {/* ⭐ SINGLE POPUP */}
+      {/*  SINGLE POPUP */}
       {selectedBlog && (
         <NewsBlogPopup
           blogId={selectedBlog._id}

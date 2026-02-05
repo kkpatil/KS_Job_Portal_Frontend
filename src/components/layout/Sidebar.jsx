@@ -50,6 +50,11 @@ const adminMenu = [
     to: "/admin/cms",
     icon: <MdOutlineDashboardCustomize size={22} />,
   },
+  {
+    label: "Profile",
+    to: "/admin/settings",
+    icon: <IoSettings size={22} />,
+  },
 ];
 
 const employerMenu = [
