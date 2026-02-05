@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import ImageFour from "../../../assets/images/Image3.jpg";
+import ImageFour from "../../../assets/images/image3.jpg";
 
 function CTASection() {
   return (
