@@ -40,6 +40,19 @@ const JobBoardMain = () => {
   const { data: categories } = useGetCategoriesQuery();
 
   const jobs = data?.data || [];
+  const [page, setPage] = useState(1);
+  const pageSize = 6;
+
+  useEffect(() => {
+    setPage(1);
+  }, [filters.search, filters.location, filters.category, filters.type, filters.experience, filters.posted]);
+
+  const totalPages = Math.max(1, Math.ceil(jobs.length / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const paginatedJobs = jobs.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  );
 
   const hasFilters = Boolean(
     filters.search.trim() ||
@@ -228,7 +241,7 @@ const JobBoardMain = () => {
 
         {!isLoading && jobs.length === 0 && <p>No jobs found</p>}
 
-        {jobs.map((job) => (
+        {paginatedJobs.map((job) => (
           <div
             key={job._id}
             className="bg-white rounded-xl shadow p-5 flex flex-col md:flex-row justify-between gap-4 hover:scale-105 transition cursor-pointer mb-6"
@@ -264,6 +277,30 @@ const JobBoardMain = () => {
             </div>
           </div>
         ))}
+
+        {jobs.length > pageSize && (
+          <div className="flex items-center justify-between pt-2">
+            <p className="text-sm text-gray-500">
+              Page {currentPage} of {totalPages}
+            </p>
+            <div className="flex gap-2">
+              <button
+                className="px-3 py-1 border rounded text-sm disabled:opacity-50"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage <= 1}
+              >
+                Prev
+              </button>
+              <button
+                className="px-3 py-1 border rounded text-sm disabled:opacity-50"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage >= totalPages}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
