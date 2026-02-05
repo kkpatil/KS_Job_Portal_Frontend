@@ -172,7 +172,7 @@ const Sidebar = ({ toggleSidebar, setToggleSidebar }) => {
         </div>
 
         {/* Menu */}
-        <nav className="flex-1 px-4 overflow-y-auto">
+        <nav className="flex-1 px-4 overflow-y-auto hide-scrollbar">
           {menu.map((item, index) => (
             <SidebarItem
               key={index}

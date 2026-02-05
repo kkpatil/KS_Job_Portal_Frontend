@@ -14,6 +14,12 @@ export const employerApi = api.injectEndpoints({
       providesTags: ["EmployerDashboard"],
     }),
 
+    // ADMIN: stats for a specific employer
+    getEmployerStatsById: builder.query({
+      query: (id) => `/employers/${id}/stats`,
+      providesTags: (result, error, id) => [{ type: "EmployerStats", id }],
+    }),
+
     getEmployerById: builder.query({
       query: (id) => `/employers/${id}`,
       providesTags: (result, error, id) => [{ type: "Employer", id }],
@@ -37,6 +43,7 @@ export const employerApi = api.injectEndpoints({
       }),
       invalidatesTags: (result, error, { id }) => [
         { type: "Employer", id },
+        { type: "EmployerStats", id },
         "Employers",
         "EmployerDashboard",
       ],
@@ -61,6 +68,7 @@ export const employerApi = api.injectEndpoints({
       }),
       invalidatesTags: (result, error, { id }) => [
         { type: "Employer", id },
+        { type: "EmployerStats", id },
         "EmployerDashboard",
         "Employers",
       ],
@@ -88,6 +96,7 @@ export const {
   useGetAllEmployersQuery,
   useDeleteEmployerMutation,
   useGetEmployerDashboardQuery,
+  useGetEmployerStatsByIdQuery,
   useGetEmployerByIdQuery,
   useUpdateEmployerMutation,
   useUpdateEmployerStatusMutation,

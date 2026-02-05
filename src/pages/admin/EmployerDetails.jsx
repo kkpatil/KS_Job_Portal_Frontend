@@ -4,7 +4,7 @@ import {
   NoSymbolIcon,
   PencilSquareIcon,
 } from "@heroicons/react/24/outline";
-import { useGetEmployerByIdQuery, useGetEmployerDashboardQuery, useUpdateEmployerMutation, useUpdateEmployerStatusMutation } from "../../services/endpoints/employerApi";
+import { useGetEmployerByIdQuery, useGetEmployerStatsByIdQuery, useUpdateEmployerMutation, useUpdateEmployerStatusMutation } from "../../services/endpoints/employerApi";
 import { useParams } from "react-router-dom";
 import { formatDate } from "../../utils/formateDate";
 import { toast } from "react-toastify";
@@ -15,7 +15,7 @@ const [formData, setFormData] = useState({});
 
 
   const id = useParams()?.id;
-  const {data: employerData, isLoading, isError} = useGetEmployerDashboardQuery();
+  const { data: employerData, isLoading, isError } = useGetEmployerStatsByIdQuery(id);
   const { data , loading , error } = useGetEmployerByIdQuery(id);
    const [employerStatus, { isLoading: statusLoading, error: statusError }] = useUpdateEmployerStatusMutation();
   const [updateEmployer] = useUpdateEmployerMutation();
@@ -112,11 +112,11 @@ const handleSave = async () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <StatCard label="Total Jobs" value={employerData?.stats?.totalJobs} />
-        <StatCard label="Active Jobs" value={employerData?.stats?.activeJobs} />
+        <StatCard label="Total Jobs" value={employerData?.data?.totalJobs} />
+        <StatCard label="Active Jobs" value={employerData?.data?.activeJobs} />
         <StatCard
           label="Applications Received"
-          value={employerData?.stats?.totalApplications}
+          value={employerData?.data?.totalApplications}
         />
       </div>
 
