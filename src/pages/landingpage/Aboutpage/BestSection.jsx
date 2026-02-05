@@ -2,7 +2,7 @@ import React from "react";
 import { FaCrown, FaFileAlt, FaStar, FaUserShield } from "react-icons/fa";
 import ImageOne from "../../../assets/images/Image1.jpg";
 import ImageTwo from "../../../assets/images/Image2.jpg";
-import ImageThree from "../../../assets/images/Image3.jpg";
+import ImageThree from "../../../assets/images/image3.jpg";
 
 const BestSection = () => {
   return (
