@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import RandomImage from "../../../assets/images/hero.webp";
 
 function CompanySection() {
   return (
@@ -24,7 +25,7 @@ function CompanySection() {
   "
           >
             <img
-              src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d"
+              src={RandomImage}
               alt="Company"
               className="
                 w-full
@@ -63,7 +64,8 @@ function CompanySection() {
   justify-center md:justify-start
 "
             >
-              <Link to={"/jobs"}
+              <Link
+                to={"/jobs"}
                 className="
                   bg-[#309689]
                   text-white

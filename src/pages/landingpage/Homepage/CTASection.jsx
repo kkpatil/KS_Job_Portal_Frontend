@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import ImageFour from "../../../assets/images/Image3.jpg";
 
 function CTASection() {
   return (
@@ -25,7 +26,7 @@ function CTASection() {
           {/* Background Image */}
           <div className="absolute inset-0">
             <img
-              src="https://images.unsplash.com/photo-1607746882042-944635dfe10e"
+              src={ImageFour}
               alt="Team"
               className="
                 w-full
@@ -49,7 +50,7 @@ function CTASection() {
               Blandit a massa elementum id scelerisque rhoncus.
             </p>
 
-            <Link 
+            <Link
               to="/jobs"
               className="
                 bg-[#309689]

@@ -1,20 +1,21 @@
 import React from "react";
 import { FaPlay } from "react-icons/fa";
 import DOMPurify from "dompurify";
+import WowImage from "../../../assets/images/Wow.jpg";
 
 const VideoHeroSection = ({ cms }) => {
   const section = cms?.["about.videohero"];
 
   if (!section) return null;
 
-const heading = section.heading || section; // fallback
+  const heading = section.heading || section; // fallback
 
   return (
     <section className="max-w-7xl mx-auto px-6 py-16 -mt-20">
       <div className="group relative rounded-2xl overflow-hidden">
         {/* Blurred Background Image */}
         <img
-          src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d"
+          src={WowImage}
           alt="background"
           className="w-full h-[300px] sm:h-[400px] md:h-[500px] object-cover blur-md scale-110
                transition-all duration-700

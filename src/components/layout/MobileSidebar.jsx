@@ -5,56 +5,123 @@ import { FaBriefcase, FaChalkboardTeacher } from "react-icons/fa";
 import { MdOutlineAdminPanelSettings } from "react-icons/md";
 import { HiOutlineLightBulb } from "react-icons/hi2";
 import { MdOutlineDashboardCustomize } from "react-icons/md";
-import {  NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const adminMenu = [
   { label: "Dashboard", to: "/admin", icon: <HomeIcon className="w-5 h-5" /> },
-  { label: "Employers", to: "/admin/employers", icon: <MdOutlineAdminPanelSettings size={22} /> },
-  { label: "Candidates", to: "/admin/candidates", icon: <MdOutlineAdminPanelSettings size={22} /> },
-  { label: "Applications", to: "/admin/applications", icon: <FaBriefcase size={20} /> },
+  {
+    label: "Employers",
+    to: "/admin/employers",
+    icon: <MdOutlineAdminPanelSettings size={22} />,
+  },
+  {
+    label: "Candidates",
+    to: "/admin/candidates",
+    icon: <MdOutlineAdminPanelSettings size={22} />,
+  },
+  {
+    label: "Applications",
+    to: "/admin/applications",
+    icon: <FaBriefcase size={20} />,
+  },
   { label: "Jobs", to: "/admin/jobs", icon: <MdWorkHistory size={22} /> },
-  { label: "Categories", to: "/admin/categories", icon: <FaChalkboardTeacher size={20} /> },
-  { label: "Skills", to: "/admin/skills", icon: <HiOutlineLightBulb size={22} /> },
-  { label: "Reports", to: "/admin/reports", icon: <ChartBarIcon className="w-5 h-5" /> },
-  { label: "CMS", to: "/admin/cms", icon: <MdOutlineDashboardCustomize size={22} /> },
+  {
+    label: "Categories",
+    to: "/admin/categories",
+    icon: <FaChalkboardTeacher size={20} />,
+  },
+  {
+    label: "Skills",
+    to: "/admin/skills",
+    icon: <HiOutlineLightBulb size={22} />,
+  },
+  {
+    label: "Reports",
+    to: "/admin/reports",
+    icon: <ChartBarIcon className="w-5 h-5" />,
+  },
+  {
+    label: "CMS",
+    to: "/admin/cms",
+    icon: <MdOutlineDashboardCustomize size={22} />,
+  },
   { label: "Settings", to: "/admin/settings", icon: <IoSettings size={22} /> },
 ];
 
 const employerMenu = [
-  { label: "Dashboard", to: "/employer", icon: <HomeIcon className="w-5 h-5" /> },
+  {
+    label: "Dashboard",
+    to: "/employer",
+    icon: <HomeIcon className="w-5 h-5" />,
+  },
   { label: "My Jobs", to: "/employer/jobs", icon: <MdWorkHistory size={22} /> },
-  { label: "Applications", to: "/employer/applications", icon: <ChartBarIcon className="w-5 h-5" /> },
-  { label: "Settings", to: "/employer/settings", icon: <IoSettings size={22} /> },
+  {
+    label: "Applications",
+    to: "/employer/applications",
+    icon: <ChartBarIcon className="w-5 h-5" />,
+  },
+  {
+    label: "Settings",
+    to: "/employer/settings",
+    icon: <IoSettings size={22} />,
+  },
 ];
 
 const candidateMenu = [
-  { label: "Dashboard", to: "/candidate", icon: <HomeIcon className="w-5 h-5" /> },
-  { label: "My Jobs", to: "/candidate/jobs", icon: <MdWorkHistory size={22} /> },
-  { label: "Applications", to: "/candidate/applications", icon: <ChartBarIcon className="w-5 h-5" /> },
-  {label:"Saved Jobs", to:"/candidate/saved-jobs", icon:<ChartBarIcon className="w-5 h-5" />},
-  { label: "Profile", to: "/candidate/profile", icon: <ChartBarIcon className="w-5 h-5" /> },
-  { label: "Settings", to: "/candidate/settings", icon: <IoSettings size={22} /> },
-
-]
+  {
+    label: "Dashboard",
+    to: "/candidate",
+    icon: <HomeIcon className="w-5 h-5" />,
+  },
+  {
+    label: "My Jobs",
+    to: "/candidate/jobs",
+    icon: <MdWorkHistory size={22} />,
+  },
+  {
+    label: "Applications",
+    to: "/candidate/applications",
+    icon: <ChartBarIcon className="w-5 h-5" />,
+  },
+  {
+    label: "Saved Jobs",
+    to: "/candidate/saved-jobs",
+    icon: <ChartBarIcon className="w-5 h-5" />,
+  },
+  {
+    label: "Profile",
+    to: "/candidate/profile",
+    icon: <ChartBarIcon className="w-5 h-5" />,
+  },
+  {
+    label: "Settings",
+    to: "/candidate/settings",
+    icon: <IoSettings size={22} />,
+  },
+];
 
 const MobileSidebar = () => {
   const navigate = useNavigate();
   const role = localStorage.getItem("role");
 
-  const menu = role === "admin" ? adminMenu : role === "employer" ? employerMenu : role === "candidate" && candidateMenu;
+  const menu =
+    role === "admin"
+      ? adminMenu
+      : role === "employer"
+        ? employerMenu
+        : role === "candidate" && candidateMenu;
 
   const logoutHandle = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("role");
-    
-    navigate("/login",{ replace: true });
+
+    navigate("/login", { replace: true });
     toast.success("Logout successful");
-  }
+  };
 
   return (
     <div className="hidden md:flex flex-col fixed top-0 left-0 h-full w-64 bg-[#3f9287c8] text-white">
-      
       {/* Logo */}
       <div className="h-20 flex items-center px-6 text-2xl font-bold border-b font-mono">
         Jobie
@@ -75,12 +142,16 @@ const MobileSidebar = () => {
       {/* Footer */}
       <div className="flex items-center justify-center gap-6 px-6 py-4 text-xs ">
         © 2025 Jobie
-        <button onClick={()=>logoutHandle()} className=" btn-danger p-3  m-3 text-md text-white flex items-center gap-3 cursor-pointer">Logout <IoLogOut size={22} /> </button>
+        <button
+          onClick={() => logoutHandle()}
+          className=" btn-danger p-3  m-3 text-md text-white flex items-center gap-3 cursor-pointer"
+        >
+          Logout <IoLogOut size={22} />{" "}
+        </button>
       </div>
     </div>
   );
 };
-
 
 const SidebarItem = ({ icon, label, to }) => (
   <NavLink

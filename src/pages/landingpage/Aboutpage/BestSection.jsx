@@ -1,5 +1,8 @@
 import React from "react";
 import { FaCrown, FaFileAlt, FaStar, FaUserShield } from "react-icons/fa";
+import ImageOne from "../../../assets/images/Image1.jpg";
+import ImageTwo from "../../../assets/images/Image2.jpg";
+import ImageThree from "../../../assets/images/Image3.jpg";
 
 const BestSection = () => {
   return (
@@ -13,11 +16,11 @@ const BestSection = () => {
                           transition-all duration-500 hover:-translate-y-1 hover:shadow-xl"
           >
             <img
-              src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d"
+              src={ImageOne}
               alt="img1"
               className="w-full h-[260px] sm:h-full object-cover blur-md scale-110
                          transition-all duration-700
-                         hover:blur-sm hover:scale-100"
+                         hover:blur-[0] hover:scale-100"
             />
           </div>
 
@@ -27,11 +30,11 @@ const BestSection = () => {
                           transition-all duration-500 hover:-translate-y-1 hover:shadow-xl"
           >
             <img
-              src="https://images.unsplash.com/photo-1498050108023-c5249f4df085"
+              src={ImageTwo}
               alt="img2"
               className="w-full h-full object-cover blur-md scale-110
                          transition-all duration-700
-                         hover:blur-sm hover:scale-100"
+                         hover:blur-[0] hover:scale-100"
             />
           </div>
 
@@ -41,11 +44,11 @@ const BestSection = () => {
                           transition-all duration-500 hover:-translate-y-1 hover:shadow-xl"
           >
             <img
-              src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f"
+              src={ImageThree}
               alt="img3"
               className="w-full h-full object-cover blur-md scale-110
                          transition-all duration-700
-                         hover:blur-sm hover:scale-100"
+                         hover:blur-[0] hover:scale-100"
             />
           </div>
         </div>

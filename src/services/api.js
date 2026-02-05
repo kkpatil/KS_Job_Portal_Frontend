@@ -34,6 +34,7 @@ export const api = createApi({
     "Testimonial",
     "NewsBlog",
     "Contact",
+    "Subscriber",
   ],
   endpoints: () => ({}),
 });

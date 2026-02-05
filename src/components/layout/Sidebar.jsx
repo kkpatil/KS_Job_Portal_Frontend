@@ -8,7 +8,7 @@ import { MdOutlineDashboardCustomize } from "react-icons/md";
 import { useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { getTokenPayload } from "../../utils/jwt";
-
+import { toast } from "react-toastify";
 const adminMenu = [
   { label: "Dashboard", to: "/admin", icon: <HomeIcon className="w-5 h-5" /> },
   {
@@ -116,10 +116,9 @@ const Sidebar = ({ toggleSidebar, setToggleSidebar }) => {
     return () => {};
   }, [toggleSidebar]);
 
-  // ✅ JWT se role
+  //  JWT se role
   const { role } = getTokenPayload(); // ADMIN | EMPLOYER | CANDIDATE
 
-  // ✅ SAFE menu selection (always array)
   const menu =
     role === "ADMIN"
       ? adminMenu
@@ -127,10 +126,11 @@ const Sidebar = ({ toggleSidebar, setToggleSidebar }) => {
         ? employerMenu
         : role === "CANDIDATE"
           ? candidateMenu
-          : []; // 🔥 VERY IMPORTANT fallback
+          : []; //
 
   const logoutHandle = () => {
     localStorage.removeItem("token");
+    toast.success("Logout Successfully");
     navigate("/", { replace: true });
   };
 

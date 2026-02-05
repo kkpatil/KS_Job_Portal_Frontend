@@ -48,29 +48,27 @@ const FAQSection = ({ cms }) => {
               <button
                 type="button"
                 className="w-full flex items-center justify-between px-6 py-5 text-left"
-                onClick={() =>
-                  setOpenIndex(isOpen ? null : index)
-                }
+                onClick={() => setOpenIndex(isOpen ? null : index)}
               >
                 <div className="flex gap-4 items-center">
-                  <span className="text-teal-500 font-semibold">
-                    {faq.id}
-                  </span>
+                  <span className="text-teal-500 font-semibold">{faq.id}</span>
 
-                  <h4 className="font-semibold text-black">
+                  <h4 className="font-semibold text-black leading-snug">
                     {faq.question}
                   </h4>
                 </div>
 
                 {/* Icon with rotation */}
                 <span
-                  className={`w-8 h-8 flex items-center justify-center rounded-full border
-                    transition-transform duration-300
-                    ${
-                      isOpen
-                        ? "border-teal-500 text-teal-500 rotate-180"
-                        : "border-teal-400 text-teal-400"
-                    }`}
+                  className={`w-8 h-8 min-w-[32px] min-h-[32px]
+    flex items-center justify-center
+    rounded-full border flex-shrink-0
+    transition-transform duration-300
+    ${
+      isOpen
+        ? "border-teal-500 text-teal-500 rotate-180"
+        : "border-teal-400 text-teal-400"
+    }`}
                 >
                   {isOpen ? <FaTimes size={12} /> : <FaPlus size={12} />}
                 </span>
@@ -89,9 +87,7 @@ const FAQSection = ({ cms }) => {
                   <div
                     className="px-14 pb-6 text-gray-600 text-sm"
                     dangerouslySetInnerHTML={{
-                      __html: DOMPurify.sanitize(
-                        faq.answer || ""
-                      ),
+                      __html: DOMPurify.sanitize(faq.answer || ""),
                     }}
                   />
                 </div>
