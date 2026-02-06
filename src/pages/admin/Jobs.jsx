@@ -517,7 +517,7 @@ const EditJobModal = ({ job, onClose }) => {
           name="location"
           value={form.location}
           onChange={handleChange}
-          placeholder="Location"
+          placeholder="e.g. Toronto, Canada / London, UK"
           className="w-full border px-3 py-2 rounded"
         />
 

@@ -101,7 +101,7 @@ const CompanyProfile = () => {
             name="companyLocation"
             value={form.companyLocation}
             onChange={handleChange}
-            placeholder="e.g. Pune, India"
+            placeholder="e.g. Toronto, Canada / London, UK"
           />
         </div>
 

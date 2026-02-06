@@ -104,28 +104,28 @@ const CompleteProfile = () => {
                 name="country"
                 value={form.country}
                 onChange={handleChange}
-                placeholder="e.g. India"
+                placeholder="e.g. Canada / UK"
               />
               <Input
                 label="State"
                 name="state"
                 value={form.state}
                 onChange={handleChange}
-                placeholder="e.g. Maharashtra"
+                placeholder="e.g. Ontario / England"
               />
               <Input
                 label="Zip Code"
                 name="zipCode"
                 value={form.zipCode}
                 onChange={handleChange}
-                placeholder="e.g. 411001"
+                placeholder="e.g. M5V 2T6 / SW1A 1AA"
               />
               <Input
                 label="Apartment / Street"
                 name="address"
                 value={form.address}
                 onChange={handleChange}
-                placeholder="e.g. 21, MG Road"
+                placeholder="e.g. 21 King St W"
               />
             </Section>
           </div>
@@ -160,7 +160,7 @@ const CompleteProfile = () => {
                 name="preferredLocation"
                 value={form.preferredLocation}
                 onChange={handleChange}
-                placeholder="e.g. Remote, Pune"
+                placeholder="e.g. Toronto, Canada / London, UK"
               />
               <Input
                 label="Skills (comma separated)"
@@ -240,7 +240,7 @@ const CompleteProfile = () => {
                 name="workAuthorization"
                 value={form.workAuthorization}
                 onChange={handleChange}
-                placeholder="e.g. India"
+                placeholder="e.g. Canada / UK"
               />
             </div>
           </div>

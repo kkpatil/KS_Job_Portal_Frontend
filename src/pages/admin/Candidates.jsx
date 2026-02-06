@@ -353,7 +353,7 @@ const Candidates = () => {
               </div>
               <input
                 className="border px-3 py-2 rounded w-full"
-                placeholder="Preferred Location"
+                placeholder="e.g. Toronto, Canada / London, UK"
                 value={form.preferredLocation}
                 onChange={(e) =>
                   setForm((f) => ({ ...f, preferredLocation: e.target.value }))

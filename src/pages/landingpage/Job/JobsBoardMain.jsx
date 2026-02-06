@@ -86,7 +86,7 @@ const JobBoardMain = () => {
             <input
               type="text"
               value={locationInput}
-              placeholder="Search city (Delhi, Indore...)"
+              placeholder="Search city (Toronto, London...)"
               className="
         w-full border rounded-lg pl-9 pr-3 py-2 text-sm
         focus:outline-none focus:ring-2 focus:ring-teal-500

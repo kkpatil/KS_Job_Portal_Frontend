@@ -332,7 +332,7 @@ const Profile = () => {
               <div className="flex items-center gap-2 rounded-xl border border-gray-100 bg-white/90 px-3 py-2 text-gray-800 shadow-sm">
                 <FiGlobe />
                 <span className="break-words">
-                  Work Auth: {user?.workAuthorization || "India"}
+                  Work Auth: {user?.workAuthorization || "Canada / UK"}
                 </span>
               </div>
             </div>
@@ -415,7 +415,7 @@ const Profile = () => {
               <Grid>
                 <Input
                   label="Address"
-                  placeholder="Street address"
+                  placeholder="e.g. 21 King St W"
                   value={form.address}
                   onChange={(e) =>
                     setForm({
@@ -426,7 +426,7 @@ const Profile = () => {
                 />
                 <Input
                   label="State"
-                  placeholder="State"
+                  placeholder="e.g. Ontario / England"
                   value={form.state}
                   onChange={(e) =>
                     setForm({
@@ -437,7 +437,7 @@ const Profile = () => {
                 />
                 <Input
                   label="Country"
-                  placeholder="Country"
+                  placeholder="e.g. Canada / UK"
                   value={form.country}
                   onChange={(e) =>
                     setForm({
@@ -448,7 +448,7 @@ const Profile = () => {
                 />
                 <Input
                   label="Zip Code"
-                  placeholder="Zip code"
+                  placeholder="e.g. M5V 2T6 / SW1A 1AA"
                   value={form.zipCode}
                   onChange={(e) =>
                     setForm({
@@ -500,7 +500,7 @@ const Profile = () => {
                 />
                 <Input
                   label="Preferred Location"
-                  placeholder="e.g. Remote, Pune"
+                  placeholder="e.g. Toronto, Canada / London, UK"
                   value={form.preferredLocation}
                   onChange={(e) =>
                     setForm({
@@ -592,7 +592,7 @@ const Profile = () => {
                 />
                 <Input
                   label="Work Authorization"
-                  placeholder="e.g. India"
+                  placeholder="e.g. Canada / UK"
                   value={form.workAuthorization}
                   onChange={(e) =>
                     setForm({

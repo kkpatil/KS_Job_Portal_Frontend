@@ -145,7 +145,7 @@ const Settings = () => {
             name="location"
             value={company.location}
             onChange={handleCompanyChange}
-            placeholder="e.g. Pune, India"
+            placeholder="e.g. Toronto, Canada / London, UK"
           />
         </div>
 
