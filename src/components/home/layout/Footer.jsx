@@ -133,7 +133,7 @@ function Footer() {
       <div className="border-t border-gray-700">
         <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center text-sm gap-3 text-center md:text-left">
           <p className="text-gray-500">
-            © Copyright Job Portal 2026. Designed by{" "}
+            © Copyright Job Portal 2026.{" "}
             {/* <span className="font-semibold">Krishaa IT Soft Solutions</span> */}
           </p>
           <div className="flex gap-6">
