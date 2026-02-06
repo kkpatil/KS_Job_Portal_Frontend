@@ -48,6 +48,7 @@ const CMS = lazy(() => import("../pages/admin/CMS"));
 const Jobs = lazy(() => import("../pages/admin/Jobs"));
 const JobsDetails = lazy(() => import("../pages/admin/JobsDetails"));
 const Reports = lazy(() => import("../pages/admin/Reports"));
+const Subscribers = lazy(() => import("../pages/admin/Subscribers"));
 
 // ================= EMPLOYER =================
 const EmployerDashboard = lazy(() => import("../pages/employer/Dashboard"));
@@ -77,6 +78,7 @@ const SavedJobs = lazy(() => import("../pages/candidate/SavedJobs"));
 
 // ================= PUBLIC =================
 const NotFound = lazy(() => import("../pages/public/NotFound"));
+const Unsubscribed = lazy(() => import("../pages/public/Unsubscribed"));
 
 // ================= DUMMY USER =================
 const dummyUser = {
@@ -104,6 +106,7 @@ const AppRoutes = () => {
           <Route path="/job/:id" element={<JobDetail />} />
           <Route path="/privacy&policy" element={<PrivacyPolicy />} />
           <Route path="/terms&conditions" element={<TermsAndConditions />} />
+          <Route path="/unsubscribe" element={<Unsubscribed />} />
           <Route path="/ProfilePage" element={<ProfilePage />} />
           {/* AUTH */}
           <Route path="/login" element={<Login />} />
@@ -260,6 +263,16 @@ const AppRoutes = () => {
               <PrivateRoute allowedRoles={["ADMIN"]}>
                 <AdminLayout>
                   <Reports />
+                </AdminLayout>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/admin/subscribers"
+            element={
+              <PrivateRoute allowedRoles={["ADMIN"]}>
+                <AdminLayout>
+                  <Subscribers />
                 </AdminLayout>
               </PrivateRoute>
             }

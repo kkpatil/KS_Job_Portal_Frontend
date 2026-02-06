@@ -5,6 +5,7 @@ import { FaBriefcase, FaChalkboardTeacher } from "react-icons/fa";
 import { MdOutlineAdminPanelSettings } from "react-icons/md";
 import { HiOutlineLightBulb } from "react-icons/hi2";
 import { MdOutlineDashboardCustomize } from "react-icons/md";
+import { HiOutlineMail } from "react-icons/hi";
 import { useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -44,6 +45,11 @@ const adminMenu = [
     label: "Reports",
     to: "/admin/reports",
     icon: <ChartBarIcon className="w-5 h-5" />,
+  },
+  {
+    label: "Subscribers",
+    to: "/admin/subscribers",
+    icon: <HiOutlineMail size={22} />,
   },
   {
     label: "CMS",

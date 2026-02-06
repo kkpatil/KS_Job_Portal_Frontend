@@ -4,36 +4,56 @@ import {
   NoSymbolIcon,
   PencilSquareIcon,
 } from "@heroicons/react/24/outline";
-import { useGetEmployerByIdQuery, useGetEmployerStatsByIdQuery, useUpdateEmployerMutation, useUpdateEmployerStatusMutation } from "../../services/endpoints/employerApi";
+import {
+  useGetEmployerByIdQuery,
+  useGetEmployerStatsByIdQuery,
+  useUpdateEmployerMutation,
+  useUpdateEmployerStatusMutation,
+} from "../../services/endpoints/employerApi";
 import { useParams } from "react-router-dom";
 import { formatDate } from "../../utils/formateDate";
 import { toast } from "react-toastify";
 
 const EmployerDetails = () => {
   const [editModal, setEditModal] = useState(false);
-const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({});
 
+  const getInitials = (name) => {
+    if (!name) return "U";
+    const parts = name.trim().split(/\s+/);
+
+    const first = parts[0]?.[0] || "";
+
+    const last = parts.length > 1 ? parts[parts.length - 1][0] : "";
+
+    return (first + last).toUpperCase() || "U";
+  };
 
   const id = useParams()?.id;
-  const { data: employerData, isLoading, isError } = useGetEmployerStatsByIdQuery(id);
-  const { data , loading , error } = useGetEmployerByIdQuery(id);
-   const [employerStatus, { isLoading: statusLoading, error: statusError }] = useUpdateEmployerStatusMutation();
+  const {
+    data: employerData,
+    isLoading,
+    isError,
+  } = useGetEmployerStatsByIdQuery(id);
+  const { data, loading, error } = useGetEmployerByIdQuery(id);
+  const [employerStatus, { isLoading: statusLoading, error: statusError }] =
+    useUpdateEmployerStatusMutation();
   const [updateEmployer] = useUpdateEmployerMutation();
 
   const handleChange = (e) => {
-  setFormData({ ...formData, [e.target.name]: e.target.value });
-};
- 
-const handleSave = async () => {
-  try {
-    await updateEmployer({ id, data: formData }).unwrap();
-    toast.success("Employer updated successfully");
-    setEditModal(false);
-  } catch (err) {
-    toast.error("Failed to update employer");
-    console.error(err);
-  }
-};
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSave = async () => {
+    try {
+      await updateEmployer({ id, data: formData }).unwrap();
+      toast.success("Employer updated successfully");
+      setEditModal(false);
+    } catch (err) {
+      toast.error("Failed to update employer");
+      console.error(err);
+    }
+  };
 
   const handleApprove = async () => {
     try {
@@ -42,9 +62,8 @@ const handleSave = async () => {
     } catch (error) {
       toast.error("Failed to approve employer");
       console.log("Error approving employer:", error);
-
     }
-  }
+  };
 
   const handleBlocked = async () => {
     try {
@@ -53,10 +72,9 @@ const handleSave = async () => {
     } catch (error) {
       toast.error("Failed to block employer");
       console.log("Error blocking employer:", error);
-
     }
-  }
- 
+  };
+
   const statusColor = {
     ACTIVE: "bg-green-100 text-green-700",
     PENDING: "bg-yellow-100 text-yellow-700",
@@ -66,17 +84,23 @@ const handleSave = async () => {
   if (isError) return <div>Error loading employer data.</div>;
   return (
     <div className="space-y-6">
-      <button className="text-sm text-gray-800  border rounded-md p-2 hover:shadow-md transition flex items-center gap-1 duration-300 hover:scale-105 hover:text-white hover:bg-[#313C1D] cursor-pointer" onClick={() => window.history.back()}>
+      <button
+        className="text-sm text-gray-800  border rounded-md p-2 hover:shadow-md transition flex items-center gap-1 duration-300 hover:scale-105 hover:text-white hover:bg-[#313C1D] cursor-pointer"
+        onClick={() => window.history.back()}
+      >
         &larr; Back to Employers
-      </button>  
+      </button>
       <div className="bg-white rounded-xl shadow-sm p-6 flex justify-between items-center">
         <div className="flex items-center gap-4">
-          <img
+          {/* <img
    
             src={data?.avatar || "https://i.pravatar.cc/150?img=12"}
             alt="avatar"
             className="w-16 h-16 rounded-lg object-cover"
-          />
+          /> */}
+          <div className="w-16 h-16 rounded-md bg-[#7cc360] text-white text-2xl flex items-center justify-center font-bold">
+            {getInitials(data?.companyName)}
+          </div>
           <div>
             <h2 className="text-xl font-semibold">{data?.companyName}</h2>
             <span
@@ -92,19 +116,27 @@ const handleSave = async () => {
         {/* ACTIONS */}
         <div className="flex gap-3">
           {data?.status === "ACTIVE" ? (
-  <button onClick={handleBlocked} className="btn-danger cursor-pointer transition-all duration-300 hover:scale-105">
-    Block
-  </button>
-) : (
-  <button onClick={handleApprove} className="btn-secondary cursor-pointer transition-all duration-300 hover:scale-105">
-    Activate
-  </button>
-)}
+            <button
+              onClick={handleBlocked}
+              className="btn-danger cursor-pointer transition-all duration-300 hover:scale-105"
+            >
+              Block
+            </button>
+          ) : (
+            <button
+              onClick={handleApprove}
+              className="btn-secondary cursor-pointer transition-all duration-300 hover:scale-105"
+            >
+              Activate
+            </button>
+          )}
 
-
-          <button onClick={()=>{
-            setFormData(data),
-            setEditModal(true)}}  className=" flex items-center gap-1 px-4 py-2 text-sm bg-gray-800 text-white rounded-lg cursor-pointer hover:scale-105 transition-all duration-300">
+          <button
+            onClick={() => {
+              (setFormData(data), setEditModal(true));
+            }}
+            className=" flex items-center gap-1 px-4 py-2 text-sm bg-gray-800 text-white rounded-lg cursor-pointer hover:scale-105 transition-all duration-300"
+          >
             <PencilSquareIcon className="w-4 h-4" />
             Edit
           </button>
@@ -142,105 +174,106 @@ const handleSave = async () => {
         </div>
       </div>
       {editModal && (
-  <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 ">
-    <div onClick={(e) => e.stopPropagation()} className="bg-white w-full max-w-2xl rounded-xl shadow-lg p-6 space-y-5">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 ">
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white w-full max-w-2xl rounded-xl shadow-lg p-6 space-y-5"
+          >
+            <h2 className="text-xl font-semibold">Edit Employer Profile</h2>
 
-      <h2 className="text-xl font-semibold">Edit Employer Profile</h2>
+            {/* COMPANY INFO */}
+            <div>
+              <h3 className="font-medium mb-2">Company Information</h3>
 
-      {/* COMPANY INFO */}
-      <div>
-        <h3 className="font-medium mb-2">Company Information</h3>
+              <input
+                name="companyName"
+                value={formData.companyName || ""}
+                onChange={handleChange}
+                placeholder="Company Name"
+                className="input w-full mb-2"
+              />
 
-        <input
-          name="companyName"
-          value={formData.companyName || ""}
-          onChange={handleChange}
-          placeholder="Company Name"
-          className="input w-full mb-2"
-        />
+              <input
+                name="industry"
+                value={formData.industry || ""}
+                onChange={handleChange}
+                placeholder="Industry"
+                className="input w-full mb-2"
+              />
 
-        <input
-          name="industry"
-          value={formData.industry || ""}
-          onChange={handleChange}
-          placeholder="Industry"
-          className="input w-full mb-2"
-        />
+              <input
+                name="companySize"
+                value={formData.companySize || ""}
+                onChange={handleChange}
+                placeholder="Company Size"
+                className="input w-full mb-2"
+              />
 
-        <input
-          name="companySize"
-          value={formData.companySize || ""}
-          onChange={handleChange}
-          placeholder="Company Size"
-          className="input w-full mb-2"
-        />
+              <input
+                name="website"
+                value={formData.website || ""}
+                onChange={handleChange}
+                placeholder="Website"
+                className="input w-full"
+              />
+            </div>
 
-        <input
-          name="website"
-          value={formData.website || ""}
-          onChange={handleChange}
-          placeholder="Website"
-          className="input w-full"
-        />
-      </div>
+            {/* CONTACT INFO */}
+            <div>
+              <h3 className="font-medium mb-2">Employer Contact</h3>
 
-      {/* CONTACT INFO */}
-      <div>
-        <h3 className="font-medium mb-2">Employer Contact</h3>
+              <input
+                name="contactName"
+                value={formData.contactName || ""}
+                onChange={handleChange}
+                placeholder="Contact Name"
+                className="input w-full mb-2"
+              />
 
-        <input
-          name="contactName"
-          value={formData.contactName || ""}
-          onChange={handleChange}
-          placeholder="Contact Name"
-          className="input w-full mb-2"
-        />
+              <input
+                name="contactRole"
+                value={formData.contactRole || ""}
+                onChange={handleChange}
+                placeholder="Role"
+                className="input w-full mb-2"
+              />
 
-        <input
-          name="contactRole"
-          value={formData.contactRole || ""}
-          onChange={handleChange}
-          placeholder="Role"
-          className="input w-full mb-2"
-        />
+              <input
+                name="contactEmail"
+                value={formData.contactEmail || ""}
+                onChange={handleChange}
+                placeholder="Email"
+                className="input w-full mb-2"
+              />
 
-        <input
-          name="contactEmail"
-          value={formData.contactEmail || ""}
-          onChange={handleChange}
-          placeholder="Email"
-          className="input w-full mb-2"
-        />
+              <input
+                name="contactPhone"
+                value={formData.contactPhone || ""}
+                onChange={handleChange}
+                placeholder="Phone"
+                className="input w-full"
+              />
+            </div>
 
-        <input
-          name="contactPhone"
-          value={formData.contactPhone || ""}
-          onChange={handleChange}
-          placeholder="Phone"
-          className="input w-full"
-        />
-      </div>
+            {/* ACTIONS */}
+            <div className="flex justify-end gap-3 pt-4">
+              <button
+                onClick={() => setEditModal(false)}
+                className="px-4 py-2 border rounded-lg cursor-pointer transition-all duration-300 hover:scale-105"
+              >
+                Cancel
+              </button>
 
-      {/* ACTIONS */}
-      <div className="flex justify-end gap-3 pt-4">
-        <button
-          onClick={() => setEditModal(false)}
-          className="px-4 py-2 border rounded-lg cursor-pointer transition-all duration-300 hover:scale-105"
-        >
-          Cancel
-        </button>
-
-        <button
-          onClick={handleSave}
-          className="px-4 py-2 bg-green-600 text-white rounded-lg transition-all duration-300 hover:scale-105 cursor-pointer"
-        >
-          Save Changes
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
+              <button
+                onClick={handleSave}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg transition-all duration-300 hover:scale-105 cursor-pointer"
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
